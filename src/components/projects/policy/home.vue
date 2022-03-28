@@ -146,7 +146,8 @@ export default {
               }
             })
           this.policy[key].newPermi = current.filter(
-            rule => !rule.action.startsWith('create_')
+            rule => !rule.action.startsWith('create_') &&
+            !rule.action.startsWith('delete_')
           )
 
           this.policy[key].sharePermi = current.filter(
