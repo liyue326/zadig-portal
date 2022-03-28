@@ -592,10 +592,11 @@ export function getBuildTargetsAPI (projectName) {
 }
 
 export function runWorkflowAPI (projectName, data, isArtifact = false) {
+  console.log(data)
   if (isArtifact) {
-    return http.put(`/api/aslan/workflow/workflowtask?projectName=${projectName}`, data)
+    return http.put(`/api/aslan/workflow/workflowtask/${data.workflow_name}?projectName=${projectName}`, data)
   } else {
-    return http.post(`/api/aslan/workflow/workflowtask?projectName=${projectName}`, data)
+    return http.post(`/api/aslan/workflow/workflowtask/${data.workflow_name}?projectName=${projectName}`, data)
   }
 }
 
