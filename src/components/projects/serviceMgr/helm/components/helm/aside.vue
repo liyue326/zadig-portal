@@ -196,7 +196,7 @@ export default {
         .then(() => {
           renamingHelmReleaseAPI(projectName, payload).then(res => {
             this.$message({
-              message: '服务正在重启，稍后请前往环境中确认',
+              message: this.isGuide ? 'Helm release 名称修改成功' : '服务正在重启，稍后请前往环境中确认',
               type: 'success'
             })
           })
