@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 #!/bin/bash
 
 red=`tput setaf 1`
