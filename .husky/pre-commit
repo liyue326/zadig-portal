@@ -1,7 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-#!/bin/bash
+yarn lint-staged
 
 red=`tput setaf 1`
 green=`tput setaf 2`
@@ -19,7 +19,7 @@ for FILE in `git diff --name-only --cached`; do
     fi
     grep 'TODO:\|debugger\|console.log\|alert(' $FILE 2>&1 >/dev/null
     if [ $? -eq 0 ]; then
-        echo $FILE '包含，TODO: or debugger or console.log，请删除后再提交'
+        echo $FILE ${red}'包含，TODO: or debugger or console.log，请删除后再提交'
         exit 1
     fi
     
