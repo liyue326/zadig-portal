@@ -136,7 +136,7 @@
                   prop="name"
                   v-if="payload.stages[curStageIndex] && payload.stages[curStageIndex].jobs.length > 0"
                 >
-                  <el-input v-model="job.name" size="small"  style="width: 220px;"></el-input>
+                  <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
                 </el-form-item>
               </el-form>
               <JobCommonBuild :globalEnv="globalEnv" :ref="beInitCompRef" v-model="job" :workflowInfo="payload"></JobCommonBuild>
@@ -335,12 +335,13 @@ export default {
       const curType = jobTypeList.find(item => item.type === this.job.type)
       return curType ? curType.label : this.job.spec.plugin.name
     },
-    globalEnv () {
-      const res = this.payload.params.map(item => {
-        return `{{.workflow.params.${item.name}}}`
-      })
-      return this.globalConstEnvs.concat(res)
-    },
+    // globalEnv () {
+    //   const res = this.payload.params.map(item => {
+    //     return `{{.workflow.params.${item.name}}}`
+    //   })
+    //   console.log(res)
+    //   return this.globalConstEnvs.concat(res)
+    // },
     drawerTitle () {
       const res = this.configList.find(item => {
         return item.value === this.curDrawer
@@ -620,7 +621,7 @@ export default {
             } else if (this.job.type === jobType.freestyle) {
               this.$refs[this.beInitCompRef]
                 .validate()
-                .then((job) => {
+                .then(job => {
                   delete this.job.isCreate // 去除新建状态
                   this.$set(
                     this.payload.stages[this.curStageIndex].jobs,
@@ -695,6 +696,7 @@ export default {
         this.$set(this.payload, 'multi_run', this.multi_run)
       }
       if (this.curDrawer === 'env') {
+        console.log(this.$refs.env.getData())
         this.$set(this.payload, 'params', this.$refs.env.getData())
       }
       this.$message.success('设置成功')
@@ -720,6 +722,10 @@ export default {
     },
     payload: {
       handler (val, oldVal) {
+        const res = val.params.map(item => {
+          return `{{.workflow.params.${item.name}}}`
+        })
+        this.globalEnv = this.globalConstEnvs.concat(res)
         this.setJob()
       },
       deep: true

@@ -40,7 +40,7 @@
         </el-row>
       </section>
       <section class="log-content mg-t8">
-        <XtermLog :id="pluginInfo.name" @mouseleave.native="leaveLog" :logs="buildv4AnyLog" from="custom" />
+        <XtermLog :id="pluginInfo.name" @mouseleave.native="leaveLog" :logs="buildv4AnyLog" :from="pluginInfo.name" />
       </section>
     </main>
   </div>
@@ -57,7 +57,8 @@ export default {
       buildv4AnyLog: [],
       wsBuildDataBuffer: [],
       buildLogStarted: true,
-      window: window
+      window: window,
+      firstLoad: false
     }
   },
   props: {
@@ -179,7 +180,10 @@ export default {
     pluginInfo: {
       handler (val, oldVal) {
         if (val) {
-          this.getLog()
+          if (!this.firstLoad) {
+            this.getLog()
+            this.firstLoad = true
+          }
           this.adaptTaskDetail(val)
         }
         const currentSSE = `${val.spec.service_module}_${val.spec.service_name}`

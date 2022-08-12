@@ -25,7 +25,7 @@
                   class="password"
                   v-model="scope.row.value"
                   size="small"
-                  :type="text"
+                  type="text"
                   style="width: 220px;"
                 ></el-input>
               </template>
@@ -98,7 +98,7 @@
                   </span>
                 </el-tooltip>
               </el-form-item>
-              <el-form-item label="服务组件" v-if="job.spec.source === 'runtime'">
+              <el-form-item label="服务组件" v-if="job.spec.source === 'runtime'">{{originServiceAndBuilds}}
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -269,6 +269,7 @@ export default {
           if (job.type === 'zadig-deploy' && job.spec.source === 'runtime') {
             job.pickedTargets = cloneDeep(job.spec.service_and_images)
             job.spec.service_and_images = this.originServiceAndBuilds
+            console.log(this.originServiceAndBuilds)
           }
           if (job.type === 'freestyle') {
             job.spec.steps.forEach(step => {

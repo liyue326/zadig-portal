@@ -106,7 +106,6 @@ export default {
       }
       return Promise.all(valid).then(() => {
         const payload = this.$utils.cloneObj(this.value)
-        console.log(payload)
         payload.spec.properties.envs.forEach(item => {
           if (item.command === 'fixed') {
             item.value = '<+fixed>' + item.value

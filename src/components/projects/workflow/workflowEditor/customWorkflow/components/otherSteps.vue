@@ -1,5 +1,5 @@
 <template>
-  <section class="other-step-container">
+  <section class="other-step-container">{{post_script_enabled}}
     <div class="common-parcel-block" v-if="object_storage_upload_enabled || post_script_enabled">
       <div v-for="(step, index) in otherSteps" :key="index">
         <div class="dashed-container" v-if="post_script_enabled && step.name === 'shell'">
@@ -124,7 +124,7 @@ export default {
       },
       objectStorageList: [],
       object_storage_upload_enabled: false,
-      post_script_enabled: false
+      post_script_enabled: true
     }
   },
   computed: {
@@ -142,8 +142,9 @@ export default {
   },
   methods: {
     initStepStatus (steps) {
+      console.log(steps)
       this.object_storage_upload_enabled = !!steps.archive
-      this.post_script_enabled = !!steps.shell
+      this.post_script_enabled = true
     },
     addExtra (command) {
       if (command === 'script') {

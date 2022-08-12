@@ -54,25 +54,35 @@ export default {
   },
   watch: {
     logs: function (new_val, old_val) {
-      if (this.from === 'custom' && new_val !== old_val) {
-        this.term.clear()
-        this.index = 0
-      }
       for (let i = this.index; i < new_val.length; i++) {
         this.term.write(new_val[i] + '\r')
       }
       this.index = new_val.length
+    },
+    from: function (newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        this.term.clear()
+        this.index = 0
+      }
     }
   },
   mounted () {
-    const term = new Terminal({ fontSize: this.fontSize, rows: '30', padding: '15', fontFamily: 'Monaco,Consolas,monospace,Microsoft YaHei,Arial', disableStdin: true, scrollback: 9999999, cursorStyle: null })
+    const term = new Terminal({
+      fontSize: this.fontSize,
+      rows: '30',
+      padding: '15',
+      fontFamily: 'Monaco,Consolas,monospace,Microsoft YaHei,Arial',
+      disableStdin: true,
+      scrollback: 9999999,
+      cursorStyle: null
+    })
     const fitAddon = new FitAddon()
     term.loadAddon(fitAddon)
     term.open(document.getElementById(this.id))
     fitAddon.fit()
     this.term = term
-    const list = document.querySelectorAll('.xterm-viewport');
-    [].forEach.call(list, (item) => {
+    const list = document.querySelectorAll('.xterm-viewport')
+    ;[].forEach.call(list, item => {
       item.addEventListener('scroll', () => {
         this.scroll(item)
       })

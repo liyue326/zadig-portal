@@ -33,8 +33,8 @@
         <div class="content">
           <span class="text mg-r8">Start</span>
           <div class="line"></div>
-          <div class="stages" v-for="(stage,index) in payload.stages" :key="stage.label">
-            <div v-if="stage.approval && stage.approval.enabled" class="stages-approval" @click="handleApprovalChange(stage,index)">
+          <div class="stages" v-for="(stage,curStageIndex) in payload.stages" :key="stage.label">
+            <div v-if="stage.approval && stage.approval.enabled" class="stages-approval" @click="handleApprovalChange(stage,curStageIndex)">
               <el-button type="primary" size="small">人工审核</el-button>
               <div class="line"></div>
             </div>
@@ -196,15 +196,6 @@ export default {
         return {}
       }
     }
-    // curJob: {
-    //   get () {
-    //     return this.payload.stages[this.curStageIndex].jobs[this.curJobIndex]
-    //   },
-    //   set () {}
-    // }
-  },
-  created () {
-    this.getWorkflowTaskDetail(this.workflowName, this.taskId)
   },
   methods: {
     getWorkflowTaskDetail (workflow_name, task_id) {
@@ -225,9 +216,21 @@ export default {
             this.firstLoad = false
           }
         })
+        if (
+          this.curJob.type &&
+          this.curJob.type !== 'zadig-approval' &&
+          this.payload.stages &&
+          this.payload.stages.length > 0
+        ) {
+          // can't use computed hook because approval footer is stage level data but use job level data
+          this.curJob = this.payload.stages[this.curStageIndex].jobs[
+            this.curJobIndex
+          ]
+        }
         this.payload = res
         this.adaptTaskDetail(res)
         if (this.envList.length === 0) {
+          // global env and stage are not in same level data,  so need to handle data
           this.handleEnv()
           const globalEnv = [{ name: '工作流变量', envs: this.payload.params }]
           const jobs = this.payload.stages.map(item => {
@@ -238,6 +241,7 @@ export default {
       })
     },
     handleEnv () {
+      // dont show env value includes 'fixed'/'{{'
       for (let i = 0; i < this.payload.params.length; i++) {
         if (
           this.payload.params[i].value.includes('fixed') ||
@@ -287,6 +291,7 @@ export default {
       this.isShowConsoleFooter = true
       this.curJob = item
       this.curJobIndex = index
+      this.curStageIndex = curStageIndex
     },
     async refreshHistoryTaskDetail () {
       await this.getWorkflowTaskDetail(this.workflowName, this.taskId)
@@ -302,6 +307,7 @@ export default {
       detail.interval = this.$utils.timeFormat(detail.intervalSec)
     },
     handleApprovalChange (stage, index) {
+      // approval is stage level data, there use job ui
       this.curStageIndex = index
       this.curJob.type = 'zadig-approval'
       this.isShowConsoleFooter = true
@@ -323,30 +329,33 @@ export default {
     },
     closeFooter () {
       this.isShowConsoleFooter = false
+    },
+    setTitle () {
+      bus.$emit('set-topbar-title', {
+        title: '',
+        breadcrumb: [
+          { title: '项目', url: '/v1/projects' },
+          {
+            title: this.projectName,
+            isProjectName: true,
+            url: `/v1/projects/detail/${this.projectName}/detail`
+          },
+          {
+            title: '工作流',
+            url: `/v1/projects/detail/${this.projectName}/pipelines`
+          },
+          {
+            title: this.workflowName,
+            url: `/v1/projects/detail/${this.projectName}/pipelines/custom/${this.workflowName}`
+          },
+          { title: this.taskId, url: `` }
+        ]
+      })
     }
   },
   mounted () {
+    this.setTitle()
     this.refreshHistoryTaskDetail()
-    bus.$emit('set-topbar-title', {
-      title: '',
-      breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
-        {
-          title: this.projectName,
-          isProjectName: true,
-          url: `/v1/projects/detail/${this.projectName}/detail`
-        },
-        {
-          title: '工作流',
-          url: `/v1/projects/detail/${this.projectName}/pipelines`
-        },
-        {
-          title: this.workflowName,
-          url: `/v1/projects/detail/${this.projectName}/pipelines/custom/${this.workflowName}`
-        },
-        { title: this.taskId, url: `` }
-      ]
-    })
   },
   beforeDestroy () {
     this.timeTimeoutFinishFlag = true
@@ -531,7 +540,6 @@ export default {
         height: 30px;
         padding: 0 60px;
         line-height: 30px;
-        background: #eaeaea;
 
         .item {
           display: inline-block;
