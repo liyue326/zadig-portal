@@ -41,11 +41,17 @@ export default {
       if (!res) {
         return
       }
+      const envValues = this.defaultEnvsValues[this.envName]
       const payload = {
-        defaultValues: this.defaultEnvsValues[this.envName],
-        valuesData: this.defaultEnvsValues.valuesData
+        defaultValues: envValues.envValue || '',
+        valuesData: envValues.gitRepoConfig
+          ? {
+            autoSync: envValues.gitRepoConfig.autoSync,
+            yamlSource: 'repo',
+            gitRepoConfig: envValues.gitRepoConfig
+          }
+          : null
       }
-      payload.valuesData.autoSync = payload.valuesData.gitRepoConfig.autoSync
       this.updateHelmEnvVarLoading = true
       updateHelmEnvVarAPI(this.projectName, this.envName, payload)
         .then(() => {

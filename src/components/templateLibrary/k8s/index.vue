@@ -11,7 +11,7 @@
               @onRefreshFile="getFiles"
               @onSelectFileChange="onSelectFileChange"
               @updateFile="updateFile($event)"
-            ></FileTree>
+           />
           </div>
           <template v-if="files.length >0">
             <template>
@@ -20,22 +20,19 @@
                 <FileEditor
                   ref="FileEditor"
                   :fileContent="fileContent"
-                  :parseVariables.sync="parseVariables"
-                  :inputVariables="inputVariables"
                   :fileContentChange="fileContentChange"
-                  :variablesChanged="variablesChanged"
                   @onRefreshFile="getFiles"
                   @onUpdateFile="onUpdateFile"
-                ></FileEditor>
+                />
               </div>
               <multipane-resizer></multipane-resizer>
               <aside class="service-aside service-aside-right" :style="{ flexGrow: 1 }">
                 <FileAside
                   :fileContent="fileContent"
-                  :inputVariables.sync="inputVariables"
-                  :parseVariables="parseVariables"
+                  :initVariableYaml="initVariableYaml"
                   :systemVariables="systemVariables"
-                ></FileAside>
+                  @updateTemplate="updateTemplate"
+                />
               </aside>
             </template>
           </template>
@@ -70,11 +67,10 @@ export default {
         content: ''
       },
       files: [],
-      parseVariables: [],
       inputVariables: [],
       systemVariables: [],
       initFileContent: '',
-      variablesChanged: false
+      initVariableYaml: ''
     }
   },
   methods: {
@@ -108,8 +104,12 @@ export default {
           res.status = 'added'
           this.fileContent = res
           this.initFileContent = res.content
+          this.initVariableYaml = res.variable_yaml
         }
       }
+    },
+    updateTemplate (content) {
+      this.getFile(content)
     },
     onUpdateFile ({ name, status, res }) {
       this.$router.replace({
@@ -148,23 +148,16 @@ export default {
         if (val.status === 'added') {
           this.getFile(val)
         } else if (val.status === 'named') {
+          this.initFileContent = ''
           this.fileContent = {
             content: '',
             name: val.name,
-            status: 'named'
+            status: 'named',
+            variable_yaml: ''
           }
-          // if (this.stagedFile[val.name]) {
-          //   this.fileInTree.content = this.stagedFile[val.name]
-          // }
-          // this.$refs.myCm && this.editorFocus()
         }
       },
       immediate: false
-    },
-    variables: {
-      handler (val, old_val) {
-        this.variablesChanged = true
-      }
     }
   },
   mounted () {

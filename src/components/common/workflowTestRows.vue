@@ -96,7 +96,7 @@
       <el-table-column width="250px">
       </el-table-column>
       <el-table-column width="100px"
-                       label="环境变量">
+                       label="变量">
         <template slot-scope="scope">
           <el-popover placement="left"
                       width="450"
@@ -134,10 +134,6 @@
 
 <script>
 export default {
-  data () {
-    return {
-    }
-  },
   props: {
     runnerTests: {
       type: Array,

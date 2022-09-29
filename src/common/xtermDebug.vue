@@ -83,7 +83,7 @@ export default {
         }
         this.ws.onerror = (evt) => {
           wsLink = false
-          this.$nextTick(() => { this.term.writeln(`\u001b[31m****************系统信息：遇到错误 ${evt.message} ！！！，请关闭窗口重试 ****************\u001b[0m`) })
+          this.$nextTick(() => { this.term.writeln(`\u001b[31m****************系统信息：遇到错误${evt.message ? evt.message : ''}，请关闭窗口重试 ****************\u001b[0m`) })
         }
       })
     }

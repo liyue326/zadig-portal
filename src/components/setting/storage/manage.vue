@@ -37,6 +37,10 @@
                        label="华为云 OBS">
               <i class="iconfont iconhuawei"></i> <span>华为云 OBS</span>
             </el-option>
+            <el-option :value="5"
+                       label="Amazon S3">
+              <i class="iconfont iconaws"></i> <span>Amazon S3</span>
+            </el-option>
             <el-option :value="0"
                        label="其他">
               <i class="iconfont iconqita"></i> <span>其他</span>
@@ -134,6 +138,10 @@
             <el-option :value="4"
                        label="华为云 OBS">
               <i class="iconfont iconhuawei"></i> <span>华为云 OBS</span>
+            </el-option>
+            <el-option :value="5"
+                       label="Amazon S3">
+              <i class="iconfont iconaws"></i> <span>Amazon S3</span>
             </el-option>
             <el-option :value="0"
                        label="其他">
@@ -335,6 +343,10 @@ export default {
         4: {
           icon: 'iconfont logo iconhuawei',
           name: '华为云 OBS'
+        },
+        5: {
+          icon: 'iconfont logo iconaws',
+          name: 'Amazon S3'
         }
       },
       dialogStorageCreateFormVisible: false,

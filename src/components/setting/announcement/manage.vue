@@ -12,11 +12,13 @@
                label-width="90px">
         <el-form-item label="标题"
                       prop="content.title">
-          <el-input v-model="announcement.content.title"></el-input>
+          <el-input style="width: 100%;" size="small" v-model="announcement.content.title"></el-input>
         </el-form-item>
         <el-form-item label="优先级"
                       prop="content.priority">
-          <el-select v-model="announcement.content.priority"
+          <el-select size="small"
+                     style="width: 100%;"
+                     v-model="announcement.content.priority"
                      placeholder="请选择优先级">
             <el-option label="高"
                        :value="1"></el-option>
@@ -28,7 +30,9 @@
         </el-form-item>
         <el-form-item label="时间范围"
                       prop="duration">
-          <el-date-picker v-model="announcement.duration"
+          <el-date-picker style="width: 100%;"
+                          size="small"
+                          v-model="announcement.duration"
                           type="datetimerange"
                           range-separator="至"
                           start-placeholder="开始日期"
@@ -37,7 +41,8 @@
         </el-form-item>
         <el-form-item label="内容"
                       prop="content.content">
-          <el-input :autosize="{ minRows: 4}"
+          <el-input size="small"
+                    :autosize="{ minRows: 4}"
                     type="textarea"
                     v-model="announcement.content.content"></el-input>
         </el-form-item>
@@ -63,11 +68,13 @@
                label-width="90px">
         <el-form-item label="标题"
                       prop="content.title">
-          <el-input v-model="swapAnnouncement.content.title"></el-input>
+          <el-input style="width: 100%;" size="small" v-model="swapAnnouncement.content.title"></el-input>
         </el-form-item>
         <el-form-item label="优先级"
                       prop="content.priority">
-          <el-select v-model="swapAnnouncement.content.priority"
+          <el-select style="width: 100%;"
+                     size="small"
+                     v-model="swapAnnouncement.content.priority"
                      placeholder="请选择优先级">
             <el-option label="高"
                        :value="1"></el-option>
@@ -79,7 +86,9 @@
         </el-form-item>
         <el-form-item label="时间范围"
                       prop="duration">
-          <el-date-picker v-model="swapAnnouncement.duration"
+          <el-date-picker style="width: 100%;"
+                          size="small"
+                          v-model="swapAnnouncement.duration"
                           type="datetimerange"
                           range-separator="至"
                           start-placeholder="开始日期"
@@ -88,7 +97,9 @@
         </el-form-item>
         <el-form-item label="内容"
                       prop="content.content">
-          <el-input :autosize="{ minRows: 4}"
+          <el-input style="width: 100%;"
+                    size="small"
+                    :autosize="{ minRows: 4}"
                     type="textarea"
                     v-model="swapAnnouncement.content.content"></el-input>
         </el-form-item>
@@ -116,21 +127,26 @@
                     style="width: 100%;">
             <el-table-column label="标题">
               <template slot-scope="scope">
-                <span v-if="showActive(scope.row.content.start_time,scope.row.content.end_time)"
-                      class="ann-active"></span>
-                <span>{{scope.row.content.title}}</span>
+                <div class="indicator-container">
+                  <span>{{scope.row.content.title}}</span>
+                  <span v-if="showActive(scope.row.content.start_time,scope.row.content.end_time)"
+                        class="ann-active"></span>
+                </div>
               </template>
             </el-table-column>
             <el-table-column label="优先级">
               <template slot-scope="scope">
                 <el-tag v-if="scope.row.content.priority===1"
-                        size="small"
+                        size="mini"
+                        effect="dark"
                         type="danger">高</el-tag>
                 <el-tag v-if="scope.row.content.priority===2"
-                        size="small"
+                        size="mini"
+                        effect="dark"
                         type="warning">中</el-tag>
                 <el-tag v-if="scope.row.content.priority===3"
-                        size="small"
+                        size="mini"
+                        effect="dark"
                         type="info">低</el-tag>
               </template>
             </el-table-column>
@@ -194,9 +210,9 @@ export default {
       dialogAnnouncementEditFormVisible: false,
       allAnnouncements: [],
       rules: {
-        'content.title': [{ required: true, message: '请输入公告标题', trigger: 'blur' }],
-        'content.priority': [{ required: true, message: '请选择优先级', trigger: 'blur' }],
-        'content.content': [{ required: true, message: '请填写公告内容', trigger: 'blur' }],
+        'content.title': [{ required: true, message: '请输入公告标题', trigger: ['blur', 'change'] }],
+        'content.priority': [{ required: true, message: '请选择优先级', trigger: ['blur', 'change'] }],
+        'content.content': [{ required: true, message: '请填写公告内容', trigger: ['blur', 'change'] }],
         duration: [
           {
             type: 'array',
@@ -324,18 +340,14 @@ export default {
       )
     }
   },
-  computed: {
-
-  },
   created () {
     bus.$emit(`set-topbar-title`, { title: '公告管理', breadcrumb: [] })
-
     this.getAnnouncements()
   }
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .setting-anno-container {
   position: relative;
   flex: 1;
@@ -367,13 +379,18 @@ export default {
     .announcement-list {
       padding-bottom: 30px;
 
-      .ann-active {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        vertical-align: middle;
-        background: @themeColor;
-        border-radius: 50%;
+      .indicator-container {
+        display: inline-flex;
+        align-items: center;
+
+        .ann-active {
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          margin-left: 5px;
+          background: @themeColor;
+          border-radius: 50%;
+        }
       }
     }
   }

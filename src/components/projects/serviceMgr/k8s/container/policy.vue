@@ -43,12 +43,13 @@
       </el-form>
     </div>
     <div class="operation-container">
-      <el-button type="primary" size="small" @click="submitForm('projectForm')">保存策略</el-button>
+      <el-button type="primary" size="small" @click="submitForm('projectForm')" :disabled="!isProjectAdmin">保存策略</el-button>
     </div>
   </div>
 </template>
 <script>
-import { getSingleProjectAPI, updateSingleProjectAPI } from '@api'
+import { getSingleProjectAPI, updateSingleProjectAPI, queryUserBindingsAPI } from '@api'
+import store from 'storejs'
 import CusDeliverable from '../../../detail_ope/components/cusDeliverable.vue'
 const validateDeployTimeout = (rule, value, callback) => {
   const reg = /^[0-9]+.?[0-9]*/
@@ -76,6 +77,7 @@ export default {
   },
   data () {
     return {
+      userBindings: [],
       projectForm: {
         timeout: null,
         custom_image_rule: {},
@@ -121,6 +123,15 @@ export default {
       } else {
         return false
       }
+    },
+    isProjectAdmin () {
+      if (this.$utils.roleCheck('admin')) {
+        return true
+      } else if (this.userBindings.length > 0) {
+        return this.userBindings.some(item => item.role === 'project-admin')
+      } else {
+        return false
+      }
     }
   },
   methods: {
@@ -135,8 +146,19 @@ export default {
         }
       })
     },
+    async getUserBinding (projectName) {
+      const userInfo = store.get('userInfo')
+      const userBindings = await queryUserBindingsAPI(
+        userInfo.uid,
+        projectName
+      ).catch(error => console.log(error))
+      if (userBindings) {
+        this.userBindings = userBindings
+      }
+    },
     updatePolicy (projectName, payload) {
       updateSingleProjectAPI(projectName, payload).then(res => {
+        this.$emit('closeDrawer', true)
         this.$message({
           type: 'success',
           message: '策略更新成功'
@@ -160,6 +182,7 @@ export default {
     }
   },
   mounted () {
+    this.getUserBinding(this.projectName)
     this.getPolicy(this.projectName)
   }
 }

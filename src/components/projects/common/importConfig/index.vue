@@ -17,7 +17,7 @@
       </div>
     </div>
     <el-dialog title="环境配置 - 从代码库导入" :visible.sync="showGitImportDialog" append-to-body>
-      <Repository ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig" :fileType="'k8sYaml'"></Repository>
+      <Repository ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig" :fileType="'k8sYaml'" showAutoSync></Repository>
       <div slot="footer">
         <el-button @click="showGitImportDialog = false" size="small">取 消</el-button>
         <el-button type="primary" @click="importConfigYaml" size="small" :loading="loadValueYamls">导 入</el-button>
@@ -40,8 +40,9 @@ const valueInfo = {
     owner: '',
     repo: '',
     branch: '',
-    path: '',
-    isDir: false
+    valuesPaths: [],
+    namespace: '',
+    autoSync: false
   }
 }
 
@@ -97,11 +98,11 @@ export default {
         const repoConfig = this.importRepoInfoUse.gitRepoConfig
         const params = {
           codehostId: repoConfig.codehostID,
-          repoOwner: repoConfig.owner,
+          repoOwner: repoConfig.namespace,
           repoName: repoConfig.repo,
           branchName: repoConfig.branch,
-          path: repoConfig.path,
-          isDir: repoConfig.isDir,
+          path: repoConfig.valuesPaths[0],
+          isDir: false,
           projectName: this.projectName
         }
         this.loadValueYamls = true

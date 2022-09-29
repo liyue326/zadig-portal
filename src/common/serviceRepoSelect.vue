@@ -69,7 +69,7 @@
                     @change="getRepoNameById(targetIndex,repoIndex,target.repos[repoIndex].codehost_id,target.repos[repoIndex]['repo_owner'])"
                     v-model.trim="target.repos[repoIndex]['repo_owner']"
                     remote
-                    :remote-method="(query)=>{searchNamespace(repoIndex,query)}"
+                    :remote-method="(query)=>{searchNamespace(targetIndex,repoIndex,query)}"
                     @clear="searchNamespace(targetIndex,repoIndex,'')"
                     loading-text="加载中，支持手动创建"
                     allow-create
@@ -134,8 +134,8 @@
                     loading-text="加载中，支持手动创建"
                     filterable
                     remote
-                    :remote-method="(query)=>{searchBranch(targetIndex,repoIndex,query)}"
-                    @clear="searchBranch(targetIndex,repoIndex,'')"
+                    :remote-method="(query)=>{searchBranch(targetIndex,repoIndex,query,repo)}"
+                    @clear="searchBranch(targetIndex,repoIndex,'',repo)"
                     allow-create
                     :loading="codeInfo[targetIndex][repoIndex].loading.branch"
                     clearable
@@ -290,7 +290,7 @@ export default {
   data () {
     return {
       allCodeHosts: [],
-      codeInfo: {},
+      codeInfo: [[{ repo_owners: '', loading: '', branch: '' }], [{ repo_owners: '', loading: '', branch: '' }]],
       showAdvancedSetting: {},
       validateName: 'repoSelect',
       loading: {
@@ -616,8 +616,10 @@ export default {
       const res = this.allCodeHosts.find(item => {
         return item.id === id
       })
-      row.source = res.type
-      row.auth_type = res.auth_type
+      if (row && res) {
+        row.source = res.type
+        row.auth_type = res.auth_type
+      }
       if (!key) {
         if (this.codeInfo[targetIndex][repoIndex]) {
           this.codeInfo[targetIndex][repoIndex].repo_owners = []
@@ -734,7 +736,7 @@ export default {
         this.getRepoNameById(targetIndex, repoIndex, id, repo_owner, query)
       }
     },
-    searchBranch (targetIndex, repoIndex, query) {
+    searchBranch (targetIndex, repoIndex, query, repo) {
       const id = this.targets[targetIndex].repos[repoIndex].codehost_id
       const repoOwner = this.targets[targetIndex].repos[repoIndex].repo_owner
       const repoName = this.targets[targetIndex].repos[repoIndex].repo_name
@@ -748,7 +750,8 @@ export default {
           id,
           repoOwner,
           repoName,
-          query
+          query,
+          repo
         )
       } else {
         const items = this.$utils.filterObjectArrayByKey(

@@ -1,7 +1,7 @@
 <template>
   <div class="service-list">
     <el-table v-if="containerServiceList.length > 0" :data="containerServiceList">
-      <el-table-column label="服务名" width="250px">
+      <el-table-column label="服务名" width="280px">
         <template slot-scope="scope">
           <router-link :to="setRoute(scope)">
             <span :class="$utils._getStatusColor(scope.row.status)" class="service-name">
@@ -41,12 +41,7 @@
           </template>
         </template>
       </el-table-column>
-      <el-table-column v-if="!isPmService" align="left" label="READY" width="130px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.ready?scope.row.ready:'N/A' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="left" label="状态" width="130px">
+      <el-table-column align="left" label="状态" width="220px">
         <template slot="header" slot-scope="{}">
           状态{{`(${runningContainerService}/${containerServiceList.length})`}}
           <el-tooltip effect="dark" placement="top">

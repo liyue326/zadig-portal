@@ -34,8 +34,8 @@
     </div>
     <div class="common-parcel-block" v-if="docker_enabled || binary_enabled || object_storage_upload_enabled ||post_script_enabled">
       <el-form
-        v-if="docker_enabled && buildConfig.post_build.docker_build"
-        :model="buildConfig.post_build.docker_build"
+        v-if="docker_enabled && buildPostConfig.docker_build"
+        :model="buildPostConfig.docker_build"
         :rules="docker_rules"
         ref="dockerBuildRef"
         label-width="170px"
@@ -51,35 +51,35 @@
             <el-alert title="私有镜像仓库未集成，请前往系统设置 -> Registry 管理  进行集成。" type="warning"></el-alert>
           </div>
           <el-form-item label="构建上下文目录" prop="work_dir">
-            <el-input v-model="buildConfig.post_build.docker_build.work_dir" size="small">
+            <el-input v-model="buildPostConfig.docker_build.work_dir" size="small">
               <template slot="prepend">$WORKSPACE/</template>
             </el-input>
           </el-form-item>
           <el-form-item label="Dockerfile 来源" prop="source">
-            <el-select size="small" v-model="buildConfig.post_build.docker_build.source" placeholder="请选择" @change="$refs.dockerBuildRef.clearValidate()">
+            <el-select size="small" v-model="buildPostConfig.docker_build.source" placeholder="请选择" @change="$refs.dockerBuildRef.clearValidate()">
               <el-option label="代码仓库" value="local"></el-option>
               <el-option label="模板库" value="template"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="buildConfig.post_build.docker_build.source === 'local'" label="Dockerfile 的绝对路径" prop="docker_file">
-            <el-input v-model="buildConfig.post_build.docker_build.docker_file" size="small">
+          <el-form-item v-if="buildPostConfig.docker_build.source === 'local'" label="Dockerfile 的绝对路径" prop="docker_file">
+            <el-input v-model="buildPostConfig.docker_build.docker_file" size="small">
               <template slot="prepend">$WORKSPACE/</template>
             </el-input>
           </el-form-item>
-          <el-form-item v-if="buildConfig.post_build.docker_build.source === 'template'" label="模板选择" prop="template_id">
+          <el-form-item v-if="buildPostConfig.docker_build.source === 'template'" label="模板选择" prop="template_id">
             <el-select
               style="width: 90%;"
               size="small"
               filterable
               @change="getDockerfileTemplate"
-              v-model="buildConfig.post_build.docker_build.template_id"
+              v-model="buildPostConfig.docker_build.template_id"
               placeholder="请选择"
             >
               <el-option v-for="(template,index) in dockerfileTemplates" :key="index" :label="template.name" :value="template.id"></el-option>
             </el-select>
             <template>
               <el-button
-                :disabled="!buildConfig.post_build.docker_build.template_id"
+                :disabled="!buildPostConfig.docker_build.template_id"
                 style="margin-left: 5px;"
                 type="text"
                 @click="showDockerfile = true"
@@ -95,14 +95,14 @@
           </el-form-item>
           <el-form-item label="构建参数">
             <el-tooltip effect="dark" content="支持所有 Docker Build 参数" placement="top-start">
-              <el-input v-model="buildConfig.post_build.docker_build.build_args" size="small" placeholder="--build-arg key=value"></el-input>
+              <el-input v-model="buildPostConfig.docker_build.build_args" size="small" placeholder="--build-arg key=value"></el-input>
             </el-tooltip>
           </el-form-item>
         </div>
       </el-form>
       <el-form
-        v-if="binary_enabled && buildConfig.post_build.file_archive"
-        :model="buildConfig.post_build.file_archive"
+        v-if="binary_enabled && buildPostConfig.file_archive"
+        :model="buildPostConfig.file_archive"
         :rules="file_archive_rules"
         ref="fileArchiveRef"
         label-width="170px"
@@ -115,16 +115,16 @@
             <el-button type="text" @click="removeBinary" icon="el-icon-delete"></el-button>
           </span>
           <el-form-item label="二进制包存储路径" prop="file_location">
-            <el-input v-model="buildConfig.post_build.file_archive.file_location" size="small">
+            <el-input v-model="buildPostConfig.file_archive.file_location" size="small">
               <template slot="append">/$PKG_FILE</template>
               <template slot="prepend">$WORKSPACE/</template>
             </el-input>
           </el-form-item>
         </div>
       </el-form>
-    <el-form
-        v-if="object_storage_upload_enabled && buildConfig.post_build.object_storage_upload"
-        :model="buildConfig.post_build.object_storage_upload"
+      <el-form
+        v-if="object_storage_upload_enabled && buildPostConfig.object_storage_upload"
+        :model="buildPostConfig.object_storage_upload"
         :rules="object_storage_rules"
         ref="objectStorageRef"
         label-width="170px"
@@ -137,13 +137,13 @@
             <el-button type="text" @click="removeObject" icon="el-icon-delete"></el-button>
           </span>
           <el-form-item label="对象存储" prop="object_storage_id">
-            <el-select size="small" v-model="buildConfig.post_build.object_storage_upload.object_storage_id" placeholder="请选择对象存储" @change="$refs.objectStorageRef.clearValidate()">
+            <el-select size="small" v-model="buildPostConfig.object_storage_upload.object_storage_id" placeholder="请选择对象存储" @change="$refs.objectStorageRef.clearValidate()">
               <el-option v-for="(item,index) in objectStorageList" :key="index" :label="`${item.endpoint}/${item.bucket}`" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="上传文件" prop="upload_detail">
-            <template v-if="buildConfig.post_build.object_storage_upload.upload_detail.length > 0" >
-              <el-row v-for="(item,index) in buildConfig.post_build.object_storage_upload.upload_detail" :key="index">
+            <template v-if="buildPostConfig.object_storage_upload.upload_detail.length > 0" >
+              <el-row v-for="(item,index) in buildPostConfig.object_storage_upload.upload_detail" :key="index">
                 <el-col :span="11">
                     <el-input v-model="item.file_path" style="max-width: 100%;" size="small">
                       <template slot="prepend">$WORKSPACE/</template>
@@ -157,7 +157,7 @@
                 <el-col :span="4">
                   <div class="">
                     <el-button @click="removeObjectStorage(index)" type="danger" icon="el-icon-minus"  size="mini" circle plain></el-button>
-                    <el-button v-if="index === buildConfig.post_build.object_storage_upload.upload_detail.length - 1" type="primary" icon="el-icon-plus"  @click="addObjectStorage" size="mini" circle plain></el-button>
+                    <el-button v-if="index === buildPostConfig.object_storage_upload.upload_detail.length - 1" type="primary" icon="el-icon-plus"  @click="addObjectStorage" size="mini" circle plain></el-button>
                   </div>
                 </el-col>
               </el-row>
@@ -167,8 +167,8 @@
         </div>
       </el-form>
       <el-form
-        v-if="post_script_enabled && buildConfig.post_build.scripts"
-        :model="buildConfig.post_build"
+        v-if="post_script_enabled && buildPostConfig.scripts"
+        :model="buildPostConfig"
         ref="scriptRef"
         label-width="220px"
         class="stcov label-at-left"
@@ -182,7 +182,7 @@
             <el-button type="text" @click="removeScript" icon="el-icon-delete"></el-button>
           </div>
           <div class="script-content">
-            <Editor v-model="buildConfig.post_build.scripts" height="100%"></Editor>
+            <Editor v-model="buildPostConfig.scripts" height="100%"></Editor>
           </div>
         </div>
       </el-form>
@@ -201,7 +201,7 @@ import {
 } from '@api'
 export default {
   props: {
-    buildConfig: Object,
+    buildPostConfig: Object,
     validObj: Object,
     usedToHost: Boolean, // Cloud hosting builds do not require mirror repositories
     mini: Boolean
@@ -285,28 +285,28 @@ export default {
   },
   methods: {
     // called by the parent component at edit time
-    initStepStatus (buildConfig = this.buildConfig) {
-      if (buildConfig.post_build.docker_build) {
+    initStepStatus (buildPostConfig = this.buildPostConfig) {
+      if (buildPostConfig.docker_build) {
         this.docker_enabled = true
-        if (buildConfig.post_build.docker_build.template_id) {
+        if (buildPostConfig.docker_build.template_id) {
           this.getDockerfileTemplate(
-            buildConfig.post_build.docker_build.template_id
+            buildPostConfig.docker_build.template_id
           )
         }
       } else {
         this.docker_enabled = false
       }
-      if (buildConfig.post_build.file_archive) {
+      if (buildPostConfig.file_archive) {
         this.binary_enabled = true
       } else {
         this.binary_enabled = false
       }
-      if (buildConfig.post_build.object_storage_upload) {
+      if (buildPostConfig.object_storage_upload) {
         this.object_storage_upload_enabled = true
       } else {
         this.object_storage_upload_enabled = false
       }
-      if (buildConfig.post_build.scripts) {
+      if (buildPostConfig.scripts) {
         this.post_script_enabled = true
       } else {
         this.post_script_enabled = false
@@ -315,7 +315,7 @@ export default {
     addExtra (command) {
       if (command === 'docker') {
         this.docker_enabled = true
-        this.$set(this.buildConfig.post_build, 'docker_build', {
+        this.$set(this.buildPostConfig, 'docker_build', {
           work_dir: '',
           docker_file: '',
           build_args: '',
@@ -324,17 +324,17 @@ export default {
       }
       if (command === 'binary') {
         this.binary_enabled = true
-        this.$set(this.buildConfig.post_build, 'file_archive', {
+        this.$set(this.buildPostConfig, 'file_archive', {
           file_location: ''
         })
       }
       if (command === 'script') {
         this.post_script_enabled = true
-        this.$set(this.buildConfig.post_build, 'scripts', '#!/bin/bash\nset -e')
+        this.$set(this.buildPostConfig, 'scripts', '#!/bin/bash\nset -e')
       }
       if (command === 'object') {
         this.object_storage_upload_enabled = true
-        this.$set(this.buildConfig.post_build, 'object_storage_upload', {
+        this.$set(this.buildPostConfig, 'object_storage_upload', {
           enabled: true,
           object_storage_id: '',
           upload_detail: []
@@ -348,28 +348,28 @@ export default {
     },
     removeDocker () {
       this.docker_enabled = false
-      delete this.buildConfig.post_build.docker_build
+      delete this.buildPostConfig.docker_build
     },
     removeBinary () {
       this.binary_enabled = false
-      delete this.buildConfig.post_build.file_archive
+      delete this.buildPostConfig.file_archive
     },
     removeScript () {
       this.post_script_enabled = false
-      delete this.buildConfig.post_build.scripts
+      delete this.buildPostConfig.scripts
     },
     removeObject () {
       this.object_storage_upload_enabled = false
-      delete this.buildConfig.post_build.object_storage_upload
+      delete this.buildPostConfig.object_storage_upload
     },
     addObjectStorage () {
-      this.buildConfig.post_build.object_storage_upload.upload_detail.push({
+      this.buildPostConfig.object_storage_upload.upload_detail.push({
         file_path: '',
         dest_path: ''
       })
     },
     removeObjectStorage (index) {
-      this.buildConfig.post_build.object_storage_upload.upload_detail.splice(index, 1)
+      this.buildPostConfig.object_storage_upload.upload_detail.splice(index, 1)
     },
     async getDockerfileTemplate (id) {
       const projectName = this.$route.params.project_name

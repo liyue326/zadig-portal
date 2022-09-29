@@ -27,7 +27,13 @@
         <el-form-item label="创建方式" prop="source" v-if="!createShare">
           <el-select class="select" @change="changeCreateMethod" v-model="projectConfig.source" size="small" placeholder="请选择环境类型">
             <el-option label="新建" value="system"></el-option>
+            <el-option label="复制" value="copy"></el-option>
             <el-option v-if="currentProductDeliveryVersions.length > 0" label="回溯" value="versionBack"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="projectConfig.source==='copy'" label="复制来源" prop="base_env_name">
+          <el-select @change="changeSourceEnv" placeholder="请选择环境" size="small" v-model="projectConfig.base_env_name" value-key="version">
+            <el-option v-for="(item,index) in envNameList" :key="index" :label="item.name" :value="item.name"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-if="projectConfig.source==='versionBack'" label="选择版本">
@@ -55,7 +61,12 @@
             <el-option v-for="cluster in allCluster" :key="cluster.id" :label="$utils.showClusterName(cluster)" :value="cluster.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="K8s 命名空间" v-if="projectConfig.source==='system'" prop="defaultNamespace" class="secondary-label">
+        <el-form-item
+          label="K8s 命名空间"
+          v-if="projectConfig.source==='system'||projectConfig.source==='copy'"
+          prop="defaultNamespace"
+          class="secondary-label"
+        >
           <el-select
             v-model="projectConfig.defaultNamespace"
             :disabled="editButtonDisabled"
@@ -83,7 +94,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="服务选择" v-if="projectConfig.source==='system'" prop="selectedService">
+        <el-form-item label="服务选择" v-if="projectConfig.source==='system'||projectConfig.source==='copy'" prop="selectedService">
           <div class="select-service">
             <el-select v-model="projectConfig.selectedService" size="small" placeholder="选择服务" filterable clearable multiple collapse-tags>
               <el-option
@@ -104,20 +115,21 @@
           </div>
         </el-form-item>
       </el-form>
-      <EnvConfig class="common-parcel-block" ref="envConfigRef"></EnvConfig>
+      <EnvConfig class="common-parcel-block" ref="envConfigRef" />
       <div
-        v-if="variables.length && !$utils.isEmpty(containerMap) && projectConfig.source==='system'"
+        v-if="(variables.length && !$utils.isEmpty(containerMap) && (projectConfig.source==='system')||projectConfig.source==='copy')"
         class="common-parcel-block box-card-service"
       >
-        <div class="primary-title">变量列表
-         <VariablePreviewEditor :services="previewServices" :projectName="projectConfig.product_name" :variables="variables" />
+        <div class="primary-title">
+          变量列表
+          <VariablePreviewEditor :services="previewServices" :projectName="projectConfig.product_name" :variables="variables" />
         </div>
-        <VarList :variables="variables" :rollbackMode="rollbackMode"></VarList>
+        <VarList :variables="variables" :rollbackMode="rollbackMode" />
       </div>
-      <div v-if="projectConfig.source==='system'" class="common-parcel-block">
+      <div v-if="projectConfig.source==='system'||projectConfig.source==='copy'" class="common-parcel-block">
         <div class="primary-title">服务列表</div>
         <div>
-          <div class="service-filter-block">
+          <div v-if="projectConfig.source==='system'" class="service-filter-block">
             <span class="service-filter">
               快速过滤:
               <el-tooltip class="img-tooltip" effect="dark" placement="top">
@@ -177,7 +189,7 @@
       <el-form label-width="35%" class="ops">
         <el-form-item>
           <el-button @click="$router.back()" :loading="startDeployLoading" size="medium">取消</el-button>
-          <el-button @click="deployK8sEnv" :loading="startDeployLoading" type="primary" size="medium">立即创建</el-button>
+          <el-button  v-hasPermi="{projectName: projectName, actions: ['create_environment','production:create_environment'],operator:'or',isBtn:true}" @click="deployK8sEnv" :loading="startDeployLoading" type="primary" size="medium">立即创建</el-button>
         </el-form-item>
       </el-form>
       <footer v-if="startDeployLoading" class="create-footer">
@@ -205,12 +217,15 @@ import {
   productHostingNamespaceAPI,
   initProjectEnvAPI,
   getVersionListAPI,
+  listProductAPI,
+  getEnvInfoAPI,
+  envRevisionsAPI,
   getClusterListAPI,
-  createProductAPI,
+  createEnvAPI,
   getRegistryWhenBuildAPI
 } from '@api'
 import bus from '@utils/eventBus'
-import { uniq, cloneDeep, intersection } from 'lodash'
+import { uniq, cloneDeep, intersection, flattenDeep } from 'lodash'
 import { serviceTypeMap } from '@utils/wordTranslate'
 
 const validateEnvName = (rule, value, callback) => {
@@ -269,6 +284,9 @@ export default {
         env_name: [
           { required: true, trigger: 'change', validator: validateEnvName }
         ],
+        base_env_name: [
+          { required: true, trigger: 'change', message: '请选择来源' }
+        ],
         selectedService: {
           type: 'array',
           required: true,
@@ -278,6 +296,7 @@ export default {
       },
       imageRegistry: [],
       containerNames: [],
+      envNameList: [],
       virtualData: {
         keeps: 20,
         size: 34,
@@ -304,20 +323,26 @@ export default {
       return Object.keys(this.containerMap)
     },
     previewServices () {
-      return this.serviceNames.map(item => { return { service_name: item } })
+      return this.serviceNames.map(item => {
+        return { service_name: item }
+      })
     },
     variables () {
-      const services = this.projectConfig.selectedService
-      const currentVars = cloneDeep(
-        (this.projectConfig.vars || []).filter(
-          item => intersection(item.services, services).length
+      if (this.projectConfig.source === 'system') {
+        const services = this.projectConfig.selectedService
+        const currentVars = cloneDeep(
+          (this.projectConfig.vars || []).filter(
+            item => intersection(item.services, services).length
+          )
         )
-      )
-      currentVars.forEach(item => {
-        item.allServices = item.services
-        item.services = intersection(item.services, services)
-      })
-      return currentVars
+        currentVars.forEach(item => {
+          item.allServices = item.services
+          item.services = intersection(item.services, services)
+        })
+        return currentVars
+      } else {
+        return this.projectConfig.vars
+      }
     },
     selectedContainerMap () {
       // Filtered Container Services
@@ -345,7 +370,11 @@ export default {
   },
   methods: {
     changeEnvName (value) {
-      if (this.projectConfig.source === 'system' && !this.nsIsExisted) {
+      if (
+        (this.projectConfig.source === 'system' ||
+          this.projectConfig.source === 'copy') &&
+        !this.nsIsExisted
+      ) {
         this.projectConfig.defaultNamespace = this.projectName + '-env-' + value
       }
     },
@@ -437,6 +466,94 @@ export default {
         this.currentProductDeliveryVersions = res
       })
     },
+    getEnvNameList () {
+      const projectName = this.projectName
+      listProductAPI(projectName).then(res => {
+        if (res.length) {
+          this.envNameList = res.map(env => {
+            return {
+              name: env.name
+            }
+          })
+        }
+      })
+    },
+    async changeSourceEnv (envName) {
+      const projectName = this.projectName
+      const envInfo = await getEnvInfoAPI(projectName, envName)
+      const envRevision = await envRevisionsAPI(projectName, envName)
+      const vars = envInfo.vars
+      const availableServices = flattenDeep(envInfo.services)
+      const serviceImages = envRevision[0].services.filter(item => {
+        return availableServices.indexOf(item.service_name) >= 0
+      })
+      const clusterId = envInfo.cluster_id
+      for (
+        let groupIndex = 0;
+        groupIndex < envInfo.services.length;
+        groupIndex++
+      ) {
+        const group = envInfo.services[groupIndex]
+        for (
+          let serviceIndex = 0;
+          serviceIndex < group.length;
+          serviceIndex++
+        ) {
+          const service = group[serviceIndex]
+          const currnt = serviceImages.find(elemnet => {
+            return elemnet.service_name === service
+          })
+          group[serviceIndex] = currnt
+        }
+      }
+      for (const group of envInfo.services) {
+        group.sort((a, b) => {
+          if (a.service_name !== b.service_name) {
+            return a.service_name.charCodeAt(0) - b.service_name.charCodeAt(0)
+          }
+          if (a.type === 'k8s' || b.type === 'k8s') {
+            return a.type === 'k8s' ? 1 : -1
+          }
+          return 0
+        })
+      }
+
+      const containerMap = {}
+      const containerNames = []
+      for (const group of envInfo.services) {
+        for (const ser of group) {
+          if (ser.type === 'k8s') {
+            containerMap[ser.service_name] =
+              containerMap[ser.service_name] || {}
+            containerMap[ser.service_name][ser.type] = ser
+            ser.picked = true
+            const containers = ser.containers
+            if (containers) {
+              for (const con of containers) {
+                containerNames.push(con.image_name)
+                Object.defineProperty(con, 'defaultImage', {
+                  value: con.image,
+                  enumerable: false,
+                  writable: false
+                })
+              }
+            }
+          }
+        }
+      }
+      this.containerMap = containerMap
+      this.projectConfig.services = envInfo.services
+      this.containerNames = uniq(containerNames)
+      this.getImages()
+      this.$set(
+        this.projectConfig,
+        'selectedService',
+        Object.keys(containerMap)
+      )
+      this.projectConfig.cluster_id = clusterId
+      this.projectConfig.vars = vars
+      this.projectConfig.registry_id = envInfo.registry_id
+    },
     async getTemplateAndImg () {
       const projectName = this.projectName
       const isStcov = this.isStcov
@@ -510,7 +627,7 @@ export default {
               image.full = `${image.host}/${image.owner}/${image.name}:${image.tag}`
             }
             this.imageMap = this.makeMapOfArray(images, 'name')
-            if (!this.rollbackMode) {
+            if (!this.rollbackMode && this.projectConfig.source !== 'copy') {
               this.quickSelection = 'latest'
               this.quickInitImage()
             }
@@ -534,8 +651,12 @@ export default {
         this.hostingNamespace = res.map(ns => ns.name)
       })
     },
-    changeCreateMethod () {
+    changeCreateMethod (val) {
       if (this.selection) {
+        this.getTemplateAndImg()
+      }
+      if (val === 'system') {
+        this.projectConfig.base_env_name = ''
         this.getTemplateAndImg()
       }
       this.selection = ''
@@ -561,13 +682,17 @@ export default {
 
           const selectedServices = [] // filtered service: keep the same format as the original services
           const selectedServiceNames = this.projectConfig.selectedService
-
           for (const group of this.projectConfig.services) {
             const currentGroup = []
             for (const ser of group) {
               const containers = ser.containers
               if (containers && ser.picked && ser.type === 'k8s') {
                 if (selectedServiceNames.includes(ser.service_name)) {
+                  if (this.projectConfig.source === 'copy') {
+                    ser.containers = this.containerMap[ser.service_name][
+                      ser.type
+                    ].containers
+                  }
                   currentGroup.push(ser)
                 }
                 for (const con of ser.containers) {
@@ -580,8 +705,8 @@ export default {
             }
             selectedServices.push(currentGroup)
           }
-          const payload = this.$utils.cloneObj(this.projectConfig)
 
+          const payload = this.$utils.cloneObj(this.projectConfig)
           if (this.projectConfig.source !== 'versionBack') {
             payload.services = cloneDeep(selectedServices) // full service to partial service
           }
@@ -598,7 +723,7 @@ export default {
           payload.namespace = payload.defaultNamespace
           payload.is_existed = this.nsIsExisted
 
-          payload.env_config_yamls = this.$refs.envConfigRef.getAllYaml()
+          payload.env_configs = this.$refs.envConfigRef.getEnvConfig()
 
           if (this.createShare && this.baseEnvName) {
             payload.share_env = {
@@ -611,7 +736,12 @@ export default {
           function sleep (time) {
             return new Promise(resolve => setTimeout(resolve, time))
           }
-          createProductAPI(payload).then(
+          this.$store.commit('SET_MASK_STATUS', true)
+          createEnvAPI(
+            payload,
+            '',
+            this.projectConfig.source === 'copy' ? 'copy' : ''
+          ).then(
             res => {
               // Add delay to solve the back-end permission synchronization problem
               sleep(5000).then(() => {
@@ -628,6 +758,7 @@ export default {
             },
             () => {
               this.startDeployLoading = false
+              this.$store.commit('SET_MASK_STATUS', false)
             }
           )
         } else {
@@ -669,7 +800,8 @@ export default {
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: `${this.projectName}`,
+          title: this.projectName,
+          isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         { title: '环境', url: '' },
@@ -677,6 +809,7 @@ export default {
       ]
     })
     this.getVersionList()
+    this.getEnvNameList()
     this.projectConfig.product_name = this.projectName
     this.getCluster()
     getRegistryWhenBuildAPI(this.projectName).then(res => {

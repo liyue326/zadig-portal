@@ -50,7 +50,12 @@
     </el-card>
 
     <el-dialog :visible.sync="taskDialogVisible" title="运行 通用-工作流" custom-class="run-workflow" width="60%" class="dialog">
-      <RunCommonWorkflow :value="taskDialogVisible" :workflow="commonToRun"></RunCommonWorkflow>
+      <RunCustomWorkflow
+        v-if="taskDialogVisible"
+        :workflowName="workflowName"
+        :projectName="projectName"
+        @success="hideAfterSuccess"
+      />
     </el-dialog>
   </div>
 </template>
@@ -59,11 +64,12 @@
 import {
   getCommonWorkflowAPI,
   deleteCommonWorkflowAPI,
-  getCommonWorkflowTasksAPI,
+  getCustomWorkflowTaskListAPI,
   getCommonWorkflowListInProjectAPI
 } from '@api'
 import TaskList from '@/components/projects/common/taskList.vue'
 import RunCommonWorkflow from './common/runCommonWorkflow.vue'
+import RunCustomWorkflow from './common/runCustomWorkflow'
 import bus from '@utils/eventBus'
 export default {
   data () {
@@ -74,7 +80,7 @@ export default {
       pageSize: 50,
       taskDialogVisible: false,
       durationSet: {},
-      pageStart: 0,
+      pageStart: 1,
       timerId: null,
       timeTimeoutFinishFlag: false,
       commonToRun: {},
@@ -95,32 +101,30 @@ export default {
   },
   methods: {
     async autoRefreshHistoryTask () {
-      const projectName = this.$route.params.project_name
       const workflowName = this.$route.params.workflow_name
       const pageStart = this.pageStart
       const pageSize = this.pageSize
-      const res = await getCommonWorkflowTasksAPI(
-        projectName,
+      const res = await getCustomWorkflowTaskListAPI(
         workflowName,
         pageStart,
-        pageSize
+        pageSize,
+        this.projectName
       )
-      this.workflowTasks = res.data
+      this.workflowTasks = res.workflow_list
       this.total = res.total
       if (!this.timeTimeoutFinishFlag) {
         this.timerId = setTimeout(this.autoRefreshHistoryTask, 3000) // Keep only one timer
       }
     },
     getCommonWorkflowTasks (start, max) {
-      const projectName = this.projectName
       const workflowName = this.workflowName
-      getCommonWorkflowTasksAPI(projectName, workflowName, start, max).then(
+      getCustomWorkflowTaskListAPI(workflowName, start, max, this.projectName).then(
         res => {
-          this.workflowTasks = res.data
+          this.workflowTasks = res.workflow_list
           this.total = res.total
         }
       )
-      this.workflowTasks = res.data
+      this.workflowTasks = res.workflow_list
       this.total = res.total
     },
     changeTaskPage (val) {
@@ -191,6 +195,9 @@ export default {
       if (res) {
         this.usedInPolicy = res.workflow_list.find(re => re.name === this.workflowName).base_refs || []
       }
+    },
+    hideAfterSuccess () {
+      this.taskDialogVisible = false
     }
   },
   beforeDestroy () {
@@ -213,6 +220,7 @@ export default {
         { title: '项目', url: '/v1/projects' },
         {
           title: projectName,
+          isProjectName: true,
           url: `/v1/projects/detail/${projectName}`
         },
         {
@@ -225,6 +233,7 @@ export default {
   },
   components: {
     RunCommonWorkflow,
+    RunCustomWorkflow,
     TaskList
   }
 }

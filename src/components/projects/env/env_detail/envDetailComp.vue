@@ -2,12 +2,12 @@
   <div class="env-detail-container" ref="envContainer">
     <PmHostList ref="pmHostList" :currentPmServiceData="currentPmServiceData" @success="refreshServiceList"></PmHostList>
     <el-dialog title="通过工作流升级服务" :visible.sync="showStartProductBuild" custom-class="run-workflow" width="60%">
-      <run-workflow
+      <RunWorkflow
         v-if="showStartProductBuild"
         :workflows="currentServiceWorkflows"
         :currentServiceMeta="currentServiceMeta"
         @success="hideProductTaskDialog"
-      ></run-workflow>
+      />
     </el-dialog>
     <div class="envs-container">
       <ChromeTabs v-model="envName" :tabList="envNameList" :label="'name'" :name="'name'">
@@ -54,6 +54,15 @@
         element-loading-spinner="el-icon-loading"
         class="common-parcel-block basic-info-content"
       >
+        <el-tooltip v-if="envSource !== 'pm'" effect="dark" content="变更记录" placement="top">
+          <el-button
+            type="text"
+            v-hasPermi="{projectName: projectName,action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}, isBtn:true}"
+            icon="el-icon-document"
+            class="change-log"
+            @click="$router.push(`/v1/projects/detail/${projectName}/envs/${envName}/log`)"
+          ></el-button>
+        </el-tooltip>
         <el-row :gutter="10">
           <el-col v-if="!pmServiceList.length" :span="12">
             <div class="grid-title">K8s 集群</div>
@@ -83,7 +92,11 @@
             <div class="grid-content image-registry">
               <div v-if="editImageRegistry === false">
                 <span>{{imageRegistryDesc}}</span>
-                <i v-hasPermi="{projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}}" class="icon el-icon-edit icon-primary" @click="editImageRegistry = true"></i>
+                <i
+                  v-hasPermi="{projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}}"
+                  class="icon el-icon-edit icon-primary"
+                  @click="editImageRegistry = true"
+                ></i>
               </div>
               <div v-else>
                 <el-select v-model="productInfo.editRegistryID" size="mini">
@@ -121,12 +134,21 @@
                 <router-link
                   :to="`/v1/projects/detail/${projectName}/envs/create?createShare=true&baseEnvName=${productInfo.env_name}&clusterId=${productInfo.cluster_id}`"
                 >
-                  <el-button v-hasPermi="{projectName: projectName, action: isProd?'production:create_environment':'create_environment',isBtn:true}" type="primary" size="mini" plain>创建子环境</el-button>
+                  <el-button
+                    v-hasPermi="{projectName: projectName, action: isProd?'production:create_environment':'create_environment',isBtn:true}"
+                    type="primary"
+                    size="mini"
+                    plain
+                  >创建子环境</el-button>
                 </router-link>
               </template>
               <template v-if="productInfo.status!=='Disconnected' && productInfo.status!=='Creating'">
                 <el-dropdown v-if="envSource===''||envSource==='spock' || envSource==='helm'" trigger="click">
-                  <el-button v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}})" type="primary" plain>
+                  <el-button
+                    v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}})"
+                    type="primary"
+                    plain
+                  >
                     管理服务
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
@@ -134,7 +156,10 @@
                     管理服务
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
-                  <el-dropdown-menu v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}})" slot="dropdown">
+                  <el-dropdown-menu
+                    v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}})"
+                    slot="dropdown"
+                  >
                     <el-dropdown-item @click.native="manageServices('add')">添加服务</el-dropdown-item>
                     <el-dropdown-item @click.native="manageServices('update')">更新服务</el-dropdown-item>
                     <el-dropdown-item @click.native="manageServices('delete')">删除服务</el-dropdown-item>
@@ -146,12 +171,22 @@
                   effect="dark"
                   placement="top"
                 >
-                  <el-button v-hasPermi="{projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}, isBtn:true}" type="primary" @click="updateK8sEnv(productInfo)" size="mini" plain>更新环境</el-button>
+                  <el-button
+                    v-hasPermi="{projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}, isBtn:true}"
+                    type="primary"
+                    @click="updateK8sEnv(productInfo)"
+                    size="mini"
+                    plain
+                  >更新环境</el-button>
                 </el-tooltip>
               </template>
               <template v-if="envSource==='' || envSource==='spock' || envSource === 'helm'">
                 <el-dropdown trigger="click">
-                  <el-button v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}})" type="primary" plain>
+                  <el-button
+                    v-if="checkPermissionSyncMixin({projectName: projectName, actions: isProd?['production:get_environment','get_environment']:['production:config_environment','config_environment'],operator:'or',resource:{name:envName,type:'env'}})"
+                    type="primary"
+                    plain
+                  >
                     环境配置
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
@@ -159,7 +194,10 @@
                     环境配置
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
-                  <el-dropdown-menu v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd?'production:config_environment':'config_environment'})"  slot="dropdown">
+                  <el-dropdown-menu
+                    v-if="checkPermissionSyncMixin({projectName: projectName, actions: isProd?['production:get_environment','get_environment']:['production:config_environment','config_environment'],operator:'or',resource:{name:envName,type:'env'}})"
+                    slot="dropdown"
+                  >
                     <el-dropdown-item @click.native="jumpEnvConfigPage('Ingress')">Ingress</el-dropdown-item>
                     <el-dropdown-item @click.native="jumpEnvConfigPage('ConfigMap')">ConfigMap</el-dropdown-item>
                     <el-dropdown-item @click.native="jumpEnvConfigPage('Secret')">Secret</el-dropdown-item>
@@ -174,7 +212,11 @@
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item v-hasPermi="{projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}, isBtn:true}" v-if="!productInfo.share_env_enable" @click.native="shareEnv('enable')">开启自测模式</el-dropdown-item>
+                    <el-dropdown-item
+                      v-hasPermi="{projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}, isBtn:true}"
+                      v-if="!productInfo.share_env_enable"
+                      @click.native="shareEnv('enable')"
+                    >开启自测模式</el-dropdown-item>
                     <el-dropdown-item
                       v-hasPermi="{projectName: projectName, action: isProd?'production:config_environment':'config_environment',resource:{name:envName,type:'env'}, isBtn:true}"
                       v-if="productInfo.share_env_enable && productInfo.share_env_is_base"
@@ -347,14 +389,13 @@
                 </el-popover>
               </template>
               <div>
-                <span v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd ?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'} })" class="add-host el-icon-edit-outline" @click="editHost(scope.row)"></span>
-                <el-tooltip
-                  v-else
-                  effect="dark"
-                  content="无权限操作"
-                  placement="top"
-                >
-                <span class="add-host el-icon-edit-outline permission-disabled"></span>
+                <span
+                  v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd ?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'} })"
+                  class="add-host el-icon-edit-outline"
+                  @click="editHost(scope.row)"
+                ></span>
+                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                  <span class="add-host el-icon-edit-outline permission-disabled"></span>
                 </el-tooltip>
               </div>
             </template>
@@ -364,7 +405,7 @@
             <template slot-scope="scope">
               <span class="operation">
                 <el-tooltip
-                 v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd ?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'}})"
+                  v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd ?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'}})"
                   effect="dark"
                   content="通过工作流升级服务"
                   placement="top"
@@ -374,38 +415,26 @@
                     class="iconfont iconshengji"
                   ></i>
                 </el-tooltip>
-                <el-tooltip
-                 v-else
-                  effect="dark"
-                  content="无权限操作"
-                  placement="top"
-                >
-                  <i
-                    class="iconfont iconshengji permission-disabled"
-                  ></i>
+                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                  <i class="iconfont iconshengji permission-disabled"></i>
                 </el-tooltip>
               </span>
               <span v-if="scope.row.status!=='Succeeded'" class="operation">
                 <el-tooltip
-                 v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd ?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'},isBtn:true})"
+                  v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd ?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'},isBtn:true})"
                   effect="dark"
                   content="查看服务升级日志"
                   placement="top"
                 >
                   <i @click="openPmServiceLog(envName,scope.row.service_name)" class="iconfont iconiconlog"></i>
                 </el-tooltip>
-                <el-tooltip
-                  v-else
-                  effect="dark"
-                  content="无权限操作"
-                  placement="top"
-                >
-                  <i  class="iconfont iconiconlog permission-disabled"></i>
+                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                  <i class="iconfont iconiconlog permission-disabled"></i>
                 </el-tooltip>
               </span>
               <span class="operation">
                 <el-tooltip
-                 v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd ?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'}})"
+                  v-if="checkPermissionSyncMixin({projectName: projectName, action: isProd ?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'}})"
                   effect="dark"
                   content="查看服务配置"
                   placement="top"
@@ -414,13 +443,10 @@
                     <i class="iconfont iconfuwupeizhi"></i>
                   </router-link>
                 </el-tooltip>
-                <el-tooltip
-                  v-else
-                  effect="dark"
-                  content="无权限操作"
-                  placement="top"
-                >
-                <span ><i class="iconfont iconfuwupeizhi permission-disabled"></i></span>
+                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                  <span>
+                    <i class="iconfont iconfuwupeizhi permission-disabled"></i>
+                  </span>
                 </el-tooltip>
               </span>
             </template>
@@ -472,7 +498,7 @@
 import { translateEnvStatus, serviceTypeMap } from '@utils/wordTranslate'
 import {
   envRevisionsAPI,
-  productEnvInfoAPI,
+  getEnvInfoAPI,
   productServicesAPI,
   listProductAPI,
   updateServiceAPI,
@@ -773,6 +799,11 @@ export default {
     },
     refreshServiceList () {
       this.initPageInfo()
+      // Helm: update chart list
+      if (this.envSource === 'helm') {
+        this.filterChartName = '*'
+        this.$refs.chartListRef.getChartNames(this.envName)
+      }
       this.getEnvServices('search')
       this.fetchEnvRevision()
     },
@@ -990,7 +1021,7 @@ export default {
     async getProductEnvInfo (projectName, envName) {
       this.envLoading = true
       this.serviceLoading = true
-      const envInfo = await productEnvInfoAPI(projectName, envName)
+      const envInfo = await getEnvInfoAPI(projectName, envName)
       if (envInfo) {
         if (!envInfo.registry_id) {
           envInfo.registry_id = ''
@@ -1170,6 +1201,10 @@ export default {
       this.showStartProductBuild = false
     },
     deleteHostingEnv (project_name, env_name) {
+      if (this.usedInPolicy.length) {
+        this.cantDelete(false)
+        return
+      }
       const envType = this.isProd ? 'prod' : ''
       this.$prompt(
         '请输入环境名称以确认',
@@ -1228,9 +1263,9 @@ export default {
         `环境 ${this.envName} 已在协作模式 ${this.usedInPolicy.join(
           '、'
         )} 中被定义为基准环境，如需${
-          isDelete ? '删除' : '配置回收策略'
+          isDelete ? '删除' : '取消托管'
         }请先修改协作模式！`,
-        `${isDelete ? '删除' : '回收'}环境`,
+        isDelete ? '删除环境' : '取消托管',
         {
           confirmButtonText: '确定',
           type: 'warning'
@@ -1297,10 +1332,15 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        const envType = this.isProd ? 'prod' : ''
-        restartServiceOriginAPI(projectName, serviceName, envName, envType).then(
-          res => {
+      })
+        .then(() => {
+          const envType = this.isProd ? 'prod' : ''
+          restartServiceOriginAPI(
+            projectName,
+            serviceName,
+            envName,
+            envType
+          ).then(res => {
             this.$message({
               message: '重启服务成功',
               type: 'success'
@@ -1308,14 +1348,14 @@ export default {
             this.initPageInfo()
             this.getEnvServices()
             this.fetchEnvRevision()
-          }
-        )
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消重启'
+          })
         })
-      })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消重启'
+          })
+        })
     },
     restartPmService (service, revisionMeta) {
       const payload = {

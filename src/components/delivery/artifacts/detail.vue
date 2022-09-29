@@ -11,7 +11,7 @@
                 <div class="item-detail">
                   <div>
                     <span class="key">服务名称：</span>
-                    <span class="value">{{$utils.showServiceName(artifact.name)}}</span>
+                    <span class="value">{{artifact.name}}</span>
                   </div>
                   <template v-if="artifact.type==='image'">
                     <div>
@@ -80,10 +80,23 @@
                     <span class="key">PR：</span>
                     <span class="value">
                       <a
+                        v-if="cm.source==='github'"
+                        class="link"
+                        :href="`${cm.address}/${cm.repo_owner}/${cm.repo_name}/pull/${cm.pr}`"
+                        target="_blank"
+                      >{{cm.pr}}</a>
+                      <a
+                        v-else-if="cm.source==='gitlab'"
                         class="link"
                         :href="`${cm.address}/${cm.repo_owner}/${cm.repo_name}/merge_requests/${cm.pr}`"
                         target="_blank"
-                      >{{'#' + cm.pr}}</a>
+                      >{{cm.pr}}</a>
+                      <a
+                        v-else-if="cm.source==='gitee'"
+                        class="link"
+                        :href="`${cm.address}/${cm.repo_owner}/${cm.repo_name}/pulls/${cm.pr}`"
+                        target="_blank"
+                      >{{cm.pr}}</a>
                     </span>
                   </div>
                   <div v-if="cm.commit_message">

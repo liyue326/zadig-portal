@@ -41,7 +41,7 @@
           </el-col>
           <el-col :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconjiqun1"></i> 部署环境
+              <i class="iconfont iconvery-environ"></i> 部署环境
             </div>
           </el-col>
           <el-col :span="6">
@@ -55,6 +55,22 @@
         <el-row :gutter="0">
           <el-col :span="6">
             <div class="grid-content item-title">
+              <i class="iconfont iconvery-service"></i> 服务名称
+            </div>
+          </el-col>
+          <el-col :span="6">
+            <div class="grid-content item-desc">
+              <span v-if="deploy.service_type==='helm'">
+                {{`${$utils.showServiceName(deploy.container_name,deploy.service_name)}`}}
+              </span>
+              <router-link v-else
+                           class="env-link"
+                           :to="serviceUrl(deploy)">
+                {{deploy.service_name}}</router-link>
+            </div>
+          </el-col>
+          <el-col :span="6">
+            <div class="grid-content item-title">
               <i class="iconfont iconSliceCopy"></i> 镜像信息
             </div>
           </el-col>
@@ -62,25 +78,9 @@
             <el-tooltip effect="dark"
                         :content="deploy.image"
                         placement="top">
-              <div class="grid-content item-desc">{{deploy.image?deploy.image.split('/')[2]:"*"}}
+              <div class="grid-content item-desc image-name">{{deploy.image?deploy.image.split('/')[2]:"*"}}
               </div>
             </el-tooltip>
-          </el-col>
-          <el-col :span="6">
-            <div class="grid-content item-title">
-              <i class="iconfont iconfuwu"></i> 服务名称
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="grid-content item-desc">
-              <span v-if="deploy.service_type==='helm'">
-                {{`${$utils.showServiceName(deploy.container_name)}`}}
-              </span>
-              <router-link v-else
-                           class="env-link"
-                           :to="serviceUrl(deploy)">
-                {{deploy.service_name}}</router-link>
-            </div>
           </el-col>
         </el-row>
       </div>
@@ -133,6 +133,12 @@ export default {
 .task-detail-deploy {
   .deploy-item {
     margin-bottom: 15px;
+  }
+
+  .image-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .env-link {

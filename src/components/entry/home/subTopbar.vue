@@ -126,9 +126,12 @@
           </button>
           <el-dropdown-menu slot="dropdown" class="project-config">
             <el-dropdown-item icon="el-icon-edit-outline" @click.native="$router.push(`/v1/projects/edit/${projectName}`)">修改</el-dropdown-item>
+            <el-dropdown-item v-if="deployType === 'cloud_host'" @click.native="$router.push(`/v1/projects/detail/${projectName}/host`)">
+             <i class="iconfont iconwuliji"></i>主机管理
+            </el-dropdown-item>
             <el-dropdown-item icon="el-icon-lock" @click.native="$router.push(`/v1/projects/detail/${projectName}/rbac`)">权限</el-dropdown-item>
             <el-dropdown-item
-              v-if="deployType === 'k8s' || deployType === 'helm'"
+              v-if="deployType !== 'cloud_host'"
               icon="item-icon iconfont iconvery-collaboratiom"
               @click.native="$router.push(`/v1/projects/detail/${projectName}/policy`)"
             >协作模式</el-dropdown-item>
@@ -164,7 +167,7 @@ export default {
   methods: {
     bindComp (comp, type) {
       if (type === 'workflow') {
-        comp.createWorkflow()
+        comp.showSelectWorkflowType = true
       } else if (type === 'env') {
         this.$router.push(`/v1/projects/detail/${this.projectName}/envs/create`)
       } else if (type === 'build') {
@@ -190,6 +193,8 @@ export default {
 </script>
 <style lang="less">
 .subtopbar-container {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: row;
   align-items: center;

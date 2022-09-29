@@ -24,7 +24,7 @@ export default {
       breadcrumb: [
         { title: '项目', url: '/v1/projects' },
         { title: this.projectName, isProjectName: true, url: `/v1/projects/detail/${this.projectName}/detail` },
-        { title: '测试', url: `/v1/projects/detail/${this.projectName}/test/function` },
+        { title: '测试', url: `/v1/projects/detail/${this.projectName}/test` },
         { title: this.workflowName, url: '' }]
     })
   },

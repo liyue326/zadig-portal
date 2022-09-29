@@ -45,11 +45,7 @@ export function checkPermissionSync (opts) {
     }
     // 项目角色权限判断
   } else if (type === 'project' || projectName) {
-    const currentProject = store.getters.projectList.find(item => item.name === projectName)
     const currentProjectPermissions = store.getters.projectPermissions[projectName] ? store.getters.projectPermissions[projectName] : {}
-    if (currentProject && currentProject.public) {
-      return true
-    }
     const projectCollaborativeModeCheckingResult = () => {
       if (!isEmpty(resource) && (!isEmpty(currentProjectPermissions.workflow_verbs_map[resource.name]) || !isEmpty(currentProjectPermissions.environment_verbs_map[resource.name]))) {
         if (resource.type === 'workflow') {
@@ -142,11 +138,7 @@ export async function permissionCheckingLogic (opts) {
     }
     // 项目角色权限判断
   } else if (type === 'project' || projectName) {
-    const currentProject = store.getters.projectList.find(item => item.name === projectName)
     const currentProjectPermissions = store.getters.projectPermissions[projectName] ? store.getters.projectPermissions[projectName] : {}
-    if (currentProject && currentProject.public) {
-      return true
-    }
     const projectCollaborativeModeCheckingResult = () => {
       if (!isEmpty(resource) && (!isEmpty(currentProjectPermissions.workflow_verbs_map[resource.name]) || !isEmpty(currentProjectPermissions.environment_verbs_map[resource.name]))) {
         if (resource.type === 'workflow') {

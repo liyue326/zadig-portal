@@ -22,7 +22,9 @@
                 </div>
               </el-col>
               <el-col :span="7" >
+                <el-input v-if="build.source==='other'" v-model="build.branchOrTag.name" placeholder="请输入分支或标签" size="small"></el-input>
                 <el-select
+                  v-else
                   v-model="build.branchOrTag"
                   remote
                   :remote-method="(query)=>{searchRepoInfo(build,query)}"
@@ -31,7 +33,7 @@
                   clearable
                   size="small"
                   value-key="id"
-                  :placeholder="build.source==='other'?'请输入分支或标签':'请选择分支或标签'"
+                  placeholder="请选择分支或标签"
                   @change="changeBranchOrTag(build)"
                 >
                   <el-option-group v-for="group in build.branchAndTagList" :key="group.label" :label="group.label">
@@ -116,7 +118,7 @@
         </template>
       </el-table-column>
       <el-table-column width="100px"
-                       :label="pickedTargets[0].jenkins_build_args ? '变量': '环境变量'">
+                       label="变量">
         <template slot-scope="scope">
           <el-popover placement="left"
                       width="450"
@@ -281,6 +283,8 @@ export default {
             // source:other  init options data
             if (build.source === 'other') {
               this.searchRepoInfo(build, '')
+            } else {
+              this.searchRepoInfo(build)
             }
           })
         })
@@ -317,6 +321,7 @@ export default {
             repo: build.repo_name,
             default_branch: build.branch,
             codehost_id: build.codehost_id,
+            filter_regexp: build.filter_regexp,
             repo_namespace: build.repo_namespace,
             key: query
           }

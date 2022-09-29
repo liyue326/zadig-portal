@@ -24,7 +24,7 @@
         <el-button type="primary" @click="updateUserInfo">确 定</el-button>
       </span>
     </el-dialog>
-    <div class="section">
+    <div v-if="currentEditUserInfo" class="section">
       <div class="Box">
         <div class="row">
           <div class="edit-columns">
@@ -33,9 +33,9 @@
             </div>
           </div>
           <div class="info-tag">
-            <span class="username">{{currentEditUserInfo.name}}</span>
-            <el-tag v-if="role.includes('admin')" size="small" type="warning">管理员</el-tag>
-            <el-tag v-else size="small" type="primary">普通用户</el-tag>
+            <span  class="username">{{currentEditUserInfo.name}}</span>
+            <el-tag v-if="role.includes('admin')" size="mini" type="primary">管理员</el-tag>
+            <el-tag v-else size="mini" type="primary">普通用户</el-tag>
           </div>
 
           <div class="info-details">
@@ -44,7 +44,7 @@
                 <template>
                   <tr>
                     <td>最近登录</td>
-                    <td class>{{$utils.convertTimestamp(currentEditUserInfo.lastLoginTime)}}</td>
+                    <td class>{{$utils.convertTimestamp(currentEditUserInfo.last_login_time)}}</td>
                   </tr>
                 </template>
                 <!-- <tr>
@@ -58,6 +58,17 @@
                                type="text">点击下载</el-button>
                   </td>
                 </tr>-->
+                <tr v-if="currentEditUserInfo.identity_type">
+                  <td>
+                    <span>用户来源</span>
+                  </td>
+                  <td>
+                    <span >
+                      <i class="iconfont" :class="'icon'+currentEditUserInfo.identity_type"></i>
+                      <span>{{identityTypeMap[currentEditUserInfo.identity_type]}}</span>
+                    </span>
+                  </td>
+                </tr>
                 <tr v-if="currentEditUserInfo.identity_type ==='system'">
                   <td>
                     <span>修改密码</span>
@@ -134,6 +145,12 @@ export default {
       }
     }
     return {
+      identityTypeMap: {
+        github: 'GitHub',
+        system: '系统创建',
+        ldap: 'OpenLDAP',
+        oauth: 'OAuth'
+      },
       currentEditUserInfo: null,
       pwd: {
         oldPassword: '',
@@ -142,7 +159,6 @@ export default {
       },
       loading: false,
       modifiedPwdDialogVisible: false,
-      sysNoti: {},
       workflowNoti: {},
       rules: {
         oldPassword: [
@@ -159,10 +175,12 @@ export default {
   },
   methods: {
     async getCurrentUserInfo () {
+      this.loading = true
       const res = await getCurrentUserInfoAPI(this.userinfo.uid).catch(error =>
         console.log(error)
       )
       if (res) {
+        this.loading = false
         this.currentEditUserInfo = res
       }
     },
@@ -254,8 +272,6 @@ export default {
         info.forEach(element => {
           if (element.type === 2) {
             this.workflowNoti = element
-          } else if (element.type === 1) {
-            this.sysNoti = element
           }
         })
       }

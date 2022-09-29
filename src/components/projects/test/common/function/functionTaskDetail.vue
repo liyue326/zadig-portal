@@ -277,18 +277,28 @@ export default {
   },
   watch: {
     $route (to, from) {
-      if (this.$route.query.status === 'running') {
-        this.fetchTaskDetail()
-      } else {
+      if (
+        this.status === 'passed' ||
+      this.status === 'failed' ||
+      this.status === 'timeout' ||
+      this.status === 'cancelled'
+      ) {
         this.fetchOldTaskDetail()
+      } else {
+        this.fetchTaskDetail()
       }
     }
   },
   created () {
-    if (this.status === 'running') {
-      this.fetchTaskDetail()
-    } else {
+    if (
+      this.status === 'passed' ||
+      this.status === 'failed' ||
+      this.status === 'timeout' ||
+      this.status === 'cancelled'
+    ) {
       this.fetchOldTaskDetail()
+    } else {
+      this.fetchTaskDetail()
     }
   },
   components: {

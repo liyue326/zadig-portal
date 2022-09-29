@@ -70,14 +70,17 @@ export default {
                   style={this.showHover[data.id] ? 'visibility: visible' : 'visibility: hidden'}
                   class="el-icon-close icon"
                   onClick = {() => this.deleteServer(data)}
-                ></el-button><el-button
-                  v-hasPermi={{ projectName: this.$route.params.project_name, action: 'edit_service', isBtn: true }}
-                  type="text"
-                  size="mini"
-                  style={this.showHover[data.id] ? 'visibility: visible' : 'visibility: hidden'}
-                  class="el-icon-refresh icon"
-                  onClick = {() => this.openRepoModal(data.source, data)}
-                ></el-button></span>}
+                ></el-button>
+                {data.source !== 'customEdit'
+                  ? <el-button
+                    v-hasPermi={{ projectName: this.$route.params.project_name, action: 'edit_service', isBtn: true }}
+                    type="text"
+                    size="mini"
+                    style={this.showHover[data.id] ? 'visibility: visible' : 'visibility: hidden'}
+                    class="el-icon-refresh icon"
+                    onClick = {() => this.openRepoModal(data.source, data)}
+                  ></el-button>
+                  : ''} </span>}
               </span>
             )}
         </span>
@@ -132,7 +135,10 @@ export default {
           }
           this.$store.dispatch('queryFileContent', params).then(res => {
             if (res) {
+              const autoSync = this.nodeData.find(ele => ele.service_name === data.service_name).auto_sync
+              data.autoSync = autoSync
               data.txt = res
+              data.originalTxt = res
             } else {
               data.txt = ''
             }

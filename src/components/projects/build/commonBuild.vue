@@ -284,6 +284,11 @@ export default {
             this.$set(repo, 'showVars', false)
           })
         }
+        if (buildConfig.pre_build.envs) {
+          buildConfig.pre_build.envs.forEach(element => {
+            element.disabledKey = true
+          })
+        }
 
         this.buildConfig = buildConfig
 

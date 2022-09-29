@@ -179,6 +179,7 @@ export default {
           const data = {
             label: val,
             status: 'named',
+            variable_yaml: '',
             name: val
           }
           this.files.push(data)

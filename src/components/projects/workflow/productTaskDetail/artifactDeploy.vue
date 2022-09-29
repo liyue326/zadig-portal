@@ -1,13 +1,9 @@
 <template>
-  <div class="task-detail-deploy">
-    <el-card v-if="deploy"
-             class="box-card task-process"
-             :body-style="{ margin: '15px 0 0 0' }">
-      <div slot="header"
-           class="clearfix subtask-header">
+  <div class="task-detail-artifact-deploy">
+    <el-card v-if="deploy" class="box-card task-process" :body-style="{ margin: '15px 0 0 0' }">
+      <div slot="header" class="clearfix subtask-header">
         <span>交付物部署</span>
-        <div v-if="deploy.status==='running'"
-             class="loader">
+        <div v-if="deploy.status==='running'" class="loader">
           <div class="ball-scale-multiple">
             <div></div>
             <div></div>
@@ -17,95 +13,85 @@
       </div>
       <div class="deploy-item">
         <div class="error-wrapper">
-          <el-alert v-if="deploy.error"
-                    title="错误信息"
-                    :description="deploy.error"
-                    type="error"
-                    close-text="知道了">
-
-          </el-alert>
+          <el-alert v-if="deploy.error" title="错误信息" :description="deploy.error" type="error" close-text="知道了"></el-alert>
         </div>
         <el-row :gutter="0">
           <el-col :span="6">
-            <div class="grid-content item-title">
+            <div class="item-title">
               <i class="iconfont iconzhuangtai"></i> 部署状态
             </div>
           </el-col>
           <el-col :span="6">
-            <div class="grid-content item-desc"
-                 :class="$translate.calcTaskStatusColor(deploy.status)">
-              {{deploy.status?$translate.translateTaskStatus(deploy.status):"未运行"}}
+            <div
+              class="item-desc"
+              :class="$translate.calcTaskStatusColor(deploy.status)"
+            >{{deploy.status?$translate.translateTaskStatus(deploy.status):"未运行"}}</div>
+          </el-col>
+          <el-col :span="6">
+            <div class="item-title">
+              <i class="iconfont iconvery-environ"></i> 部署环境
             </div>
           </el-col>
           <el-col :span="6">
-            <div class="grid-content item-title">
-              <i class="iconfont iconjiqun1"></i> 部署环境
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="grid-content item-desc">
-              <router-link class="env-link"
-                           :to="`/v1/projects/detail/${deploy.product_name}/envs/detail?envName=${deploy.env_name}`">
-                {{deploy.env_name}}</router-link>
+            <div class="item-desc">
+              <router-link
+                class="env-link"
+                :to="`/v1/projects/detail/${deploy.product_name}/envs/detail?envName=${deploy.env_name}`"
+              >{{deploy.env_name}}</router-link>
             </div>
           </el-col>
         </el-row>
         <el-row :gutter="0">
           <el-col :span="6" v-if="deploy.artifact_info">
-            <div class="grid-content item-title">
+            <div class="item-title">
               <i class="iconfont iconSliceCopy"></i> 交付物信息
             </div>
           </el-col>
-          <el-col :span="6"  v-if="deploy.artifact_info">
+          <el-col :span="6" v-if="deploy.artifact_info">
             <div>{{deploy.artifact_info.file_name}}</div>
           </el-col>
-          <el-col :span="6"  v-if="!deploy.artifact_info">
-            <div class="grid-content item-title">
+          <el-col :span="6">
+            <div class="item-title">
+              <i class="iconfont iconvery-service"></i> 服务名称
+            </div>
+          </el-col>
+          <el-col :span="6">
+            <div class="item-desc">
+              <span v-if="deploy.service_type==='helm'">{{`${$utils.showServiceName(deploy.container_name,deploy.service_name)}`}}</span>
+              <router-link v-else class="env-link" :to="serviceUrl(deploy)">{{$utils.showServiceName(deploy.service_name)}}</router-link>
+            </div>
+          </el-col>
+          <el-col :span="6" v-if="!deploy.artifact_info">
+            <div class="item-title">
               <i class="iconfont iconSliceCopy"></i> 镜像信息
             </div>
           </el-col>
-          <el-col :span="6"  v-if="!deploy.artifact_info">
-            <el-tooltip effect="dark"
-                        :content="deploy.image"
-                        placement="top">
-              <div class="grid-content item-desc">{{deploy.image?deploy.image.split('/')[2]:"*"}}
-              </div>
+          <el-col :span="6" v-if="!deploy.artifact_info">
+            <el-tooltip effect="dark" :content="deploy.image" placement="top">
+              <div class="item-desc image-name">{{deploy.image?deploy.image.split('/')[2]:"*"}}</div>
             </el-tooltip>
-          </el-col>
-          <el-col :span="6">
-            <div class="grid-content item-title">
-              <i class="iconfont iconfuwu"></i> 服务名称
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="grid-content item-desc">
-              <router-link v-if="deploy.service_type === 'pm'" class="env-link"
-                           :to="`/v1/projects/detail/${deploy.product_name}/envs/detail/${deploy.service_name}/pm?envName=${deploy.env_name}&projectName=${deploy.product_name}&namespace=${deploy.namespace}`">{{$utils.showServiceName(deploy.service_name)}}</router-link>
-              <router-link v-else class="env-link"
-                           :to="`/v1/projects/detail/${deploy.product_name}/envs/detail/${deploy.service_name}?envName=${deploy.env_name}&projectName=${deploy.product_name}&namespace=${deploy.namespace}`">{{$utils.showServiceName(deploy.service_name)}}</router-link>
-            </div>
           </el-col>
         </el-row>
       </div>
     </el-card>
-    <el-card id="deploy-log"
-             v-if="!$utils.isEmpty(deploy)&&deploy.enabled && serviceType==='pm'"
-             class="box-card task-process"
-             :body-style="{padding:'8px 20px',margin: '5px 0 0 0' }">
+    <el-card
+      id="deploy-log"
+      v-if="!$utils.isEmpty(deploy)&&deploy.enabled && serviceType==='pm'"
+      class="box-card task-process"
+      :body-style="{padding:'8px 20px',margin: '5px 0 0 0' }"
+    >
       <div class="log-container">
         <div class="log-content">
-          <XtermLog :id="deploy.service_name"
-                     @mouseleave.native="leaveLog"
-                     :logs="artifactDeployLog"/>
+          <XtermLog :id="deploy.service_name" @mouseleave.native="leaveLog" :logs="artifactDeployLog" />
         </div>
       </div>
     </el-card>
-
   </div>
 </template>
 
 <script>
 import mixin from '@/mixin/killSSELogMixin'
+import qs from 'qs'
 import { getWorkflowHistoryBuildLogAPI } from '@api'
 
 export default {
@@ -138,6 +124,21 @@ export default {
     }
   },
   methods: {
+    serviceUrl (deploy) {
+      const serviceName = deploy.service_name.split('_')[0]
+      const path = `/v1/projects/detail/${deploy.product_name}/envs/detail/${serviceName}`
+      const query = {
+        envName: deploy.env_name,
+        projectName: deploy.product_name,
+        namespace: deploy.namespace,
+        clusterId: deploy.cluster_id ? deploy.cluster_id : ''
+      }
+      if (deploy.service_type === 'pm') {
+        return path + '/pm?' + qs.stringify(query)
+      } else {
+        return path + '?' + qs.stringify(query)
+      }
+    },
     getArtifactDeployLog () {
       this.artifactDeployLogStarted = true
     },
@@ -153,7 +154,9 @@ export default {
       }
       this[`${buildType}IntervalHandle`] = setInterval(() => {
         if (this.hasNewMsg) {
-          this.artifactDeployLog = this.artifactDeployLog.concat(this.wsBuildDataBuffer)
+          this.artifactDeployLog = this.artifactDeployLog.concat(
+            this.wsBuildDataBuffer
+          )
           this.wsBuildDataBuffer = []
         }
         this.hasNewMsg = false
@@ -170,7 +173,9 @@ export default {
           // Listen for messages without a specified event
           sse.subscribe('', data => {
             this.hasNewMsg = true
-            this.wsBuildDataBuffer = this.wsBuildDataBuffer.concat(Object.freeze(data + '\n'))
+            this.wsBuildDataBuffer = this.wsBuildDataBuffer.concat(
+              Object.freeze(data + '\n')
+            )
           })
         })
         .catch(err => {
@@ -179,13 +184,17 @@ export default {
         })
     },
     getHistoryArtifactDeployLog () {
-      return getWorkflowHistoryBuildLogAPI(this.projectName, this.workflowName, this.taskID, this.serviceName, 'artifact_deploy').then(
-        response => {
-          this.artifactDeployLog = (response.split('\n')).map(element => {
-            return element + '\n'
-          })
-        }
-      )
+      return getWorkflowHistoryBuildLogAPI(
+        this.projectName,
+        this.workflowName,
+        this.taskID,
+        this.serviceName,
+        'artifact_deploy'
+      ).then(response => {
+        this.artifactDeployLog = response.split('\n').map(element => {
+          return element + '\n'
+        })
+      })
     }
   },
   watch: {
@@ -231,11 +240,17 @@ export default {
 </script>
 
 <style lang="less">
-@import "~@assets/css/component/subtask.less";
+@import '~@assets/css/component/subtask.less';
 
-.task-detail-deploy {
+.task-detail-artifact-deploy {
   .deploy-item {
     margin-bottom: 15px;
+  }
+
+  .image-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .env-link {

@@ -85,7 +85,7 @@ export default {
             service.push(item)
           })
           service[0].children = res.file_infos.map((child, index) => {
-            child.id = child.name + index
+            child.id = res.serviceInfos[0].service_name + '-' + child.name + '-' + index
             child.label = child.name
             child.service_name = service[0].service_name
             child.txt = ''
@@ -121,18 +121,11 @@ export default {
     },
     async updateHelmChart ({ dispatch }, payload) {
       const params = {
-        helm_service_infos: []
+        file_path: payload.commitCache.slice(-1)[0].label,
+        file_content: payload.commitCache.slice(-1)[0].txt
       }
-      payload.commitCache.forEach(item => {
-        const data = {
-          service_name: item.service_name,
-          file_path: item.parent,
-          file_name: item.label,
-          file_content: item.txt
-        }
-        params.helm_service_infos.push(data)
-      })
-      const res = await Api.updateHelmChartAPI(payload.projectName, params).catch(error => console.log(error))
+      const serviceName = payload.commitCache.slice(-1)[0].service_name
+      const res = await Api.updateHelmChartAPI(serviceName, payload.projectName, params).catch(error => console.log(error))
       if (res) {
         dispatch('queryService', { projectName: payload.projectName })
         return Promise.resolve(res)
@@ -142,7 +135,7 @@ export default {
       const res = await Api.getHelmChartServiceFilePath(payload).catch(error => console.log(error))
       if (res) {
         res.map((child, index) => {
-          child.id = child.name + index
+          child.id = payload.serviceName + '-' + child.name + '-' + index
           child.label = child.name
           child.service_name = payload.serviceName
           child.txt = ''

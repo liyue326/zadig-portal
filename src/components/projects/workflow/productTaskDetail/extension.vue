@@ -50,7 +50,7 @@
       <el-col :span="6">
         <el-popover popper-class="payload-popover" placement="top" width="400" trigger="click">
           <div v-if="extensionStage.response_code" style="margin: 10px 0;">
-            <span style="display: inline-block; color: #000; font-size: 16px;">Reponse Code:</span>
+            <span style="display: inline-block; color: #000; font-size: 16px;">Response Code:</span>
             <div style="margin-top: 10px;">
               <el-tag v-if="extensionStage.response_code <=299" type="success" size="mini" effect="dark">{{ extensionStage.response_code }}</el-tag>
               <el-tag
@@ -62,7 +62,7 @@
             </div>
           </div>
           <div v-if="extensionStage.response_body" style="margin: 10px 0;">
-            <span style="display: inline-block; color: #000; font-size: 16px;">Reponse Body:</span>
+            <span style="display: inline-block; color: #000; font-size: 16px;">Response Body:</span>
             <VueJsonPretty style="padding: 10px; border: 1px solid #ebeef5; border-radius: 6px;" v-if="checkJSON(extensionStage.response_body)" :data="JSON.parse(extensionStage.response_body)" />
             <pre v-else style="max-height: 400px; padding: 10px 5px; overflow: auto; border: 1px solid #ebeef5; border-radius: 6px;">{{extensionStage.response_body}}</pre>
           </div>

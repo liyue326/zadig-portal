@@ -1,0 +1,50 @@
+.mobile-workflow-build-rows,
+.mobile-workflow-test-rows {
+  .build-row {
+    padding: 5px 0;
+
+    .repo-warning {
+      margin-left: 4px;
+      color: #ff1949;
+      vertical-align: bottom;
+      cursor: pointer;
+    }
+
+    &:not(:first-child) {
+      margin-top: 5px;
+    }
+  }
+
+  .repo-name-container {
+    .repo-name {
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      &.adjust {
+        line-height: 57px;
+      }
+    }
+
+    .namespace {
+      line-height: 32px;
+    }
+  }
+
+  .el-switch__label--left {
+    margin-right: 5px;
+  }
+
+  .el-switch__label--right {
+    margin-left: 5px;
+  }
+
+  .other {
+    width: 60%;
+    overflow: hidden;
+    line-height: 32px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}

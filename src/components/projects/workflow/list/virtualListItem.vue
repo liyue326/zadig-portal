@@ -3,26 +3,26 @@
     :workflowInfo="workflow"
     :name="workflow.name"
     :isFavorite="workflow.isFavorite || false"
-    :type="workflow.type === 'common' ? 'common' : 'workflow'"
+    :type="workflow.workflow_type === 'common_workflow' ? 'common_workflow' : 'workflow'"
     :projectName="workflow.projectName || workflow.project_name"
     :stages="stages"
     :recentTaskStatus="workflow.recentTask?workflow.recentTask.status:''"
     :recentSuccessID="workflow.recentSuccessfulTask?`#${workflow.recentSuccessfulTask.taskID}`:''"
     :avgRuntime="makeAvgRunTime(workflow.averageExecutionTime)"
     :avgSuccessRate="makeAvgSuccessRate(workflow.successRate)"
-    :recentSuccessLink="makeTaskDetailLink(workflow.projectName,workflow.recentSuccessfulTask)"
+    :recentSuccessLink="makeTaskDetailLink(workflow.projectName,workflow.recentSuccessfulTask,workflow.workflow_type)"
     :recentFailID="workflow.recentFailedTask?`#${workflow.recentFailedTask.taskID}`:''"
-    :recentFailLink="makeTaskDetailLink(workflow.projectName,workflow.recentFailedTask)"
+    :recentFailLink="makeTaskDetailLink(workflow.projectName,workflow.recentFailedTask,workflow.workflow_type)"
     :updateTime="$utils.convertTimestamp(workflow.update_time)"
     :description="workflow.description"
     @refreshWorkflow="refreshWorkflow"
   >
-    <template v-if="workflow.type === 'common'" slot="operations">
+    <template v-if="workflow.workflow_type === 'common_workflow'" slot="operations">
       <el-button
         type="primary"
-        v-if="checkPermissionSyncMixin({projectName: workflow.project_name, action: 'run_workflow',resource:{type:'workflow',name:workflow.name}})"
+        v-if="checkPermissionSyncMixin({projectName: workflow.projectName, action: 'run_workflow',resource:{type:'workflow',name:workflow.name}})"
         class="button-exec"
-        @click="startCommonWorkflowBuild(workflow)"
+        @click="startCustomWorkflowBuild(workflow)"
       >
         <span class="iconfont iconzhixing">&nbsp;执行</span>
       </el-button>
@@ -32,20 +32,25 @@
         </el-button>
       </el-tooltip>
       <router-link
-        v-if="checkPermissionSyncMixin({projectName: workflow.project_name, action: 'edit_workflow', action: 'run_workflow', resource:{type:'workflow',name:workflow.name}})"
-        :to="`/workflows/common/edit/${workflow.name}?projectName=${workflow.project_name}&id=${workflow.id}`"
+        v-if="checkPermissionSyncMixin({projectName: workflow.projectName, action: 'edit_workflow', resource:{type:'workflow',name:workflow.name}})"
+        :to="workflow.workflow_type === 'common_workflow' ? `/v1/projects/detail/${workflow.projectName}/pipelines/custom/edit/${workflow.name}?projectName=${workflow.projectName}` :  `/workflows/common/edit/${workflow.name}?projectName=${workflow.projectName}&id=${workflow.id}`"
       >
         <span class="menu-item iconfont icondeploy"></span>
       </router-link>
       <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
         <span class="permission-disabled menu-item iconfont icondeploy"></span>
       </el-tooltip>
-      <el-dropdown v-hasPermi="{projectName: workflow.project_name, action:'delete_workflow', resource:{type:'workflow',name:workflow.name}, isBtn: true}">
+      <el-dropdown>
         <span class="el-dropdown-link">
           <i class="iconfont iconmorelist more-operation"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item @click.native="deleteCommonWorkflow(workflow)">删除</el-dropdown-item>
+          <el-dropdown-item
+            v-hasPermi="{projectName: workflow.projectName, action: 'delete_workflow',resource:{type:'workflow',name:workflow.name},isBtn:true}"
+            @click.native="deleteCommonWorkflow(workflow)"
+          >
+            <span>删除</span>
+          </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </template>
@@ -63,7 +68,6 @@
           <span class="iconfont iconzhixing">&nbsp;执行</span>
         </el-button>
       </el-tooltip>
-
       <router-link
         v-if="checkPermissionSyncMixin({projectName: workflow.projectName, action: 'edit_workflow',resource:{type:'workflow',name:workflow.name},isBtn: true})"
         :to="`/workflows/product/edit/${workflow.name}?projectName=${workflow.projectName}`"
@@ -73,9 +77,7 @@
       <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
         <span class="permission-disabled menu-item iconfont icondeploy"></span>
       </el-tooltip>
-      <el-dropdown
-        @visible-change="(status) => fnShowTimer(status, index, workflow)"
-      >
+      <el-dropdown @visible-change="(status) => fnShowTimer(status, index, workflow)">
         <span class="el-dropdown-link">
           <i class="iconfont iconmorelist more-operation"></i>
         </span>
@@ -130,6 +132,7 @@ export default {
   },
   inject: [
     'startProductWorkflowBuild',
+    'startCustomWorkflowBuild',
     'copyWorkflow',
     'deleteProductWorkflow',
     'renamePipeline',
@@ -144,11 +147,17 @@ export default {
       return this.workflow.projectName
     },
     stages () {
-      return this.workflow.enabledStages
-        ? this.workflow.enabledStages.map(stage =>
-          this.wordTranslation(stage, 'workflowStage')
-        )
-        : []
+      let stages = []
+      if (this.workflow.workflow_type === 'common_workflow') {
+        stages = this.workflow.enabledStages
+      } else {
+        stages = this.workflow.enabledStages
+          ? this.workflow.enabledStages.map(stage =>
+            this.wordTranslation(stage, 'workflowStage')
+          )
+          : []
+      }
+      return stages
     }
   },
   methods: {
@@ -166,9 +175,13 @@ export default {
         return ''
       }
     },
-    makeTaskDetailLink (projectName, taskInfo) {
+    makeTaskDetailLink (projectName, taskInfo, type) {
       if (taskInfo) {
-        return `/v1/projects/detail/${projectName}/pipelines/multi/${taskInfo.pipelineName}/${taskInfo.taskID}?status=${taskInfo.status}`
+        if (type === 'common_workflow') {
+          return `/v1/projects/detail/${projectName}/pipelines/custom/${taskInfo.pipelineName}/${taskInfo.taskID}?status=${taskInfo.status}`
+        } else {
+          return `/v1/projects/detail/${projectName}/pipelines/multi/${taskInfo.pipelineName}/${taskInfo.taskID}?status=${taskInfo.status}`
+        }
       } else {
         return ''
       }

@@ -165,12 +165,7 @@ export default {
         reg_provider: [{ required: true, message: '请选择镜像仓库提供商', trigger: ['blur'] }],
         reg_addr: [{
           required: true,
-          message: '请输入 URL',
-          trigger: ['blur']
-        },
-        {
-          type: 'url',
-          message: '请输入正确的 URL，包含协议',
+          message: '请输入 URL，包含协议',
           trigger: ['blur']
         }],
         region: [{ required: true, message: '请输入区域', trigger: ['blur'] }],

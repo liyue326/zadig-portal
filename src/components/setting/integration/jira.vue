@@ -164,7 +164,7 @@ import {
 } from '@api'
 const validateJiraURL = (rule, value, callback) => {
   if (value === '') {
-    callback(new Error('请输入服务 URL'))
+    callback(new Error('请输入服务 URL，包含协议'))
   } else {
     if (value.endsWith('/')) {
       callback(new Error('URL 末尾不能包含 /'))
@@ -199,15 +199,10 @@ export default {
           required: true,
           message: '请输入 Host',
           trigger: 'blur'
-        },
-        {
-          type: 'url',
-          message: '请输入正确的 URL，包含协议',
-          trigger: ['blur', 'change']
         }, {
           required: true,
-          trigger: 'change',
-          validator: validateJiraURL
+          validator: validateJiraURL,
+          trigger: ['blur', 'change']
         }],
         access_token: {
           required: true,

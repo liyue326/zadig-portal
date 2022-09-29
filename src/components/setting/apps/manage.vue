@@ -58,7 +58,6 @@
             <Editor v-model="createApp.scripts"
                     lang="sh"
                     theme="monokai"
-                    :options="option"
                     width="100%"
                     height="220"></Editor>
           </el-form-item>
@@ -388,7 +387,8 @@ export default {
     },
     getApps () {
       this.loading = true
-      getAllAppsAPI().then(
+      const showAvailable = false
+      getAllAppsAPI(showAvailable).then(
         response => {
           this.loading = false
           const apps = this.$utils.sortVersion(response, 'version', 'asc')

@@ -67,8 +67,22 @@ export default {
       this.configInfo.index = index + 1
       this.editConfig(next)
     },
-    getAllYaml () {
-      return this.configInfo.map(info => info.initYaml).filter(info => info)
+    getEnvConfig () {
+      return this.configInfo.filter(info => info.initYaml).map(info => {
+        const config = info.gitRepoConfig
+        return {
+          yaml_data: info.initYaml,
+          git_repo_config: {
+            branch: config.branch,
+            codehost_id: config.codehostID,
+            owner: config.owner,
+            repo: config.repo,
+            values_paths: config.valuesPaths,
+            namespace: config.namespace
+          },
+          auto_sync: config.autoSync
+        }
+      })
     }
   },
   components: {

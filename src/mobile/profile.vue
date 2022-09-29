@@ -1,115 +1,133 @@
 <template>
   <div class="mobile-profile">
-    <van-nav-bar left-arrow
-                 @click-left="mobileGoback">
-      <template #title>
-        {{username}}
-      </template>
+    <van-nav-bar>
+      <template #title>账号设置</template>
     </van-nav-bar>
-    <div v-if="loading"
-         class="load-cover">
-      <van-loading type="spinner"
-                   color="#0066ff" />
+    <div v-if="loading" class="load-cover">
+      <van-loading type="spinner" color="#0066ff" />
     </div>
 
     <template v-else>
-      <van-panel title="用户名"
-                 :desc="username"
-                 :status="userRole">
-      </van-panel>
-      <van-panel title="用户来源"
-                 :desc="from">
-      </van-panel>
-      <van-panel title="最近登录"
-                 :desc="$utils.convertTimestamp(currentEditUserInfo.info.lastLoginTime)">
-      </van-panel>
-      <van-panel v-if="jwtToken"
-                 title="API Token"
-                 :desc="jwtToken">
-      </van-panel>
+      <van-cell :label="currentUserInfo.name">
+        <template #title>
+          <span>用户名</span>
+        </template>
+        <template #default>
+          <van-tag v-if="role.includes('admin')" type="primary">管理员</van-tag>
+          <van-tag v-else type="primary">普通用户</van-tag>
+        </template>
+      </van-cell>
+      <van-cell :label="$utils.convertTimestamp(currentUserInfo.last_login_time)">
+        <template #title>
+          <span>最近登录</span>
+        </template>
+      </van-cell>
+      <van-cell :label="identityTypeMap[currentUserInfo.identity_type]">
+        <template #title>
+          <span>用户来源</span>
+        </template>
+      </van-cell>
+      <van-cell :label="currentUserInfo.token">
+        <template #title>
+          <span>API Token</span>
+        </template>
+      </van-cell>
+      <van-cell v-if="buildInfo">
+        <template #title>
+          <span>Build Info</span>
+        </template>
+        <template #label>
+          <span>{{buildInfo.commits.join(' ')}}</span>
+          <br>
+          <span>{{buildInfo.time}}</span>
+        </template>
+        <template #default>
+          <span>{{buildInfo.version}}</span>
+        </template>
+      </van-cell>
       <div class="logout">
-        <van-button type="danger"
-                    @click="logout"
-                    round
-                    block>退出登录</van-button>
+        <van-button type="danger" @click="logOut" size="normal" round block>退出登录</van-button>
       </div>
-
     </template>
-
   </div>
-
 </template>
 <script>
-import { NavBar, Tag, Panel, Loading, Button, Notify } from 'vant'
-import store from 'storejs'
+import { NavBar, Tag, Cell, CellGroup, Loading, Button, Notify } from 'vant'
+import { getCurrentUserInfoAPI } from '@api'
+import storejs from 'storejs'
+import { mapState } from 'vuex'
+import moment from 'moment'
 export default {
   components: {
     [NavBar.name]: NavBar,
     [Tag.name]: Tag,
-    [Panel.name]: Panel,
     [Loading.name]: Loading,
     [Button.name]: Button,
+    [Cell.name]: Cell,
+    [CellGroup.name]: CellGroup,
     [Notify.name]: Notify
   },
   data () {
     return {
       loading: false,
-      jwtToken: null,
-      currentEditUserInfo: {
-        info: {
-          id: 5,
-          name: '',
-          email: '',
-          password: '',
-          phone: '',
-          isAdmin: true,
-          isSuperUser: false,
-          organization_id: 0,
-          directory: 'system',
-          teams: []
-        },
-        teams: [],
-        organization: {
-          id: 1,
-          name: '',
-          token: '',
-          website: ''
-        }
+      currentUserInfo: {},
+      identityTypeMap: {
+        github: 'GitHub',
+        system: '系统创建',
+        ldap: 'OpenLDAP',
+        oauth: 'OAuth'
       }
-
     }
   },
   methods: {
-    getJwtToken () {
-      this.jwtToken = store.get('userInfo').token
+    async getCurrentUserInfo () {
+      this.loading = true
+      const uid = storejs.get('userInfo').uid
+      const res = await getCurrentUserInfoAPI(uid).catch(error =>
+        console.log(error)
+      )
+      if (res) {
+        this.loading = false
+        this.currentUserInfo = res
+      }
     },
-    logout () {
-      store.remove('token')
-      this.$store.dispatch('clearProjectTemplates')
+    async logOut () {
+      await this.$store.dispatch('LOGINOUT')
       this.$router.push('/signin')
-      Notify({ type: 'success', message: '账号退出成功' })
     }
   },
   computed: {
-    title () {
-      return this.$route.meta.title
-    },
-    username () {
-      return this.$store.state.login.userinfo.name
-    },
-    userRole () {
-      if (this.currentEditUserInfo.info.isSuperUser) {
-        return '管理员'
+    ...mapState({
+      role: state => state.login.role
+    }),
+    buildInfo () {
+      const processEnv = process.env
+      if (processEnv && processEnv.NODE_ENV === 'production') {
+        const buildInfo = {
+          version: `${processEnv.VERSION}`,
+          time: `${moment.unix(processEnv.BUILD_TIME).format('YYYYMMDDHHmm')}`,
+          commits: []
+        }
+        if (processEnv.TAG) {
+          buildInfo.commits.push(`Tag-${processEnv.TAG}`)
+        }
+        if (processEnv.BRANCH) {
+          buildInfo.commits.push(`Branch-${processEnv.BRANCH}`)
+        }
+        if (processEnv.PR) {
+          buildInfo.commits.push(`PR-${processEnv.PR}`)
+        }
+        if (processEnv.COMMIT_ID) {
+          buildInfo.commits.push(`${processEnv.COMMIT_ID.substring(0, 7)}`)
+        }
+        return buildInfo
       } else {
-        return '普通用户'
+        return null
       }
-    },
-    from () {
-      return this.currentEditUserInfo.info.directory
     }
   },
   mounted () {
-    this.getJwtToken()
+    this.getCurrentUserInfo()
   }
 }
 </script>
@@ -121,7 +139,7 @@ export default {
     left: 0;
     z-index: 999;
     width: 100%;
-    height: calc(~"100% - 46px");
+    height: calc(~'100% - 46px');
     background: rgba(255, 255, 255, 0.5);
 
     .van-loading {

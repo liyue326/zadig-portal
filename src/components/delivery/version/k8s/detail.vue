@@ -334,7 +334,21 @@
         </div>
       </el-tab-pane>-->
       <el-tab-pane v-if="showArtifactDeployBtn" disabled>
-        <el-button v-hasPermi="{projectName: projectName, action: 'run_workflow',isBtn:true}" icon="el-icon-upload2" @click="runWorkflowFromVersion"  slot="label" size="mini" type="text">版本发布</el-button>
+        <el-button
+          v-if="checkPermissionSyncMixin({projectName: projectName, action: 'run_workflow',isBtn: true})"
+          icon="el-icon-upload2"
+          @click="runWorkflowFromVersion"
+          slot="label"
+          size="mini"
+          type="text"
+        >版本发布</el-button>
+        <template v-else slot="label">
+          <div>
+            <el-tooltip effect="dark" content="无权限操作" placement="top">
+              <el-button size="mini" type="text" icon="el-icon-upload2" class="permission-disable">版本发布</el-button>
+            </el-tooltip>
+          </div>
+        </template>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -646,6 +660,14 @@ export default {
             span {
               color: @themeColor;
               cursor: pointer;
+            }
+
+            .permission-disable {
+              i,
+              span {
+                color: #ccc;
+                cursor: pointer;
+              }
             }
           }
         }

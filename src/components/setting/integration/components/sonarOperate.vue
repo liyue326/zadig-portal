@@ -67,9 +67,8 @@ export default {
         server_address: [
           {
             required: true,
-            type: 'url',
-            message: '请输入正确的 URL，包含协议',
-            trigger: ['blur']
+            message: '请输入 URL，包含协议',
+            trigger: ['blur', 'change']
           }
         ],
         token: [

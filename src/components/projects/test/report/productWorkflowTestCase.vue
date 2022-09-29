@@ -1,68 +1,41 @@
 <template>
   <div class="test-case-container">
     <template v-if="testType === 'undefined'|| testType === 'function'">
-      <el-card class="box-card"
-               :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
-        <div slot="header"
-             class="clearfix">
+      <el-card class="box-card" :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
+        <div slot="header" class="clearfix">
           <span>测试报告概览</span>
         </div>
         <div class="test-summary">
-          <function-test-summary :success="testSummary.successes?testSummary.successes:(testSummary.tests - testSummary.failures - testSummary.errors)"
-                                 :failure="testSummary.failures"
-                                 :error="testSummary.errors"
-                                 :total="testSummary.tests"
-                                 :skip="testSummary.skips">
-          </function-test-summary>
+          <function-test-summary
+            :success="testSummary.successes?testSummary.successes:(testSummary.tests - testSummary.failures - testSummary.errors)"
+            :failure="testSummary.failures"
+            :error="testSummary.errors"
+            :total="testSummary.tests"
+            :skip="testSummary.skips"
+          ></function-test-summary>
         </div>
       </el-card>
-      <el-card class="box-card task-process"
-               :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
-        <div slot="header"
-             class="clearfix">
+      <el-card class="box-card task-process" :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
+        <div slot="header" class="clearfix">
           <span>详细用例</span>
         </div>
         <function-test-case :testCases="testCases"></function-test-case>
       </el-card>
     </template>
     <template v-if="testType ==='performance'">
-      <el-card class="box-card"
-               :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
-        <el-table :data="performanceTests"
-                  style="width: 100%;">
-          <el-table-column prop="label"
-                           label="Label">
-          </el-table-column>
-          <el-table-column prop="samples"
-                           label="Samples">
-          </el-table-column>
-          <el-table-column prop="average"
-                           label="Average">
-          </el-table-column>
-          <el-table-column prop="min"
-                           label="Min">
-          </el-table-column>
-          <el-table-column prop="max"
-                           label="Max">
-          </el-table-column>
-          <el-table-column prop="error"
-                           label="Error">
-          </el-table-column>
-          <el-table-column prop="line"
-                           label="90% Line">
-          </el-table-column>
-          <el-table-column prop="stdDev"
-                           label="Std Dev">
-          </el-table-column>
-          <el-table-column prop="throughput"
-                           label="Throughput">
-          </el-table-column>
-          <el-table-column prop="receivedKb"
-                           label="Received KB/sec">
-          </el-table-column>
-          <el-table-column prop="avgByte"
-                           label="Avg Bytes">
-          </el-table-column>
+      <el-card class="box-card" :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
+        <el-table :data="performanceTests" style="width: 100%;">
+          <el-table-column prop="label" label="Label"></el-table-column>
+          <el-table-column prop="samples" label="Samples"></el-table-column>
+          <el-table-column prop="average" label="Average"></el-table-column>
+          <el-table-column prop="min" label="Min"></el-table-column>
+          <el-table-column prop="max" label="Max"></el-table-column>
+          <el-table-column prop="error" label="Error"></el-table-column>
+          <el-table-column prop="line" label="90% Line"></el-table-column>
+          <el-table-column prop="stdDev" label="Std Dev"></el-table-column>
+          <el-table-column prop="throughput" label="Throughput"></el-table-column>
+          <el-table-column prop="receivedKb" label="Received KB/sec"></el-table-column>
+          <el-table-column prop="avgByte" label="Avg Bytes"></el-table-column>
         </el-table>
       </el-card>
     </template>
@@ -72,7 +45,7 @@
 <script>
 import functionTestCase from '@/components/projects/test/common/functionTestCase.vue'
 import functionTestSummary from '@/components/projects/test/common/functionTestSummary.vue'
-import { getTestReportAPI } from '@api'
+import { getTestReportAPI, getTestJunitReportAPI } from '@api'
 import bus from '@utils/eventBus'
 export default {
   data () {
@@ -99,33 +72,76 @@ export default {
     getTestCases () {
       const { workflow_name, task_id, test_job_name } = this.$route.params
       const { service_name, test_type } = this.$route.query
-      getTestReportAPI(this.projectName, workflow_name, task_id, test_job_name, service_name, test_type).then((res) => {
-        if (test_type === 'undefined' || test_type === 'function') {
-          this.testSummary = res.functionTestSuite
-          this.testCases = res.functionTestSuite.testcase
-          this.testCases.forEach(testCase => {
-            const blocks = []
-            if (testCase.failure && typeof testCase.failure === 'string') {
-              blocks.push(`失败原因:\n${testCase.failure}`)
-            }
-            if (testCase.failure && typeof testCase.failure === 'object') {
-              blocks.push(`失败信息:\n${testCase.failure.message}`)
-              blocks.push(`失败详情:\n${testCase.failure.text}`)
-            }
-            if (testCase.system_out) {
-              blocks.push(`标准输出:\n${testCase.system_out}`)
-            }
-            if (testCase.error) {
-              blocks.push(`错误信息:\n${testCase.error.message}`)
-              blocks.push(`错误详情:\n${testCase.error.text}`)
-              blocks.push(`错误类型:\n${testCase.error.type}`)
-            }
-            testCase.mergedOutput = blocks.join('\n')
-          })
-        } else if (test_type === 'performance') {
-          this.performanceTests = res.performanceTestSuite
-        }
-      })
+      if (service_name) {
+        getTestReportAPI(
+          this.projectName,
+          workflow_name,
+          task_id,
+          test_job_name,
+          service_name,
+          test_type
+        ).then(res => {
+          if (test_type === 'undefined' || test_type === 'function') {
+            this.testSummary = res.functionTestSuite
+            this.testCases = res.functionTestSuite.testcase
+            this.testCases.forEach(testCase => {
+              const blocks = []
+              if (testCase.failure && typeof testCase.failure === 'string') {
+                blocks.push(`失败原因:\n${testCase.failure}`)
+              }
+              if (testCase.failure && typeof testCase.failure === 'object') {
+                blocks.push(`失败信息:\n${testCase.failure.message}`)
+                blocks.push(`失败详情:\n${testCase.failure.text}`)
+              }
+              if (testCase.system_out) {
+                blocks.push(`标准输出:\n${testCase.system_out}`)
+              }
+              if (testCase.error) {
+                blocks.push(`错误信息:\n${testCase.error.message}`)
+                blocks.push(`错误详情:\n${testCase.error.text}`)
+                blocks.push(`错误类型:\n${testCase.error.type}`)
+              }
+              testCase.mergedOutput = blocks.join('\n')
+            })
+          } else if (test_type === 'performance') {
+            this.performanceTests = res.performanceTestSuite
+          }
+        })
+      } else {
+        // custom workflow
+        getTestJunitReportAPI(
+          workflow_name,
+          task_id,
+          test_job_name,
+          this.projectName
+        ).then(res => {
+          if (test_type === 'undefined' || test_type === 'function') {
+            this.testSummary = res.functionTestSuite
+            this.testCases = res.functionTestSuite.testcase
+            this.testCases.forEach(testCase => {
+              const blocks = []
+              if (testCase.failure && typeof testCase.failure === 'string') {
+                blocks.push(`失败原因:\n${testCase.failure}`)
+              }
+              if (testCase.failure && typeof testCase.failure === 'object') {
+                blocks.push(`失败信息:\n${testCase.failure.message}`)
+                blocks.push(`失败详情:\n${testCase.failure.text}`)
+              }
+              if (testCase.system_out) {
+                blocks.push(`标准输出:\n${testCase.system_out}`)
+              }
+              if (testCase.error) {
+                blocks.push(`错误信息:\n${testCase.error.message}`)
+                blocks.push(`错误详情:\n${testCase.error.text}`)
+                blocks.push(`错误类型:\n${testCase.error.type}`)
+              }
+              testCase.mergedOutput = blocks.join('\n')
+            })
+          } else if (test_type === 'performance') {
+            this.performanceTests = res.performanceTestSuite
+          }
+        })
+      }
     }
   },
   computed: {
@@ -148,11 +164,25 @@ export default {
       title: '',
       breadcrumb: [
         { title: '项目', url: '/v1/projects' },
-        { title: this.projectName, isProjectName: true, url: `/v1/projects/detail/${this.projectName}/detail` },
-        { title: '工作流', url: `/v1/projects/detail/${this.projectName}/pipelines` },
-        { title: this.workflowName, url: `/v1/projects/detail/${this.projectName}/pipelines/multi/${this.workflowName}` },
-        { title: `#${this.taskId}`, url: `/v1/projects/detail/${this.projectName}/pipelines/multi/${this.workflowName}/${this.taskId}` },
-        { title: '测试用例', url: '' }]
+        {
+          title: this.projectName,
+          isProjectName: true,
+          url: `/v1/projects/detail/${this.projectName}/detail`
+        },
+        {
+          title: '工作流',
+          url: `/v1/projects/detail/${this.projectName}/pipelines`
+        },
+        {
+          title: this.workflowName,
+          url: `/v1/projects/detail/${this.projectName}/pipelines/multi/${this.workflowName}`
+        },
+        {
+          title: `#${this.taskId}`,
+          url: `/v1/projects/detail/${this.projectName}/pipelines/multi/${this.workflowName}/${this.taskId}`
+        },
+        { title: '测试用例', url: '' }
+      ]
     })
   },
   components: {
@@ -185,7 +215,7 @@ export default {
   .clearfix::before,
   .clearfix::after {
     display: table;
-    content: "";
+    content: '';
   }
 
   .clearfix {

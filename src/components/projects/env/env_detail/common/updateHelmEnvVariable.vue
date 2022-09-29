@@ -41,7 +41,7 @@ export default {
     projectName () {
       return this.$route.params.project_name
     },
-    overrideYaml () {
+    overrideData () {
       return this.defaultEnvsValues[this.envName || 'DEFAULT']
     }
   },
@@ -51,9 +51,10 @@ export default {
     },
     initEnvVariableInfo (envName = '') {
       this.envVariable = {
-        yamlSource: this.overrideYaml ? 'freeEdit' : 'default', // : String
-        overrideYaml: this.overrideYaml || '', // : String
-        envName
+        yamlSource: this.overrideData.envValue ? 'freeEdit' : 'default', // : String
+        overrideYaml: this.overrideData.envValue || '', // : String
+        envName,
+        gitRepoConfig: this.overrideData.gitRepoConfig || null
       }
     },
     validate () {
@@ -73,26 +74,28 @@ export default {
       if (res) {
         this.envVariable = {
           yamlSource: res.defaultValues ? 'freeEdit' : 'default',
-          overrideYaml: res.defaultValues
-        }
-        this.defaultEnvsValues.valuesData = this.envVariable
-        if (res.yaml_data && res.yaml_data.source_detail && res.yaml_data.source_detail.git_repo_config && res.yaml_data.source_detail.git_repo_config.codehost_id) {
-          this.envVariable.gitRepoConfig = {
-            branch: res.yaml_data.source_detail.git_repo_config.branch,
-            codehostID: res.yaml_data.source_detail.git_repo_config.codehost_id,
-            owner: res.yaml_data.source_detail.git_repo_config.owner,
-            repo: res.yaml_data.source_detail.git_repo_config.repo,
-            autoSync: res.yaml_data.auto_sync,
-            valuesPaths: [res.yaml_data.source_detail.load_path]
-          }
+          overrideYaml: res.defaultValues,
+          gitRepoConfig: res.gitRepoConfig
         }
       }
     },
     initEnvVariablesYaml (envName, baseEnvName) {
       return getEnvDefaultVariableAPI(this.projectName, baseEnvName).then(
         res => {
-          this.$set(this.defaultEnvsValues, envName, res.defaultValues)
-          return res
+          let gitRepoConfig = null
+          if (res.yaml_data && res.yaml_data.source_detail && res.yaml_data.source_detail.git_repo_config && res.yaml_data.source_detail.git_repo_config.codehost_id) {
+            const repoConfig = res.yaml_data.source_detail.git_repo_config
+            gitRepoConfig = {
+              branch: repoConfig.branch,
+              codehostID: repoConfig.codehost_id,
+              owner: repoConfig.owner,
+              repo: repoConfig.repo,
+              autoSync: res.yaml_data.auto_sync,
+              valuesPaths: [res.yaml_data.source_detail.load_path]
+            }
+          }
+          this.$set(this.defaultEnvsValues, envName, { envValue: res.defaultValues, gitRepoConfig })
+          return { ...res, gitRepoConfig }
         }
       )
     }
@@ -100,17 +103,16 @@ export default {
   watch: {
     envName: {
       handler (newV, oldV) {
-        if (newV === '' || this.overrideYaml || this.baseEnvObj) {
+        if (newV === '' || (this.overrideData && this.overrideData.envValue) || this.baseEnvObj) {
           this.initEnvVariableInfo()
-        }
-        if (newV) {
+        } else {
           this.getEnvVariablesYaml(newV)
         }
       },
       immediate: true
     },
     'envVariable.overrideYaml' (newV) {
-      this.$set(this.defaultEnvsValues, this.envName || 'DEFAULT', newV)
+      this.$set(this.defaultEnvsValues, this.envName || 'DEFAULT', { envValue: newV, gitRepoConfig: this.envVariable.gitRepoConfig })
     },
     baseEnvObj: {
       handler (newV, oldV) {

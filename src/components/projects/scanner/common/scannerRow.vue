@@ -12,9 +12,22 @@
       <div class="value">{{ scannerInfo.statistics.run_time_average + 's' || 'N/A' }}</div>
     </section>
     <section class="operations">
-      <el-button v-hasPermi="{projectName:projectName, action: 'run_scan',isBtn:true}" type="primary" class="button-exec" @click="runCodeScanner(scannerInfo)">
+      <el-button
+        type="primary"
+        v-if="checkPermissionSyncMixin({projectName: projectName, action: 'run_scan',isBtn: true})"
+        class="button-exec"
+        @click="runCodeScanner(scannerInfo)"
+      >
         <span class="iconfont iconzhixing">&nbsp;执行</span>
       </el-button>
+      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+        <el-button
+          type="primary"
+          class="button-exec permission-disabled"
+        >
+          <span class="iconfont iconzhixing">&nbsp;执行</span>
+        </el-button>
+      </el-tooltip>
       <router-link v-if="checkPermissionSyncMixin({projectName: projectName, action: 'edit_scan'})" :to="`/v1/projects/detail/${projectName}/scanner/edit/${scannerInfo.name}?id=${scannerInfo.id}`">
         <span class="menu-item iconfont icondeploy"></span>
       </router-link>

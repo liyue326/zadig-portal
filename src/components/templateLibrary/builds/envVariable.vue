@@ -32,7 +32,7 @@
         </el-col>
         <el-col :span="4">
           <el-form-item :prop="'envs.' + build_env_index + '.key'" :rules="{required: true, message: '键 不能为空', trigger: 'blur'}">
-            <el-input placeholder="键" v-model="preEnvs.envs[build_env_index].key" size="small"></el-input>
+            <el-input placeholder="键" v-model="preEnvs.envs[build_env_index].key" size="small" :disabled="preEnvs.envs[build_env_index].disabledKey"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="4">
@@ -202,6 +202,10 @@ export default {
           desc: '构建的服务名称'
         },
         {
+          variable: '$SERVICE_MODULE',
+          desc: '构建的服务组件名称'
+        },
+        {
           variable: '$DIST_DIR',
           desc: '构建出的 Tar 包的目的目录'
         },
@@ -302,7 +306,7 @@ export default {
         key: '',
         value: '',
         type: 'string',
-        is_credential: true
+        is_credential: false
       })
     },
     validate () {
@@ -314,7 +318,7 @@ export default {
           key: '',
           value: '',
           type: 'string',
-          is_credential: true
+          is_credential: false
         })
       })
     },

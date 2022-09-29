@@ -1,5 +1,29 @@
 <template>
   <div class="service-details-container">
+    <el-dialog :visible.sync="ephemeralContainersDialog.visible" title="启动调试容器" width="600px" :close-on-click-modal="false" class="ephemeralContainers-dialog" :show-close="false" append-to-body>
+      <el-alert style="background: #fff;" title="调试容器正常启动后，点击「调试」按钮可对服务进行诊断" type="info" :closable="false"></el-alert>
+      <el-form ref="ephemeralContainerForm" :model="ephemeralContainersDialog" label-width="90px">
+        <el-form-item label="镜像来源">
+          <el-select style="width: 100%;" v-model="ephemeralContainersDialog.source" size="small" placeholder="请选择镜像来源">
+            <el-option label="使用内置镜像" value="builtin"> </el-option>
+            <el-option label="使用自定义镜像" value="custom"> </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="ephemeralContainersDialog.source === 'custom'" prop="image" :rules="{required: true, message: '镜像名称不能为空', trigger: ['blur', 'change']}" label="镜像名称">
+          <el-input size="small" v-model="ephemeralContainersDialog.image" placeholder="请输入调试容器使用的镜像名称"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-alert  v-if="ephemeralContainersDialog.source === 'builtin'" :closable="false" type="warning">
+        <span slot="title">
+          <span>内置镜像包含以下诊断工具：</span><br>
+          <span>curl、wget、iputils-ping、telnet、dnsutils、tcpdump、net-tools、procps、sysstat</span>
+        </span>
+      </el-alert>
+      <div slot="footer">
+        <el-button @click="ephemeralContainersDialog.visible = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="startEphemeralContainersDebug" size="small">确 定</el-button>
+      </div>
+    </el-dialog>
     <div class="info-card">
       <div class="info-header">
         <span>基本信息</span>
@@ -265,18 +289,45 @@
                             <span class="title">实例 IP：</span>
                             <span class="content">{{ activePod[scope.$index].ip }}</span>
                           </div>
+                          <div>
+                            <span class="title">健康探测：</span>
+                            <span
+                              class="content"
+                              :style="{ color: activePod[scope.$index].containers_ready ? 'inherit' : 'red' }"
+                            >{{ activePod[scope.$index].containers_ready ? 'ready' : 'not ready' }}</span>
+                            <el-tooltip effect="dark" :content="activePod[scope.$index].containers_message" placement="top">
+                              <i
+                                v-show="!activePod[scope.$index].containers_ready"
+                                class="el-icon-warning-outline"
+                                style="color: red; vertical-align: middle; cursor: pointer;"
+                              ></i>
+                            </el-tooltip>
+                          </div>
                         </el-col>
                         <el-col :span="6">
                           <span class="title">运行时长：</span>
                           <span class="content">{{ activePod[scope.$index].age }}</span>
                           <div>
                             <span class="title">节点信息：</span>
-                            <span class="content">{{ activePod[scope.$index].ip }}( {{activePod[scope.$index].node_name}} )</span>
+                            <span class="content">{{ activePod[scope.$index].host_ip }}( {{activePod[scope.$index].node_name}} )</span>
                           </div>
                         </el-col>
                         <el-col :span="6"
                                 class="op-buttons">
-                          <el-button v-hasPermi="{projectName: projectName, action: isProd?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'}}" @click="restartPod(activePod[scope.$index])"
+                          <el-tooltip v-if="!ephemeralContainersEnabled" effect="dark" content="实例所在的集群不支持 EphemeralContainers 功能，启动调试容器不可用" placement="top">
+                            <span style="margin-left: auto;">
+                              <el-badge value="alpha" class="ephemeral-badge">
+                                <el-button :disabled="!ephemeralContainersEnabled" size="small">启动调试容器</el-button>
+                              </el-badge>
+                            </span>
+                          </el-tooltip>
+                          <el-badge v-else value="alpha" class="ephemeral-badge">
+                          <el-button @click="openEphemeralContainersDialog(activePod[scope.$index].name)"
+                                     v-hasPermi="{projectName: projectName, action: isProd?'production:debug_pod':'debug_pod',resource:{name:envName,type:'env'},isBtn:true, disabled: activePod[scope.$index].enable_debug_container || !activePod[scope.$index].canOperate}"
+                                     :disabled="activePod[scope.$index].enable_debug_container || !activePod[scope.$index].canOperate"
+                                     size="small">启动调试容器</el-button>
+                          </el-badge>
+                          <el-button style="margin-left: 40px;" v-hasPermi="{projectName: projectName, action: isProd?'production:manage_environment':'manage_environment',resource:{name:envName,type:'env'}}" @click="restartPod(activePod[scope.$index])"
                                      :disabled="!activePod[scope.$index].canOperate"
                                      size="small">重启</el-button>
                           <el-button v-hasPermi="{projectName: projectName, action: isProd?'production:get_environment':'get_environment',resource:{name:envName,type:'env'}}" @click="showPodEvents(activePod[scope.$index])"
@@ -285,7 +336,7 @@
                       </el-row>
                       <el-row v-for="container of activePod[scope.$index].containers"
                               :key="container.name"
-                              :class="['container-row', container.__color]">
+                              :class="['container-row', container.__color || activePod[scope.$index].__color]">
                         <el-col :span="12">
                           <div>
                             <span class="title">容器名称：</span>
@@ -304,6 +355,13 @@
                           <div>
                             <span class="title">状态：</span>
                             <span class="content">{{ container.status }}</span>
+                            <el-tooltip effect="dark" content="未通过健康探测" placement="top">
+                              <i
+                                v-show="!container.ready"
+                                class="el-icon-warning-outline"
+                                style="color: red; vertical-align: middle; cursor: pointer;"
+                              ></i>
+                            </el-tooltip>
                           </div>
                           <div v-if="container.startedAtReadable">
                             <span class="title">启动时间：</span>
@@ -377,6 +435,10 @@
                    :clusterId="clusterId"
                    :visible="execModal.visible"
                    ref="debug"/>
+      <div class="download-content">
+        <el-input v-model="downloadFilePath" placeholder="输入文件在容器中的绝对路径"></el-input>
+        <el-button type="primary" @click="downloadFile(execModal.podName, execModal.containerName)" :disabled="!downloadFilePath" plain>下载</el-button>
+      </div>
     </el-dialog>
 
     <el-dialog :visible.sync="exportModal.visible"
@@ -464,10 +526,11 @@
 
 <script>
 import ContainerLog from '../serviceDetail/containerLog.vue'
-import { restartPodAPI, restartServiceAPI, scaleServiceAPI, scaleEventAPI, podEventAPI, exportYamlAPI, imagesAPI, updateServiceImageAPI, getServiceInfo, listProductAPI } from '@api'
+import { restartPodAPI, restartServiceAPI, scaleServiceAPI, scaleEventAPI, podEventAPI, exportYamlAPI, imagesAPI, updateServiceImageAPI, getServiceInfo, listProductAPI, checkEphemeralContainersAPI, startEphemeralContainersDebugAPI } from '@api'
 import moment from 'moment'
 import Editor from 'vue2-ace-bind'
 import bus from '@utils/eventBus'
+import store from 'storejs'
 import { fullScreen } from '@/utilities/fullScreen'
 export default {
   data () {
@@ -517,12 +580,20 @@ export default {
         running: 'green',
         pending: 'yellow',
         failed: 'red',
-        unstable: 'red',
+        unstable: 'light-red',
         unknown: 'purple',
-        terminating: 'gray'
+        terminating: 'gray',
+        'pod not ready': 'dark-red'
       },
       registryId: '',
-      servicesLoading: true
+      servicesLoading: true,
+      ephemeralContainersEnabled: false,
+      ephemeralContainersDialog: {
+        visible: false,
+        source: 'builtin',
+        image: ''
+      },
+      downloadFilePath: ''
     }
   },
 
@@ -582,6 +653,24 @@ export default {
   },
 
   methods: {
+    downloadFile (podName, containerName) {
+      const token = store.get('userInfo').token
+      const url = `/api/aslan/environment/kube/pods/${podName}/file?projectName=${
+        this.projectName
+      }&envName=${
+        this.envName
+      }&container=${containerName}&path=${encodeURIComponent(
+        this.downloadFilePath
+      )}&token=${token}`
+      const aEle = document.createElement('a')
+      if (aEle.download !== undefined) {
+        aEle.setAttribute('href', url)
+        aEle.setAttribute('download', this.downloadFilePath)
+        document.body.appendChild(aEle)
+        aEle.click()
+        document.body.removeChild(aEle)
+      }
+    },
     copyCommandSuccess (event) {
       this.$message({
         message: '地址已成功复制到剪贴板',
@@ -620,7 +709,7 @@ export default {
           res.scales.forEach(scale => {
             scale.pods.forEach(pod => {
               pod.status = pod.status.toLowerCase()
-              pod.__color = this.statusColorMap[pod.status]
+              pod.__color = this.statusColorMap[!pod.pod_ready && pod.status === 'running' ? 'pod not ready' : pod.status]
               pod.canOperate = !(pod.status in {
                 pending: 1,
                 terminating: 1
@@ -630,7 +719,7 @@ export default {
                 con.image2Apply = con.image
                 con.imageShort = con.image.split('/').pop()
                 con.status = con.status.toLowerCase()
-                con.__color = this.statusColorMap[con.status]
+                con.__color = this.statusColorMap[!pod.pod_ready && pod.status === 'running' ? 'pod not ready' : con.status]
                 con.startedAtReadable = con.started_at
                   ? moment(con.started_at, 'X').format('YYYY-MM-DD HH:mm:ss')
                   : ''
@@ -859,11 +948,50 @@ export default {
       listProductAPI(this.projectName).then(res => {
         this.registryId = res.find(re => re.name === this.envName).registry_id || ''
       })
+    },
+    openEphemeralContainersDialog (podName) {
+      this.ephemeralContainersDialog.visible = true
+      this.ephemeralContainersDialog.podName = podName
+    },
+    checkEphemeralContainers () {
+      checkEphemeralContainersAPI(this.clusterId).then(res => {
+        this.ephemeralContainersEnabled = res
+      })
+    },
+    startEphemeralContainersDebug () {
+      const payload = {
+        projectName: this.projectName,
+        envName: this.envName,
+        podName: this.ephemeralContainersDialog.podName,
+        image: this.ephemeralContainersDialog.image
+      }
+      this.$refs.ephemeralContainerForm.validate((valid) => {
+        if (valid) {
+          startEphemeralContainersDebugAPI(payload).then(res => {
+            this.$message.success('创建成功')
+            this.fetchServiceData()
+            this.ephemeralContainersDialog = {
+              visible: false,
+              source: 'builtin',
+              image: ''
+            }
+          }, () => {
+            this.ephemeralContainersDialog = {
+              visible: false,
+              source: 'builtin',
+              image: ''
+            }
+          })
+        } else {
+          return false
+        }
+      })
     }
   },
   created () {
     this.getEnvInfo()
     this.fetchServiceData()
+    this.checkEphemeralContainers()
     bus.$emit('set-topbar-title',
       {
         title: '',
@@ -885,6 +1013,23 @@ export default {
 
 <style lang="less" scoped>
 @import "~@assets/css/component/service-detail.less";
+
+.ephemeralContainers-dialog {
+  /deep/ .el-dialog__body {
+    padding: 0 20px;
+  }
+}
+
+/deep/.ephemeral-badge {
+  margin-left: auto;
+
+  .el-badge__content {
+    color: #06f;
+    background-color: #fff;
+    border: 1px solid #06f;
+    border-radius: 4px;
+  }
+}
 
 /deep/.el-dialog__headerbtn {
   top: 18px;

@@ -3,6 +3,9 @@ import Vuex from 'vuex'
 // Login
 import login from './modules/login'
 
+// global config
+import globalConfig from './modules/globalConfig'
+
 // Project
 import projectList from './modules/projectList'
 
@@ -26,6 +29,12 @@ import projectPermission from './modules/projectPermission'
 // Global Permission
 import globalPermission from './modules/globalPermission'
 
+// new Workflow
+import customWorkflow from './modules/customWorkflow'
+
+// plutus
+import checkPlutus from './modules/checkPlutus'
+
 Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
@@ -33,6 +42,7 @@ const debug = process.env.NODE_ENV !== 'production'
 export default new Vuex.Store({
   modules: {
     login,
+    globalConfig,
     projectList,
     projectPermission,
     globalPermission,
@@ -40,7 +50,9 @@ export default new Vuex.Store({
     serviceManage,
     k8sService,
     externalLink,
-    commonWorkflow
+    commonWorkflow,
+    customWorkflow,
+    checkPlutus
   },
   strict: debug
 })

@@ -16,7 +16,7 @@
         <el-table-column prop="update_user_name" label="最后修改"></el-table-column>
         <el-table-column label="操作" width>
           <template slot-scope="scope">
-            <el-button v-if="scope.$index!==0" @click="rollbackTo(scope.row)" icon="el-icon-refresh-left" size="mini">回滚</el-button>
+            <el-button v-if="scope.$index!==0" v-hasPermi="{projectName: projectName, actions: ['production:config_environment', 'config_environment'], operator: 'or', isBtn: true }" @click="rollbackTo(scope.row)" icon="el-icon-refresh-left" size="mini">回滚</el-button>
           </template>
         </el-table-column>
       </el-table>

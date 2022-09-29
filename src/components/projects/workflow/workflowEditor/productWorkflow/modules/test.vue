@@ -15,7 +15,7 @@
                            label="项目名称"></el-table-column>
           <el-table-column prop="desc"
                            label="描述"></el-table-column>
-          <el-table-column label="环境变量">
+          <el-table-column label="变量">
             <template slot-scope="{ row }">
               <el-popover placement="left"
                           width="450"

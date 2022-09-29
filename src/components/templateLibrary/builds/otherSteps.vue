@@ -261,7 +261,6 @@ export default {
               const empty = value.every(item => {
                 return !item.file_path || !item.dest_path
               })
-              console.log(empty)
               if (value.length === 0) {
                 callback(new Error('请至少添加一个上传文件'))
               } else if (empty) {

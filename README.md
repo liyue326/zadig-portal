@@ -30,3 +30,5 @@ yarn run build
 # build for production and view the bundle analyzer report
 yarn run build --report
 ```
+## How to skip console check
+git commit -sm "feat: message" --no-verify

@@ -19,7 +19,7 @@
                 v-for="(value, index) in filteredList"
                 :key="index"
                 :label="value"
-              >{{ value.text || $utils.showServiceName(value) }}</el-checkbox>
+              >{{ value.text || value }}</el-checkbox>
             </el-checkbox-group>
           </div>
           <div class="bottom">

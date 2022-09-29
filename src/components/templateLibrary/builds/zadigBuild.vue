@@ -16,7 +16,9 @@
       </div>
       <div class="section">
         <div class="primary-title">代码信息</div>
-        <span>使用模板新建时配置</span>
+        <span class="tips">
+          <i class="el-icon-info"></i>
+          使用模板新建时配置</span>
       </div>
       <section>
         <div class="primary-title not-first-child">构建变量</div>
@@ -241,6 +243,16 @@ export default {
     &.small-padding {
       padding-right: 10px;
       padding-left: 10px;
+    }
+
+    .tips {
+      display: inline-block;
+      width: 100%;
+      padding: 4px;
+      color: #c8c9cc;
+      font-size: 12px;
+      border: 1px dashed #e4e7ed;
+      border-radius: 4px;
     }
 
     .deploy-script {

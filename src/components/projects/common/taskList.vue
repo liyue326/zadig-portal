@@ -55,10 +55,10 @@
                        min-width="180"
                        label="服务名称">
         <template slot-scope="{ row }">
-          <template v-if="row.build_services && row.build_services.length > 0">
-            <div v-for="item in row.build_services.slice().sort()" :key="item" class="common-column hover-color">
-              <el-tooltip effect="dark" :content="$utils.showServiceName(item)" placement="top">
-                <span class="service-name-span">{{$utils.showServiceName(item)}}</span>
+          <template v-if="row.service_modules && row.service_modules.length > 0">
+            <div v-for="(item,index) in row.service_modules" :key="index" class="common-column hover-color">
+              <el-tooltip effect="dark" :content="`${item.service_module}(${item.service_name})`" placement="top">
+                <span class="service-name-span">{{`${item.service_module}(${item.service_name})`}}</span>
               </el-tooltip>
             </div>
           </template>
@@ -67,8 +67,8 @@
       </el-table-column>
       <el-table-column min-width="280" label="代码信息" v-if="showServiceNames && workflowType === 'buildv2'">
         <template slot-scope="{ row }">
-          <div v-for="(item,index) in getRepo(row)" :key="index" class="common-column repo-list">
-            <div v-if="item.builds.length > 0" effect="light"  :open-delay="250" placement="right">
+          <div v-for="(item,index) in row.service_modules" :key="index" class="common-column repo-list">
+            <div v-if="item.code_info.length > 0" effect="light"  :open-delay="250" placement="right">
               <div slot="content">
                 <el-popover
                     placement="right-start"
@@ -77,18 +77,18 @@
                     popper-class="repo-detail-popover">
                     <i slot="reference" class="repo-detail-icon el-icon-d-caret"></i>
                     <div class="repo-detail">
-                      <div v-for="(build,buildIndex) in item.builds" :key="buildIndex" class="repo-detail-item">
-                        <div class="common-column">{{ build.commit_message }}</div>
+                      <div v-for="(code,codeIndex) in item.code_info" :key="codeIndex" class="repo-detail-item">
+                        <div class="common-column">{{ code.commit_message }}</div>
                         <div class="common-column color-theme">
-                          <RepoJump :build="build" :showCommit="false" showIcon/>
+                          <RepoJump :build="code" :showCommit="false" showIcon/>
                         </div>
-                        <div class="common-column"><i class="el-icon-user" style="margin-right: 4px;"></i>{{ build.author_name }}</div>
+                        <div class="common-column"><i class="el-icon-user" style="margin-right: 4px;"></i>{{ code.author_name }}</div>
                       </div>
                     </div>
                   </el-popover>
                 <span class="hover-color">
-                  <span v-if="item.builds[0].commit_message" class="repo-info" style="width: 143px;">{{ item.builds[0].commit_message }}</span>
-                  <span v-if="item.builds[0].author_name" class="repo-info" style="width: 100px;"><i class="el-icon-user" style="margin-right: 4px;"></i>{{ item.builds[0].author_name }}</span>
+                  <span v-if="item.code_info[0].commit_message" class="repo-info" style="width: 143px;">{{ item.code_info[0].commit_message }}</span>
+                  <span v-if="item.code_info[0].author_name" class="repo-info" style="width: 100px;"><i class="el-icon-user" style="margin-right: 4px;"></i>{{ item.code_info[0].author_name }}</span>
                 </span>
               </div>
             </div>
@@ -100,11 +100,8 @@
                        min-width="100"
                        label="环境">
         <template slot-scope="scope">
-          <span v-if="scope.row.workflow_args">
-            {{ scope.row.workflow_args.namespace}}
-          </span>
-          <span v-else-if="scope.row.sub_tasks">
-            {{ getDeployEnv(scope.row.sub_tasks)}}
+          <span v-if="scope.row.namespace">
+            {{ scope.row.namespace}}
           </span>
         </template>
       </el-table-column>
@@ -152,7 +149,7 @@
                        align="center">
         <template slot-scope="scope">
             <el-button v-hasPermi="{projectName: projectName, action: 'run_workflow',resource:{name:workflowName,type:'workflow'},isBtn:true}"
-                       @click="rerun(scope.row)" v-if="scope.row.workflow_args || scope.row.task_args"
+                       @click="rerun(scope.row)"
                        type="text"
                        icon="el-icon-copy-document"
                        size="mini"
@@ -176,8 +173,8 @@
 <script>
 import RepoJump from '@/components/projects/workflow/common/repoJump.vue'
 import { wordTranslate } from '@utils/wordTranslate.js'
+import { workflowTaskDetailAPI, getCustomCloneDetailAPI } from '@api'
 import moment from 'moment'
-import { get, orderBy } from 'lodash'
 export default {
   data () {
     return {
@@ -185,28 +182,6 @@ export default {
     }
   },
   methods: {
-    getDeployEnv (sub_tasks) {
-      let env_name = '-'
-      sub_tasks.forEach(task => {
-        if (task.type === 'deploy' && task.enabled) {
-          env_name = task.env_name
-        }
-      })
-      return env_name
-    },
-    getRepo (row) {
-      const buildStage = row.stages.find(stage => stage.type === 'buildv2')
-      if (!buildStage) {
-        return []
-      }
-      const buildStageArray = this.$utils.mapToArray(buildStage.sub_tasks, 'service_name').map((element) => {
-        return {
-          service_name: element.service_name,
-          builds: get(element, 'job_ctx.builds', '')
-        }
-      })
-      return orderBy(buildStageArray, ['service_name'], ['asc'])
-    },
     convertTimestamp (value) {
       return moment.unix(value).format('MM-DD HH:mm')
     },
@@ -224,8 +199,25 @@ export default {
     changeTaskPage (val) {
       this.$emit('currentChange', val)
     },
-    rerun (task) {
-      this.$emit('cloneTask', task)
+    async rerun (task) {
+      const projectName = task.product_name
+      const workflowName = task.pipeline_name || task.workflow_name
+      const taskId = task.task_id
+      if (this.workflowType === 'buildv4') {
+        const customDetail = await getCustomCloneDetailAPI(workflowName, taskId, this.projectName)
+        if (customDetail) {
+          this.$emit('cloneTask', customDetail)
+        }
+      } else {
+        const taskDetail = await workflowTaskDetailAPI(
+          projectName,
+          workflowName,
+          taskId
+        )
+        if (taskDetail) {
+          this.$emit('cloneTask', taskDetail)
+        }
+      }
     }
   },
 

@@ -1,8 +1,18 @@
 <template>
   <div class="test-advanced-config-container">
     <el-form class="secondary-form" :model="testConfig" ref="advancedRef" label-width="120px" label-position="left">
-      <div class="primary-title">测试结果导出</div>
-      <el-form-item class="label-icon">
+      <div class="primary-title">
+        测试结果导出
+        <el-button
+          v-if="testConfig.artifact_paths.length===0"
+          @click="add"
+          type="primary"
+          size="small"
+          class="mg-l36"
+          plain
+        >添加</el-button>
+      </div>
+      <el-form-item class="label-icon" v-if="isShowTestReport || testConfig.artifact_paths.length>0">
         <template slot="label">
           <span>文件导出路径</span>
           <el-tooltip effect="dark" placement="top">
@@ -16,7 +26,6 @@
               <template slot="prepend">$WORKSPACE/</template>
             </el-input>
             <el-button
-              v-if="index!==0 || (index===0&&testConfig.artifact_paths.length > 1)"
               @click="deleteArtifactPath(index)"
               type="danger"
               size="small"
@@ -106,7 +115,8 @@ export default {
   },
   data () {
     return {
-      isValid: false
+      isValid: false,
+      isShowTestReport: false
     }
   },
   computed: {
@@ -150,6 +160,14 @@ export default {
     },
     addNotify () {
       this.$refs.notifyComp.addNotifyItem()
+    },
+    add () {
+      if (this.testConfig.artifact_paths.length === 0) {
+        this.addArtifactPath(0)
+        this.isShowTestReport = true
+      } else {
+        this.isShowTestReport = true
+      }
     }
   },
   components: {

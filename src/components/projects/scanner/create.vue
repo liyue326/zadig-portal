@@ -241,7 +241,6 @@ export default {
             repo_namespace: repo.repo_namespace
           }
         })
-        console.log('payload: ', payload, this.scannerConfig)
         this.saveLoading = true
         const res = await (this.isEdit
           ? updateCodeScannerAPI(this.scannerId, payload)

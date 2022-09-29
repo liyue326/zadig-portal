@@ -31,7 +31,7 @@
                   <i class="el-icon-question"></i>
                 </span>
               </el-tooltip>
-              <el-button type="text" size="small" @click="updateMatchRuleFlag = true">更新匹配规则</el-button>
+              <el-button type="text" size="small" @click="updateMatchRuleFlag = true" :disabled="!isProjectAdmin">更新匹配规则</el-button>
             </h4>
             <el-table :data="serviceModules" stripe style="width: 100%;">
               <el-table-column prop="name" label="服务组件"></el-table-column>
@@ -85,11 +85,11 @@
               <el-input
                 size="mini"
                 style="display: inline-block;"
-                :value="currentService.release_naming"
+                :value="currentService && currentService.release_naming"
                 @input="handleInputChange"
                 placeholder="请输入 Release 名称"
               ></el-input>
-              <el-button size="mini" @click="renamingHelmRelease" type="primary" plain>保存</el-button>
+              <el-button size="mini" @click="renamingHelmRelease" :disabled="!isProjectAdmin" type="primary" plain>保存</el-button>
             </div>
           </div>
         </div>
@@ -122,7 +122,8 @@ import Policy from '../../../k8s/container/policy.vue'
 import Help from './help.vue'
 import MatchRule from './matchRule.vue'
 import { cloneDeep } from 'lodash'
-import { renamingHelmReleaseAPI } from '@api'
+import store from 'storejs'
+import { renamingHelmReleaseAPI, queryUserBindingsAPI } from '@api'
 export default {
   props: {
     changeExpandFileList: Function,
@@ -133,7 +134,8 @@ export default {
   },
   data () {
     return {
-      updateMatchRuleFlag: false
+      updateMatchRuleFlag: false,
+      userBindings: []
     }
   },
   methods: {
@@ -196,7 +198,7 @@ export default {
         .then(() => {
           renamingHelmReleaseAPI(projectName, payload).then(res => {
             this.$message({
-              message: '服务正在重启，稍后请前往环境中确认',
+              message: this.isGuide ? 'Helm Release 名称修改成功' : '服务正在重启，稍后请前往环境中确认',
               type: 'success'
             })
           })
@@ -218,6 +220,16 @@ export default {
           }
         )
       })
+    },
+    async getUserBinding (projectName) {
+      const userInfo = store.get('userInfo')
+      const userBindings = await queryUserBindingsAPI(
+        userInfo.uid,
+        projectName
+      ).catch(error => console.log(error))
+      if (userBindings) {
+        this.userBindings = userBindings
+      }
     }
   },
   computed: {
@@ -233,7 +245,19 @@ export default {
     },
     selected () {
       return this.$route.query.rightbar || 'var'
+    },
+    isProjectAdmin () {
+      if (this.$utils.roleCheck('admin')) {
+        return true
+      } else if (this.userBindings.length > 0) {
+        return this.userBindings.some(item => item.role === 'project-admin')
+      } else {
+        return false
+      }
     }
+  },
+  mounted () {
+    this.getUserBinding(this.projectName)
   },
   beforeDestroy () {
     bus.$off('save-var')

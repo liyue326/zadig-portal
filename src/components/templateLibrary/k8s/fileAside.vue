@@ -3,61 +3,50 @@
     <div class="aside__inner">
       <div class="aside-bar">
         <div class="tabs__wrap tabs__wrap_vertical">
-          <div class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'var'}"
-               @click="changeRoute('var')">
+          <div class="tabs__item" :class="{'selected': $route.query.rightbar === 'var'}" @click="changeRoute('var')">
             <span class="step-name">变量</span>
           </div>
-          <div class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'reference'}"
-               @click="changeRoute('reference')">
+          <div class="tabs__item" :class="{'selected': $route.query.rightbar === 'reference'}" @click="changeRoute('reference')">
             <span class="step-name">引用列表</span>
           </div>
         </div>
       </div>
       <div class="aside__content">
-        <div v-if="$route.query.rightbar === 'reference'"
-             class="service-aside--variables">
+        <div v-if="$route.query.rightbar === 'reference'" class="service-aside--variables">
           <header class="service-aside-box__header">
             <div class="service-aside-box__title">引用列表</div>
           </header>
           <div class="service-aside-box__content">
             <section class="aside-section">
-              <el-table :data="referenceList"
-                        stripe
-                        style="width: 100%;">
-                <el-table-column prop="project_name"
-                                 label="项目">
-                </el-table-column>
-                <el-table-column prop="value"
-                                 label="服务名称">
+              <el-table :data="referenceList" stripe style="width: 100%;">
+                <el-table-column prop="project_name" label="项目"></el-table-column>
+                <el-table-column prop="value" label="服务名称">
                   <template slot-scope="scope">
-                    <router-link v-if="scope.row.service_name" :to="`/v1/projects/detail/${scope.row.project_name}/services?service_name=${scope.row.service_name}&rightbar=var`">{{scope.row.service_name}}</router-link>
+                    <router-link
+                      v-if="scope.row.service_name"
+                      :to="`/v1/projects/detail/${scope.row.project_name}/services?service_name=${scope.row.service_name}&rightbar=var`"
+                    >{{scope.row.service_name}}</router-link>
                     <span v-else>空</span>
                   </template>
                 </el-table-column>
               </el-table>
             </section>
-         </div>
+          </div>
         </div>
-        <div v-if="$route.query.rightbar === 'var'"
-             class="service-aside--variables">
+        <div v-if="$route.query.rightbar === 'var'" class="service-aside--variables">
           <header class="service-aside-box__header">
             <div class="service-aside-box__title">变量列表</div>
           </header>
           <div class="service-aside-box__content">
             <section class="aside-section">
               <h4>
-                <span><i class="iconfont iconfuwu"></i></span> 系统内置变量
+                <span>
+                  <i class="iconfont iconfuwu"></i>
+                </span> 系统内置变量
               </h4>
-              <el-table :data="systemVariables"
-                        stripe
-                        style="width: 100%;">
-                <el-table-column prop="key"
-                                 label="Key">
-                </el-table-column>
-                <el-table-column prop="description"
-                                 label="描述">
+              <el-table :data="systemVariables" stripe style="width: 100%;">
+                <el-table-column prop="key" label="Key"></el-table-column>
+                <el-table-column prop="description" label="描述">
                   <template slot-scope="scope">
                     <span v-if="scope.row.description">{{scope.row.description}}</span>
                     <span v-else>空</span>
@@ -67,34 +56,32 @@
             </section>
             <section class="aside-section">
               <h4>
-                <span><i class="iconfont icontanhao"></i></span> 自定义变量
-                <el-tooltip effect="dark"
-                            :content="'自定义变量通过'+' {{'+'.key}} ' +' 声明'"
-                            placement="top">
-                  <span><i class="el-icon-question"></i></span>
+                <span>
+                  <i class="iconfont icontanhao"></i>
+                </span> 自定义变量
+                <el-tooltip effect="dark" :content="'自定义变量通过'+' {{'+'.key}} ' +' 声明'" placement="top">
+                  <span>
+                    <i class="el-icon-question"></i>
+                  </span>
                 </el-tooltip>
               </h4>
               <div class="kv-container">
-                <el-table :data="inputVariables"
-                          style="width: 100%;">
-                  <el-table-column label="Key">
-                    <template slot-scope="scope">
-                      <span>{{ scope.row.key }}</span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="Value">
-                    <template slot-scope="scope">
-                      <el-input size="small"
-                                v-model="scope.row.value"
-                                type="textarea"
-                                :autosize="{ minRows: 1, maxRows: 4}"
-                                placeholder="请输入 Value"></el-input>
-                    </template>
-                  </el-table-column>
-                </el-table>
+                <VariablesEditor
+                  style="width: 100%; height: 100%;"
+                  ref="myCm"
+                  :value="fileContent.variable_yaml"
+                  :options="cmOptions"
+                  @input="onCmCodeChange"
+                />
+              </div>
+              <div v-if="notSaved" class="alert-container">
+                <el-alert title="请先保存模板" type="info" :closable="false"></el-alert>
+              </div>
+              <div class="operation" v-else>
+                <el-button type="primary" size="small" @click="validateVariables" plain :disabled="variableYamlIsEmpty">校验</el-button>
+                <el-button type="primary" size="small" @click="saveKubernetesTemplateVariable" :disabled="variableYamlIsEmpty || variableNotChanged">保存</el-button>
               </div>
             </section>
-
           </div>
         </div>
       </div>
@@ -102,13 +89,20 @@
   </div>
 </template>
 <script>
-import { getKubernetesTemplateBuildReferenceAPI } from '@api'
-import { unionBy } from 'lodash'
+import {
+  getKubernetesTemplateBuildReferenceAPI,
+  validateKubernetesTemplateVariableAPI,
+  saveKubernetesTemplateVariableAPI
+} from '@api'
+import { debounce } from 'lodash'
+import { codemirror } from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/mode/yaml/yaml'
+import 'codemirror/theme/neo.css'
 export default {
   data () {
     return {
-      referenceList: [],
-      inputVariables: []
+      referenceList: []
     }
   },
   methods: {
@@ -126,13 +120,44 @@ export default {
     },
     changeRoute (step) {
       this.$router.replace({
-        query: Object.assign(
-          {},
-          this.$route.query,
-          {
-            rightbar: step
-          })
+        query: Object.assign({}, this.$route.query, {
+          rightbar: step
+        })
       })
+    },
+    onCmCodeChange: debounce(function (newCode) {
+      this.fileContent.variable_yaml = newCode
+    }, 300),
+    validateVariables () {
+      const payload = {
+        content: this.fileContent.content,
+        variable_yaml: this.fileContent.variable_yaml
+      }
+      validateKubernetesTemplateVariableAPI(payload)
+        .then(res => {
+          if (res) {
+            this.$message.success('校验成功')
+          }
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+        })
+    },
+    saveKubernetesTemplateVariable () {
+      const id = this.fileContent.id
+      const payload = {
+        variable_yaml: this.fileContent.variable_yaml
+      }
+      saveKubernetesTemplateVariableAPI(id, payload)
+        .then(res => {
+          if (res) {
+            this.$message.success('变量保存成功')
+            this.$emit('updateTemplate', this.fileContent)
+          }
+        })
+        .catch(err => {
+          this.$message.error(err.message)
+        })
     }
   },
   props: {
@@ -140,15 +165,36 @@ export default {
       required: true,
       type: Object
     },
-    parseVariables: {
-      required: true,
-      type: Array
-    },
     systemVariables: {
       required: true,
       type: Array
+    },
+    initVariableYaml: {
+      required: true,
+      type: String
     }
-
+  },
+  computed: {
+    notSaved () {
+      return this.fileContent.status === 'named'
+    },
+    cmOptions () {
+      return {
+        tabSize: 5,
+        readOnly: this.notSaved ? 'nocursor' : false,
+        theme: 'neo',
+        mode: 'text/x-yaml',
+        lineNumbers: true,
+        line: true,
+        collapseIdentical: true
+      }
+    },
+    variableYamlIsEmpty () {
+      return this.fileContent.variable_yaml === ''
+    },
+    variableNotChanged () {
+      return this.fileContent.variable_yaml === this.initVariableYaml
+    }
   },
   watch: {
     fileContent: {
@@ -158,25 +204,10 @@ export default {
         }
       },
       immediate: false
-    },
-    parseVariables: {
-      handler (val, old_val) {
-        if (val) {
-          const union = unionBy(this.fileContent.variable, val, 'key')
-          this.inputVariables = union.filter((item) => {
-            const findIndex = val.findIndex((vitem) => vitem.key === item.key)
-            return (findIndex >= 0)
-          })
-        }
-      },
-      immediate: false
-    },
-    inputVariables: {
-      handler (val, old_val) {
-        this.$emit('update:inputVariables', val)
-      }
     }
-
+  },
+  components: {
+    VariablesEditor: codemirror
   }
 }
 </script>
@@ -184,67 +215,31 @@ export default {
 .aside__wrap {
   position: relative;
   display: flex;
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
   flex: 1;
   height: 100%;
 
   .kv-container {
-    .el-table {
-      .unused {
-        background: #e6effb;
-      }
+    height: 200px;
+    margin-top: 5px;
 
-      .present {
-        background: #fff;
-      }
+    .vue-codemirror {
+      width: 100%;
+      height: 100%;
 
-      .new {
-        background: oldlace;
-      }
-    }
-
-    .el-table__row {
-      .cell {
-        span {
-          font-weight: 400;
-        }
-
-        .operate {
-          font-size: 1.12rem;
-
-          .delete {
-            color: #ff1949;
-          }
-
-          .edit {
-            color: @themeColor;
-          }
-        }
+      .CodeMirror {
+        height: 100%;
+        border: 1px solid #ccc;
+        border-radius: 4px;
       }
     }
+  }
 
-    .render-value {
-      display: block;
-      max-width: 100%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
+  .alert-container {
+    margin-top: 10px;
+  }
 
-    .add-key-container {
-      .el-form-item__label {
-        display: none;
-      }
-
-      .el-form-item {
-        margin-bottom: 15px;
-      }
-    }
-
-    .add-kv-btn {
-      margin-top: 10px;
-    }
+  .operation {
+    margin-top: 10px;
   }
 
   .service-aside-right--resizable {
@@ -255,7 +250,6 @@ export default {
     width: 5px;
     height: 100%;
     border-left: 1px solid transparent;
-    -webkit-transition: border-color ease-in-out 200ms;
     transition: border-color ease-in-out 200ms;
 
     .capture-area__component {
@@ -264,7 +258,6 @@ export default {
       left: -6px;
       display: inline-block;
       height: 38px;
-      -webkit-transform: translateY(-50%);
       transform: translateY(-50%);
 
       .capture-area {
@@ -279,38 +272,22 @@ export default {
   }
 
   .aside__inner {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -ms-flex: 1;
     flex: 1;
-    -ms-flex-direction: row-reverse;
     flex-direction: row-reverse;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: reverse;
-    -webkit-box-flex: 1;
 
     .aside__content {
-      -ms-flex: 1;
       flex: 1;
       width: 200px;
       overflow-x: hidden;
       background-color: #fff;
-      -webkit-box-flex: 1;
 
       .service-aside--variables {
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -ms-flex-direction: column;
         flex-direction: column;
         flex-grow: 1;
         height: 100%;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
 
         .service-aside-box__header {
           display: flex;
@@ -320,11 +297,6 @@ export default {
           width: 100%;
           height: 35px;
           padding: 10px 7px 10px 20px;
-          -webkit-box-pack: justify;
-          -ms-flex-pack: justify;
-          -webkit-box-align: center;
-          -ms-flex-align: center;
-          -ms-flex-negative: 0;
 
           .service-aside-box__title {
             margin-right: 20px;
@@ -340,8 +312,6 @@ export default {
           flex-grow: 1;
           overflow-x: hidden;
           overflow-y: auto;
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
 
           .aside-section {
             position: relative;
@@ -362,19 +332,12 @@ export default {
         }
 
         .service-aside-help__content {
-          display: -webkit-box;
-          display: -ms-flexbox;
           display: flex;
-          -ms-flex: 1;
           flex: 1;
-          -ms-flex-direction: column;
           flex-direction: column;
           height: 100%;
           padding: 0 20px 10px 20px;
           overflow-y: auto;
-          -webkit-box-flex: 1;
-          -webkit-box-orient: vertical;
-          -webkit-box-direction: normal;
         }
       }
 
@@ -386,14 +349,11 @@ export default {
 
     .aside-bar {
       .tabs__wrap_vertical {
-        -ms-flex-direction: column;
         flex-direction: column;
         width: 47px;
         height: 100%;
         background-color: #f5f5f5;
         border: none;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
 
         .tabs__item {
           position: relative;
@@ -433,8 +393,6 @@ export default {
       }
 
       .tabs__wrap {
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
         justify-content: flex-start;
         height: 56px;

@@ -3,7 +3,7 @@
     <AddHostEnv ref="addHostEnv" />
     <div class="footer">
       <el-button type="primary" @click="$router.back()" size="medium" plain>取消</el-button>
-      <el-button type="primary" @click="save()" size="medium">立即创建</el-button>
+      <el-button type="primary" v-hasPermi="{projectName: projectName, actions: ['create_environment','production:create_environment'],operator:'or',isBtn:true}" @click="save()" size="medium">立即创建</el-button>
     </div>
   </div>
 </template>
@@ -25,6 +25,11 @@ export default {
           )
         }
       }
+    }
+  },
+  computed: {
+    projectName () {
+      return this.$route.params.project_name
     }
   }
 }

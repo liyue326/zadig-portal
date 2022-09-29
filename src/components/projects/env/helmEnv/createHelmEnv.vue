@@ -44,6 +44,7 @@
             filterable
             :disabled="createShare"
             v-model="projectConfig.cluster_id"
+            @change="changeCluster"
             size="small"
             placeholder="请选择 K8s 集群"
           >
@@ -121,7 +122,7 @@
       <el-form label-width="35%" class="ops">
         <el-form-item>
           <el-button @click="$router.back()" :loading="startDeployLoading" size="medium">取消</el-button>
-          <el-button @click="deployHelmEnv" :loading="startDeployLoading" type="primary" size="medium">立即创建</el-button>
+          <el-button v-hasPermi="{projectName: projectName, actions: ['create_environment','production:create_environment'],operator:'or',isBtn:true}" @click="deployHelmEnv" :loading="startDeployLoading" type="primary" size="medium">立即创建</el-button>
         </el-form-item>
       </el-form>
       <footer v-if="startDeployLoading" class="create-footer">
@@ -145,11 +146,12 @@ import {
   getClusterListAPI,
   createHelmEnvAPI,
   getEnvironmentsAPI,
+  getEnvInfoAPI,
   getRegistryWhenBuildAPI,
   productHostingNamespaceAPI
 } from '@api'
 import bus from '@utils/eventBus'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, flattenDeep } from 'lodash'
 import HelmEnvTemplate from '../env_detail/components/updateHelmEnvTemp.vue'
 import EnvConfig from '../env_detail/common/envConfig.vue'
 
@@ -306,11 +308,20 @@ export default {
         if (!this.projectConfig.baseEnvName) {
           this.projectConfig.baseEnvName = this.projectEnvNames[0]
         }
-        this.changeBaseEnv()
+        this.changeBaseEnv(this.projectEnvNames[0])
       }
     },
-    changeBaseEnv () {
-      this.projectConfig.selectedService = this.projectChartNames
+    async changeBaseEnv (envName) {
+      const projectName = this.projectName
+      const envInfo = await getEnvInfoAPI(projectName, envName)
+      const availableServices = flattenDeep(envInfo.services)
+      const projectChartNames = this.projectChartNames.filter(item => {
+        return availableServices.indexOf(item.serviceName) >= 0
+      })
+      this.projectChartNames = projectChartNames
+      this.projectConfig.registry_id = envInfo.registry_id
+      this.projectConfig.cluster_id = envInfo.cluster_id
+      this.projectConfig.selectedService = projectChartNames
       this.envNames = [this.projectConfig.baseEnvName]
       this.envName = this.projectConfig.baseEnvName
     },
@@ -348,15 +359,17 @@ export default {
             registry_id: this.projectConfig.registry_id,
             baseEnvName: isCopy ? baseEnvName : '',
             chartValues: valueInfo.chartInfo,
-            defaultValues: valueInfo.envInfo[defaultEnv] || '',
-            valuesData: {
-              autoSync: valueInfo.gitInfo.autoSync,
-              yamlSource: 'repo',
-              gitRepoConfig: valueInfo.gitInfo
-            },
+            defaultValues: valueInfo.envInfo[defaultEnv].envValue || '',
+            valuesData: valueInfo.envInfo[defaultEnv].gitRepoConfig
+              ? {
+                autoSync: valueInfo.envInfo[defaultEnv].gitRepoConfig.autoSync,
+                yamlSource: 'repo',
+                gitRepoConfig: valueInfo.envInfo[defaultEnv].gitRepoConfig
+              }
+              : null,
             namespace: this.projectConfig.defaultNamespace,
             is_existed: this.nsIsExisted,
-            env_config_yamls: this.$refs.envConfigRef.getAllYaml()
+            env_configs: this.$refs.envConfigRef.getEnvConfig()
           }
           if (this.createShare && this.baseEnvName) {
             payload.share_env = {
@@ -365,10 +378,12 @@ export default {
               base_env: this.baseEnvName
             }
           }
+
           this.startDeployLoading = true
           function sleep (time) {
             return new Promise(resolve => setTimeout(resolve, time))
           }
+          this.$store.commit('SET_MASK_STATUS', true)
           createHelmEnvAPI(
             this.projectConfig.product_name,
             [payload],
@@ -390,6 +405,7 @@ export default {
             },
             () => {
               this.startDeployLoading = false
+              this.$store.commit('SET_MASK_STATUS', false)
             }
           )
         }
@@ -410,7 +426,8 @@ export default {
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: `${this.projectName}`,
+          title: this.projectName,
+          isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         { title: '环境', url: '' },

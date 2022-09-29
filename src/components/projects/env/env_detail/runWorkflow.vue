@@ -1,81 +1,95 @@
 <template>
-  <el-form class="run-workflow"
-           label-width="80px">
-    <el-form-item prop="pipelines"
-                  label="工作流">
-      <el-select v-model="workflowName"
-                 size="small"
-                 class="full-width"
-                 @change="getWorkflow"
-                 placeholder="请选择">
-        <el-option v-for="(item,index) in workflows"
-                   :key="index"
-                   :label="item.name"
-                   :value="item.name">
-        </el-option>
+  <el-form class="run-workflow" label-width="90px">
+    <el-form-item prop="pipelines" label="工作流">
+      <el-select v-model="workflowName" size="medium" class="full-width" @change="getWorkflow" placeholder="请选择">
+        <el-option v-for="(item,index) in workflows" :key="index" :label="item.name" :value="item.name"></el-option>
       </el-select>
     </el-form-item>
     <template>
       <div v-if="workflowType==='workflow'">
-        <div v-if="workflowMeta.build_stage && workflowMeta.build_stage.enabled"
-             v-loading="precreateLoading">
-          <div v-if="pickedTargets.length > 0">
-            <WorkflowBuildRows :pickedTargets="pickedTargets"/>
+        <div v-if="buildDeployEnabled">
+          <div v-loading="precreateLoading">
+            <div v-if="pickedTargets.length > 0">
+              <WorkflowBuildRows :pickedTargets="pickedTargets" />
+            </div>
+          </div>
+          <div class="advanced-setting">
+            <el-collapse>
+              <el-collapse-item title="高级设置" name="1">
+                <el-checkbox v-model="runner.reset_cache">
+                  不使用工作空间缓存
+                  <el-tooltip effect="dark" content="可能会增加任务时长。如果构建中不使用工作空间缓存，该设置会被忽略" placement="top">
+                    <span>
+                      <i style="color: #909399;" class="el-icon-question"></i>
+                    </span>
+                  </el-tooltip>
+                </el-checkbox>
+                <br />
+                <el-checkbox v-model="runner.ignore_cache">
+                  不使用 Docker 缓存
+                  <el-tooltip effect="dark" content="只对配置了镜像构建步骤的构建生效" placement="top">
+                    <span>
+                      <i style="color: #909399;" class="el-icon-question"></i>
+                    </span>
+                  </el-tooltip>
+                </el-checkbox>
+              </el-collapse-item>
+            </el-collapse>
           </div>
         </div>
-        <div class="advanced-setting">
-          <el-collapse v-model="activeNames">
-            <el-collapse-item title="高级设置"
-                              name="1">
-              <el-checkbox v-model="runner.reset_cache">不使用工作空间缓存
-                <el-tooltip effect="dark"
-                            content="可能会增加任务时长。如果构建中不使用工作空间缓存，该设置会被忽略"
-                            placement="top">
-                  <span><i style="color: #909399;"
-                       class="el-icon-question"></i></span>
-                </el-tooltip>
-              </el-checkbox>
-              <br>
-              <el-checkbox v-model="runner.ignore_cache">不使用 Docker 缓存
-                <el-tooltip effect="dark"
-                            content="只对配置了镜像构建步骤的构建生效"
-                            placement="top">
-                  <span><i style="color: #909399;"
-                       class="el-icon-question"></i></span>
-                </el-tooltip>
-              </el-checkbox>
-            </el-collapse-item>
-          </el-collapse>
+
+        <div v-if="artifactDeployEnabled">
+          <!-- K8s Artifact Deploy -->
+          <K8sArtifactDeploy
+            v-if="!isPm && forcedUserInput.artifact_args.length > 0"
+            ref="k8sArtifactRef"
+            :allServices="allServiceNames"
+            :showCreateVersion="showCreateVersion"
+            :k8sArtifactDeployData.sync="k8sArtifactDeployData"
+            :forcedUserInput="forcedUserInput"
+            disableServiceSelection
+          />
+          <!-- Pm Artifact Deploy -->
+          <PmArtifactDeploy
+            v-if="isPm && forcedUserInput.artifact_args.length > 0"
+            :projectName="projectName"
+            :allServices="allServiceNames"
+            :forcedUserInput="forcedUserInput"
+            :pmArtifactDeployData.sync="pmArtifactDeployData"
+            disableServiceSelection
+          />
         </div>
         <div class="start-task">
-          <el-button @click="submit"
-                     :loading="startTaskLoading"
-                     :disabled="pickedTargets.length === 0"
-                     type="primary"
-                     size="small"
-                     plain>
-            {{ startTaskLoading?'启动中':'启动任务' }}
-          </el-button>
-          <span style="color: #ff1949;"
-                v-if="pickedTargets.length === 0">该服务尚未配置构建，无法启动任务</span>
+          <el-button
+            @click="startTask"
+            :loading="startTaskLoading"
+            :disabled="pickedTargets.length === 0"
+            type="primary"
+            size="small"
+          >{{ startTaskLoading?'启动中':'启动任务' }}</el-button>
+          <span style="color: #ff1949;" v-if="pickedTargets.length === 0">该服务尚未配置构建，无法启动任务</span>
         </div>
       </div>
     </template>
-
   </el-form>
 </template>
 
 <script>
-import _ from 'lodash'
 import WorkflowBuildRows from '@/components/common/workflowBuildRows.vue'
-import { precreateWorkflowTaskAPI, getAllBranchInfoAPI, runWorkflowAPI, getWorkflowDetailAPI } from '@api'
+import K8sArtifactDeploy from '../../workflow/common/k8sArtifactDeploy.vue'
+import PmArtifactDeploy from '../../workflow/common/pmArtifactDeploy.vue'
+import {
+  precreateWorkflowTaskAPI,
+  getAllBranchInfoAPI,
+  runWorkflowAPI,
+  getWorkflowDetailAPI,
+  getSingleProjectAPI
+} from '@api'
+import { sortBy, orderBy, cloneDeep, flattenDeep } from 'lodash'
 
 export default {
   data () {
     return {
-      activeNames: [],
-      pickedBuildTarget: [],
-      specificEnv: false,
       runner: {
         workflow_name: '',
         product_tmpl_name: '',
@@ -85,13 +99,14 @@ export default {
         tests: []
       },
       workflowName: '',
-      targetProject: '',
-      products: [],
-      matchedProducts: [],
       repoInfoMap: {},
       workflowMeta: {},
+      k8sArtifactDeployData: {},
+      pmArtifactDeployData: {},
       precreateLoading: false,
-      startTaskLoading: false
+      startTaskLoading: false,
+      isHelm: false,
+      isPm: false
     }
   },
   computed: {
@@ -103,36 +118,32 @@ export default {
     },
     workflowType () {
       if (this.workflowName) {
-        const currentWorkflow = this.workflows.find(element => element.name === this.workflowName)
+        const currentWorkflow = this.workflows.find(
+          element => element.name === this.workflowName
+        )
         return currentWorkflow.workflow_type
       } else {
         return ''
       }
     },
     allServiceNames () {
-      return _.sortBy(this.runner.targets.map(t => t), 'name')
-    },
-    targetsMap () {
-      return this.$utils.arrayToMap(this.runner.targets, 'name')
+      const targets = this.runner.targets.filter(
+        item => item.service_name === this.currentServiceMeta.serviceName
+      )
+      return orderBy(
+        sortBy(
+          targets.map(element => {
+            element.key = element.name + '/' + element.service_name
+            return element
+          }),
+          'service_name'
+        ),
+        'name'
+      )
     },
     pickedTargets: {
       get () {
         return this.runner.targets.filter(t => t.picked)
-      }
-    },
-    pickedTargetNames: {
-      get () {
-        return this.runner.targets.filter(t => t.picked).map(t => t.name)
-      },
-      set (val) {
-        for (const obj of this.runner.targets) {
-          obj.picked = false
-        }
-        for (const name of val) {
-          if (this.targetsMap[name]) {
-            this.targetsMap[name].picked = true
-          }
-        }
       }
     },
     buildRepos () {
@@ -141,113 +152,108 @@ export default {
       )
     },
     testRepos () {
-      return this.$utils.flattenArray(
-        this.runner.tests.map(t => t.builds)
-      )
+      return this.$utils.flattenArray(this.runner.tests.map(t => t.builds))
     },
     allRepos () {
       return this.buildRepos.concat(this.testRepos)
     },
-    allReposDeduped () {
-      return this.$utils.deduplicateArray(
-        this.allRepos,
-        re => `${re.repo_owner}/${re.repo_name}`
-      )
-    },
     allReposForQuery () {
-      return this.allReposDeduped.map(re => ({
+      return this.allRepos.map(re => ({
         repo_owner: re.repo_owner,
         repo: re.repo_name,
         default_branch: re.branch,
         codehost_id: re.codehost_id,
-        repo_namespace: re.repo_namespace
+        repo_namespace: re.repo_namespace,
+        filter_regexp: re.filter_regexp
       }))
     },
-
-    haveForcedInput () {
-      return !this.$utils.isEmpty(this.forcedUserInput)
+    artifactDeployEnabled () {
+      return !!(
+        this.workflowMeta.artifact_stage &&
+        this.workflowMeta.artifact_stage.enabled
+      )
     },
-    forcedInputTargetMap () {
-      return this.haveForcedInput ? this.$utils.arrayToMap(this.forcedUserInput.targets, 'name') : {}
+    buildDeployEnabled () {
+      return !!(
+        this.workflowMeta.build_stage && this.workflowMeta.build_stage.enabled
+      )
+    },
+    showCreateVersion () {
+      return !this.isHelm && !this.isPm
+    },
+    // 构造克隆任务数据
+    forcedUserInput () {
+      if (this.artifactDeployEnabled) {
+        return {
+          artifact_args: this.allServiceNames
+        }
+      } else {
+        return null
+      }
     }
   },
   methods: {
+    async checkProjectFeature (projectName) {
+      const res = await getSingleProjectAPI(projectName)
+      const productFeature = res.product_feature
+      if (productFeature.deploy_type === 'k8s') {
+        if (productFeature.basic_facility === 'cloud_host') {
+          this.isPm = true
+        }
+      } else if (productFeature.deploy_type === 'helm') {
+        this.isHelm = true
+      }
+    },
     getWorkflow () {
       if (this.workflowType === 'workflow') {
         getWorkflowDetailAPI(this.projectName, this.workflowName).then(res => {
           this.workflowMeta = res
           const namespace = this.currentServiceMeta.envName
-          const product = this.workflowMeta.product_tmpl_name
-          this.precreate(`${product} / ${namespace}`)
+          const projectName = this.workflowMeta.product_tmpl_name
+          this.precreate(`${projectName} / ${namespace}`)
         })
       }
     },
-    servicePipeStart () {
-      this.$emit('success')
-    },
-    async filterProducts () {
-      const prodProducts = this.products.filter(element => {
-        return (element.product_name === this.targetProject && element.is_prod)
-      })
-      const testProducts = this.products.filter(element => {
-        return (element.product_name === this.targetProject && !element.is_prod)
-      })
-      this.matchedProducts = prodProducts.concat(testProducts)
-    },
-    precreate (proNameAndNamespace) {
+    async precreate (proNameAndNamespace) {
       const [, namespace] = proNameAndNamespace.split(' / ')
       this.precreateLoading = true
-      precreateWorkflowTaskAPI(this.projectName, this.workflowName, namespace).then(res => {
-        // prepare targets for view
-        for (let i = 0; i < res.targets.length; i++) {
-          if (this.haveForcedInput) {
-            const old = res.targets[i]
-            const forcedObj = this.forcedInputTargetMap[`${old.service_name}/${old.name}`]
-            if (forcedObj) {
-              res.targets.splice(
-                i,
-                1,
-                Object.assign(this.$utils.cloneObj(forcedObj), { deploy: old.deploy, has_build: old.has_build })
-              )
-            }
-          }
-          //
-          const maybeNew = res.targets[i]
-
-          const targetIndex = this.currentServiceMeta.targets.findIndex((t) => {
-            return t.service_name === maybeNew.service_name
-          })
-          if (targetIndex >= 0) {
-            maybeNew.picked = true
-          } else {
-            maybeNew.picked = false
-          }
+      const res = await precreateWorkflowTaskAPI(
+        this.projectName,
+        this.workflowName,
+        namespace
+      )
+      // prepare targets for view
+      for (let i = 0; i < res.targets.length; i++) {
+        const maybeNew = res.targets[i]
+        const targetIndex = this.currentServiceMeta.targets.findIndex(t => {
+          return t.service_name === maybeNew.service_name
+        })
+        if (targetIndex >= 0) {
+          maybeNew.picked = true
+        } else {
+          maybeNew.picked = false
         }
-        // prepare deploys for view
-        for (const tar of res.targets) {
-          const forced = this.haveForcedInput ? this.forcedInputTargetMap[`${tar.service_name}/${tar.name}`] : null
-          const depMap = forced ? this.$utils.arrayToMap((forced.deploy || []), this.deployID) : {}
-          for (const dep of tar.deploy) {
-            this.$set(dep, 'picked', !forced || (this.deployID(dep) in depMap))
-          }
+      }
+      // prepare deploys for view
+      for (const tar of res.targets) {
+        for (const dep of tar.deploy) {
+          this.$set(dep, 'picked', true)
         }
-
-        if (this.haveForcedInput) {
-          res.product_tmpl_name = this.forcedUserInput.product_tmpl_name
-          res.description = this.forcedUserInput.description
-          res.tests = this.forcedUserInput.tests
-        }
-
-        this.runner = res
-        this.precreateLoading = false
-        getAllBranchInfoAPI({ infos: this.allReposForQuery }).then(res => {
+      }
+      this.runner = res
+      this.precreateLoading = false
+      getAllBranchInfoAPI({ infos: this.allReposForQuery })
+        .then(res => {
           // make these repo info more friendly
           res.forEach(repo => {
             if (repo.prs) {
               repo.prs.forEach(element => {
                 element.pr = element.id
               })
-              repo.branchPRsMap = this.$utils.arrayToMapOfArrays(repo.prs, 'targetBranch')
+              repo.branchPRsMap = this.$utils.arrayToMapOfArrays(
+                repo.prs,
+                'targetBranch'
+              )
             } else {
               repo.branchPRsMap = {}
             }
@@ -258,21 +264,32 @@ export default {
             }
           })
           // and make a map
-          this.repoInfoMap = this.$utils.arrayToMap(res, re => `${re.repo_owner}/${re.repo}`)
+          this.repoInfoMap = this.$utils.arrayToMap(
+            res,
+            re => `${re.repo_owner}/${re.repo}`
+          )
 
           /* prepare build/test repo for view
-             see watcher for allRepos */
+         see watcher for allRepos */
           for (const repo of this.allRepos) {
-            this.$set(repo, '_id_', this.repoID(repo))
+            this.$set(repo, '_id_', `${repo.repo_owner}/${repo.repo_name}`)
             const repoInfo = this.repoInfoMap[repo._id_]
             this.$set(repo, 'branchNames', repoInfo && repoInfo.branchNames)
-            this.$set(repo, 'branchPRsMap', repoInfo && repoInfo.branchPRsMap)
-            this.$set(repo, 'tags', (repoInfo.tags ? repoInfo.tags : []))
+            this.$set(
+              repo,
+              'branchPRsMap',
+              repoInfo && repoInfo.branchPRsMap
+            )
+            this.$set(repo, 'tags', repoInfo.tags ? repoInfo.tags : [])
             this.$set(repo, 'prNumberPropName', 'pr')
             this.$set(repo, 'errorMsg', repoInfo.error_msg || '')
             // make sure branch/pr/tag is reactive
             this.$set(repo, 'branch', repo.branch || '')
-            this.$set(repo, repo.prNumberPropName, repo[repo.prNumberPropName] || null)
+            this.$set(
+              repo,
+              repo.prNumberPropName,
+              repo[repo.prNumberPropName] || null
+            )
             this.$set(repo, 'tag', repo.tag || '')
             let branchOrTag = null
             if (repo.branch) {
@@ -312,62 +329,90 @@ export default {
               }
             ])
           }
-        }).catch(() => {
+        })
+        .catch(() => {
           this.precreateLoading = false
         })
-      }).catch(() => {
-        this.precreateLoading = false
-      })
     },
-
-    repoID (repo) {
-      return `${repo.repo_owner}/${repo.repo_name}`
-    },
-    deployID (deploy) {
-      return `${deploy.env}|${deploy.type}`
-    },
-
-    submit () {
-      if (!this.checkInput()) {
-        return
-      }
-
-      this.startTaskLoading = true
-
-      const clone = this.$utils.cloneObj(this.runner)
-
+    startTask () {
       const repoKeysToDelete = [
-        '_id_', 'branchNames', 'branchPRsMap', 'tags', 'isGithub', 'prNumberPropName', 'id', 'branchOrTag', 'branchAndTagList'
+        '_id_',
+        'branchNames',
+        'branchPRsMap',
+        'tags',
+        'isGithub',
+        'prNumberPropName',
+        'id',
+        'branchOrTag',
+        'branchAndTagList'
       ]
-
-      // filter targets
-      clone.targets = clone.targets.filter(t => t.picked)
-
-      for (const tar of clone.targets) {
-        // trim target
-        delete tar.picked
-
-        // trim build repos
-        for (const repo of tar.build.repos) {
-          repo.pr = repo.pr ? repo.pr : 0
-          repo.branch = ''
-          repo.tag = ''
-          repo[repo.branchOrTag.type] = repo.branchOrTag.name
-          for (const key of repoKeysToDelete) {
-            delete repo[key]
+      this.runner.targets = this.pickedTargets
+      const payload = cloneDeep(this.runner)
+      if (this.artifactDeployEnabled && !this.isPm) {
+        payload.registry_id = this.k8sArtifactDeployData.pickedRegistry
+        payload.artifact_args = []
+        payload.targets = []
+        this.k8sArtifactDeployData.services.forEach(element => {
+          payload.artifact_args.push({
+            service_name: element.service_name,
+            image_name: element.image_name,
+            name: element.name,
+            image: element.image,
+            deploy: element.deploy
+          })
+        })
+        // 处理 K8s 交付物部署版本信息
+        if (this.k8sArtifactDeployData.versionInfo.enabled) {
+          if (this.k8sArtifactDeployData.versionInfo.labelStr !== '') {
+            this.k8sArtifactDeployData.versionInfo.labels = this.k8sArtifactDeployData.versionInfo.labelStr
+              .trim()
+              .split(';')
+          }
+          payload.version_args = cloneDeep(
+            this.k8sArtifactDeployData.versionInfo
+          )
+        } // 处理物理机交付物部署信息
+      } else if (this.artifactDeployEnabled && this.isPm) {
+        payload.storage_id = this.pmArtifactDeployData.pickedStorage
+        payload.artifact_args = []
+        payload.targets = []
+        this.pmArtifactDeployData.services.forEach(element => {
+          if (element.file) {
+            payload.artifact_args.push({
+              service_name: element.service_name,
+              name: element.name,
+              file_name: element.file.file_name,
+              deploy: element.deploy,
+              task_id: element.file.task_id,
+              workflow_name: element.file.workflow_name,
+              url: element.file.url
+            })
+          }
+        })
+      } else {
+        for (const tar of payload.targets) {
+          // trim target
+          delete tar.picked
+          // trim build repos
+          for (const repo of tar.build.repos) {
+            repo.pr = repo.pr ? repo.pr : 0
+            repo.branch = ''
+            repo.tag = ''
+            repo[repo.branchOrTag.type] = repo.branchOrTag.name
+            for (const key of repoKeysToDelete) {
+              delete repo[key]
+            }
+          }
+          // filter deploys
+          tar.deploy = tar.deploy.filter(d => d.picked)
+          // trim deploys
+          for (const dep of tar.deploy) {
+            delete dep.picked
           }
         }
-
-        // filter deploys
-        tar.deploy = tar.deploy.filter(d => d.picked)
-        // trim deploys
-        for (const dep of tar.deploy) {
-          delete dep.picked
-        }
       }
-
       // trim test repos
-      for (const test of clone.tests) {
+      for (const test of payload.tests) {
         for (const repo of test.builds) {
           repo.pr = repo.pr ? repo.pr : 0
           for (const key of repoKeysToDelete) {
@@ -376,76 +421,169 @@ export default {
         }
       }
       const projectName = this.workflowMeta.product_tmpl_name
-      runWorkflowAPI(projectName, clone).then(res => {
-        this.$message.success('创建成功')
-        this.$emit('success')
-        this.$router.push(`/v1/projects/detail/${projectName}/pipelines/multi/${res.pipeline_name}/${res.task_id}?status=running`)
-      }).catch(error => {
-        if (error.response && error.response.data.code === 6168) {
-          const projectName = error.response.data.extra.productName
-          const envName = error.response.data.extra.envName
-          const serviceName = error.response.data.extra.serviceName
-          this.$message({
-            message: `检测到 ${projectName} 中 ${envName} 环境下的 ${serviceName} 服务未启动 <br> 请检查后再运行工作流`,
-            type: 'warning',
-            dangerouslyUseHTMLString: true,
-            duration: 5000
-          })
-          this.$router.push(`/v1/projects/detail/${projectName}/envs/detail/${serviceName}?envName=${envName}&projectName=${projectName}`)
-        }
-      }).finally(() => {
-        this.startTaskLoading = false
-      })
-    },
-    checkInput () {
-      if (!this.runner.product_tmpl_name || !this.runner.namespace || !this.workflowName) {
-        this.$message.error('请选择工作流')
-        return false
+      if (!this.checkInput(payload)) {
+        return
       }
-
-      const emptyValue = []
-
-      this.allRepos.forEach(item => {
-        if (item.use_default || !item.repo_name) {
+      this.startTaskLoading = true
+      runWorkflowAPI(projectName, payload, this.artifactDeployEnabled)
+        .then(res => {
+          this.$message.success('创建成功')
+          this.$emit('success')
+          this.$router.push(
+            `/v1/projects/detail/${projectName}/pipelines/multi/${res.pipeline_name}/${res.task_id}?status=running`
+          )
+        })
+        .catch(error => {
+          if (error.response && error.response.data.code === 6168) {
+            const projectName = error.response.data.extra.productName
+            const envName = error.response.data.extra.envName
+            const serviceName = error.response.data.extra.serviceName
+            this.$message({
+              message: `检测到 ${projectName} 中 ${envName} 环境下的 ${serviceName} 服务未启动 <br> 请检查后再运行工作流`,
+              type: 'warning',
+              dangerouslyUseHTMLString: true,
+              duration: 5000
+            })
+            this.$router.push(
+              `/v1/projects/detail/${projectName}/envs/detail/${serviceName}?envName=${envName}&projectName=${projectName}`
+            )
+          }
+        })
+        .finally(() => {
+          this.startTaskLoading = false
+        })
+    },
+    checkInput (payload) {
+      // Checking K8s artifact deploy
+      if (this.artifactDeployEnabled && !this.isPm) {
+        const invalidService = []
+        this.k8sArtifactDeployData.services.forEach(item => {
+          if (item.image === '' || item.image === undefined) {
+            invalidService.push(item.name)
+          }
+        })
+        if (this.k8sArtifactDeployData.services.length === 0) {
+          this.$message({
+            message: '请选择需要部署的服务',
+            type: 'error'
+          })
+          return false
+        } else {
+          if (
+            this.k8sArtifactDeployData.services.length > 0 &&
+            this.k8sArtifactDeployData.pickedRegistry === ''
+          ) {
+            this.$message({
+              message: '请选择镜像仓库',
+              type: 'error'
+            })
+            return false
+          } else if (invalidService.length > 0) {
+            this.$message({
+              message: invalidService.join(',') + ' 服务尚未选择镜像',
+              type: 'error'
+            })
+            return false
+          } else if (
+            this.k8sArtifactDeployData.versionInfo.enabled &&
+            this.k8sArtifactDeployData.versionInfo.version === ''
+          ) {
+            this.$message({
+              message: '请填写版本名称',
+              type: 'error'
+            })
+            return false
+          } else {
+            return true
+          }
+        } // Checking PM artifact deploy
+      } else if (this.artifactDeployEnabled && this.isPm) {
+        const invalidService = []
+        this.pmArtifactDeployData.services.forEach(item => {
+          if (!item.file) {
+            invalidService.push(item.name)
+          }
+        })
+        if (this.pmArtifactDeployData.services.length === 0) {
+          this.$message({
+            message: '请选择需要部署的服务',
+            type: 'error'
+          })
+          return false
+        } else {
+          if (
+            this.pmArtifactDeployData.services.length > 0 &&
+            this.pmArtifactDeployData.pickedStorage === ''
+          ) {
+            this.$message({
+              message: '请选择对象存储',
+              type: 'error'
+            })
+            return false
+          } else if (invalidService.length > 0) {
+            this.$message({
+              message: invalidService.join(',') + ' 服务尚未选择交付物',
+              type: 'error'
+            })
+            return false
+          } else {
+            return true
+          }
+        } // Checking K8s deploy
+      } else {
+        if (payload.tests.length === 0 && payload.targets.length === 0) {
+          this.$message({
+            message: '请选择需要构建的服务',
+            type: 'error'
+          })
           return
         }
-
-        if (!item.branchOrTag) {
-          emptyValue.push(item.repo_name)
-        }
-      })
-
-      if (emptyValue.length === 0) {
-        return true
-      } else {
-        this.$message({
-          message: emptyValue.join(',') + ' 代码库尚未选择构建信息',
-          type: 'error'
+        // Checking repos
+        const allRepos = flattenDeep(
+          payload.targets.map(tar => tar.build.repos)
+        ).concat(flattenDeep(payload.tests.map(test => test.builds)))
+        const invalidRepo = allRepos.filter(repo => {
+          if (repo.branch === '' && !repo.pr && repo.tag === '') {
+            return true
+          } else {
+            return false
+          }
         })
-        return false
+        if (invalidRepo.length === 0) {
+          return true
+        } else {
+          this.$message({
+            message:
+              invalidRepo
+                .map(item => {
+                  return item.repo_name
+                })
+                .join(',') + ' 代码库尚未选择构建信息',
+            type: 'error'
+          })
+          return false
+        }
       }
     }
   },
-  mounted () {
+  async created () {
     if (this.workflows && this.workflows.length > 0) {
       this.workflowName = this.workflows[0].name
       if (this.workflowType === 'workflow') {
-        getWorkflowDetailAPI(this.projectName, this.workflowName).then(res => {
-          this.workflowMeta = res
-          const namespace = this.currentServiceMeta.envName
-          const product = this.workflowMeta.product_tmpl_name
-          this.precreate(`${product} / ${namespace}`)
-        })
+        const workflowMeta = await getWorkflowDetailAPI(
+          this.projectName,
+          this.workflowName
+        )
+        this.workflowMeta = workflowMeta
+        const namespace = this.currentServiceMeta.envName
+        const projectName = this.workflowMeta.product_tmpl_name
+        this.precreate(`${projectName} / ${namespace}`)
       }
+      // Determine the project type and use different types of startup methods
+      this.checkProjectFeature(this.projectName)
     }
   },
   props: {
-    forcedUserInput: {
-      type: Object,
-      default () {
-        return {}
-      }
-    },
     workflows: {
       required: true,
       type: Array,
@@ -458,7 +596,9 @@ export default {
     }
   },
   components: {
-    WorkflowBuildRows
+    WorkflowBuildRows,
+    PmArtifactDeploy,
+    K8sArtifactDeploy
   }
 }
 </script>
@@ -477,9 +617,22 @@ export default {
     }
   }
 
+  .create-version {
+    .el-input,
+    .el-textarea,
+    .el-select {
+      &.full-width {
+        width: 40%;
+      }
+    }
+
+    .create-checkbox {
+      margin-bottom: 15px;
+    }
+  }
+
   .start-task {
-    margin-bottom: 10px;
-    margin-left: 10px;
+    margin-top: 15px;
   }
 }
 </style>

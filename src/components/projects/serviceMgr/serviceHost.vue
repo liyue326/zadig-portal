@@ -8,7 +8,7 @@
     </el-tabs>
     <ServiceBuild v-if="envName" :envName="envName" :serviceName="serviceName" class="serviceBuild" />
     <el-drawer title="策略" custom-class="policy-drawer" :visible.sync="showPolicyDrawer" direction="rtl" size="600px" destroy-on-close>
-      <Policy />
+      <Policy @closeDrawer="showPolicyDrawer=false" />
     </el-drawer>
   </div>
 </template>

@@ -70,7 +70,13 @@
           </span>
         </slot>
       </el-alert>
-      <el-form ref="cluster" :rules="rules" label-width="148px" label-position="left" :model="cluster">
+      <el-form ref="cluster" :rules="rules" label-width="150px" label-position="left" :model="cluster">
+        <el-form-item label="连接方式" prop="type">
+          <el-select v-model="cluster.type" style="width: 100%;" size="small" placeholder="请选择连接方式" :disabled="isEdit">
+            <el-option value="agent" label="代理连接"></el-option>
+            <el-option value="kubeconfig" label="直接连接"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="名称" prop="name">
           <el-input size="small" v-model="cluster.name" placeholder="请输入集群名称"></el-input>
         </el-form-item>
@@ -80,14 +86,21 @@
               <i class="iconfont iconaliyun"></i>
               <span>阿里云 ACK</span>
             </el-option>
-
             <el-option :value="2" label="腾讯云 TKE">
               <i class="iconfont icontengxunyun"></i>
               <span>腾讯云 TKE</span>
             </el-option>
+            <el-option :value="5" label="腾讯云 EKS">
+              <i class="iconfont icontengxunyun"></i>
+              <span>腾讯云 EKS</span>
+            </el-option>
             <el-option :value="3" label="华为云 CCE">
               <i class="iconfont iconhuawei"></i>
               <span>华为云 CCE</span>
+            </el-option>
+            <el-option :value="4" label="Amazon EKS">
+              <i class="iconfont iconaws"></i>
+              <span>Amazon EKS</span>
             </el-option>
             <el-option :value="0" label="其他">
               <i class="iconfont iconqita"></i>
@@ -103,6 +116,11 @@
             <el-radio :label="true">是</el-radio>
             <el-radio :label="false">否</el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item label="KubeConfig" prop="config" v-if="cluster.type === 'kubeconfig'" :show-message="false">
+          <Resize :resize="'vertical'" :height="'100px'" @sizeChange="$refs.codemirror.refresh()">
+            <Codemirror ref="codemirror" v-model="cluster.config" placeholder="请输入目标集群 KubeConfig"></Codemirror>
+          </Resize>
         </el-form-item>
         <el-button type="text" @click="expandAdvanced = !expandAdvanced">
           高级配置
@@ -222,7 +240,7 @@
                 <el-form-item prop="cache.nfs_properties.storage_class">
                   <span slot="label">选择 Storage Class</span>
                   <el-select v-model="cluster.cache.nfs_properties.storage_class" placeholder="请选择" style="width: 100%;" size="small">
-                    <el-option v-for="(item,index) in allStorageClass" :key="index" :label="item" :value="item"></el-option>
+                    <el-option v-for="(item,index) in allFileStorageClass" :key="index" :label="item" :value="item"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item prop="cache.nfs_properties.storage_size_in_gib">
@@ -279,7 +297,7 @@
               </el-form-item>
             </template>
           </section>
-          <section v-if="!cluster.local">
+          <section>
             <h4>
               Dind 资源配置
               <el-link
@@ -293,7 +311,7 @@
             <el-form-item label="副本数量" prop="dind_cfg.replicas">
               <el-input v-model.number="cluster.dind_cfg.replicas" size="small" placeholder="请输入副本数量"></el-input>
             </el-form-item>
-            <el-form-item label="资源规格">
+            <el-form-item label="资源限制(limit)">
               <el-form-item label="CPU(m)" label-width="90px" prop="dind_cfg.resources.limits.cpu">
                 <el-input v-model.number="cluster.dind_cfg.resources.limits.cpu" size="small" placeholder="请输入 CPU"></el-input>
               </el-form-item>
@@ -301,6 +319,34 @@
                 <el-input v-model.number="cluster.dind_cfg.resources.limits.memory" size="small" placeholder="请输入 Memory"></el-input>
               </el-form-item>
             </el-form-item>
+            <template v-if="isEdit">
+              <el-form-item label="存储资源">
+                <el-radio-group v-model="cluster.dind_cfg.storage.type" @change="changeDindStorageType">
+                  <el-radio label="rootfs">临时存储</el-radio>
+                  <el-radio label="dynamic" :disabled="cluster.status !== 'normal'">
+                    集群存储资源
+                    <span v-if="cluster.status !== 'normal'" style="color: #e6a23c; font-weight: 400; font-size: 12px;">集群正常接入后才可使用集群存储资源</span>
+                  </el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <template v-if="cluster.dind_cfg.storage.type === 'dynamic' && cluster.status === 'normal'">
+                <el-form-item prop="dind_cfg.storage.storage_class" label="选择 Storage Class">
+                  <el-select v-model="cluster.dind_cfg.storage.storage_class" placeholder="请选择" style="width: 100%;" size="small">
+                    <el-option v-for="(item,index) in allStorageClass" :key="index" :label="item" :value="item"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item prop="dind_cfg.storage.storage_size_in_gib" label="存储空间大小">
+                  <el-input
+                    v-model.number="cluster.dind_cfg.storage.storage_size_in_gib"
+                    style="width: 100%; vertical-align: baseline;"
+                    size="small"
+                    placeholder="请输入存储空间大小"
+                  >
+                    <template slot="append">GiB</template>
+                  </el-input>
+                </el-form-item>
+              </template>
+            </template>
           </section>
         </template>
       </el-form>
@@ -314,7 +360,7 @@
     <div class="section">
       <el-alert type="info" :closable="false">
         <template>
-          支持阿里云 ACK、腾讯云 TKE、华为云 CCE 等 K8s 集群的接入和使用，详情可参考
+          支持阿里云 ACK、腾讯云 TKE、腾讯云 EKS、华为云 CCE 等 K8s 集群的接入和使用，详情可参考
           <el-link
             style="font-size: 14px; vertical-align: baseline;"
             type="primary"
@@ -356,7 +402,7 @@
             <el-table-column label="最近连接时间">
               <template slot-scope="{ row }">
                 <span>{{$utils.convertTimestamp(row.last_connection_time)}}</span>
-                <el-tooltip v-if="row.update_hubagent_error_msg" effect="dark" content="最近一次 agent 更新失败，点击「更新 agent」按钮再次更新" placement="top">
+                <el-tooltip v-if="row.update_hubagent_error_msg" effect="dark" content="最近一次组件更新失败，点击「更新组件」按钮再次更新" placement="top">
                   <i class="el-icon-warning-outline" style="color: red;"></i>
                 </el-tooltip>
               </template>
@@ -369,7 +415,7 @@
 
             <el-table-column width="310" label="操作">
               <template slot-scope="scope">
-                <span v-show="!scope.row.local">
+                <span v-show="!scope.row.local && scope.row.type !== 'kubeconfig'">
                   <el-button
                     v-if="scope.row.status==='pending'||scope.row.status==='abnormal'"
                     @click="clusterOperation('access',scope.row)"
@@ -380,7 +426,9 @@
                 </span>
                 <el-button @click="clusterOperation('edit',scope.row)" type="primary" size="mini" plain>编辑</el-button>
                 <el-button v-show="!scope.row.local" @click="clusterOperation('delete',scope.row)" size="mini" type="danger" plain>删除</el-button>
-                <el-button v-if="!scope.row.local" :disabled="scope.row.status !== 'normal'" @click="updateAgent(scope.row)" size="mini" type="primary" plain>更新 agent</el-button>
+                <el-tooltip effect="dark" content="更新 Zadig 系统管理集群的相关组件" placement="top">
+                  <el-button v-if="!scope.row.local" :disabled="scope.row.type === 'agent' && scope.row.status !== 'normal'" @click="updateAgent(scope.row)" size="mini" type="primary" plain>更新组件</el-button>
+                </el-tooltip>
               </template>
             </el-table-column>
           </el-table>
@@ -391,6 +439,8 @@
 </template>
 
 <script>
+import Resize from '@/components/common/resize'
+import Codemirror from '@/components/projects/common/codemirror.vue'
 import {
   getClusterListAPI,
   createClusterAPI,
@@ -420,11 +470,12 @@ const validateClusterName = (rule, value, callback) => {
 }
 
 const clusterInfo = {
+  type: 'agent',
   name: '',
   provider: null,
   production: false,
   description: '',
-  namespace: '',
+  config: '',
   cache: {
     medium_type: 'object',
     object_properties: {
@@ -450,6 +501,11 @@ const clusterInfo = {
         cpu: 4000,
         memory: 8192
       }
+    },
+    storage: {
+      type: 'rootfs',
+      storage_class: '',
+      storage_size_in_gib: 10
     }
   }
 }
@@ -465,6 +521,7 @@ export default {
       allCluster: [],
       allStorage: [],
       externalStorage: [],
+      allFileStorageClass: [],
       allStorageClass: [],
       allPvc: [],
       deployType: 'Deployment',
@@ -486,6 +543,14 @@ export default {
         3: {
           icon: 'iconfont logo iconhuawei',
           name: '华为云'
+        },
+        4: {
+          icon: 'iconfont logo iconaws',
+          name: 'Amazon EKS'
+        },
+        5: {
+          icon: 'iconfont logo icontengxunyun',
+          name: '腾讯云'
         }
       },
       accessCluster: {
@@ -505,7 +570,7 @@ export default {
           }
         ],
         provider: [
-          { required: true, message: '请选择提供商', trigger: 'blur' }
+          { required: true, message: '请选择提供商', trigger: ['blur', 'change'] }
         ],
         production: [
           {
@@ -514,6 +579,12 @@ export default {
             message: '请选择是否为生产集群'
           }
         ],
+        config: {
+          type: 'string',
+          required: true,
+          message: '请输入目标集群 KubeConfig',
+          trigger: 'change'
+        },
         'advanced_config.node_labels': {
           required: false,
           message: '请选择标签',
@@ -573,6 +644,16 @@ export default {
         'dind_cfg.resources.limits.memory': {
           required: true,
           message: '请输入 Memory',
+          type: 'number'
+        },
+        'dind_cfg.storage.storage_class': {
+          required: true,
+          message: '请选择 Storage Class',
+          type: 'string'
+        },
+        'dind_cfg.storage.storage_size_in_gib': {
+          required: true,
+          message: '请输入存储空间大小',
           type: 'number'
         }
       },
@@ -698,10 +779,15 @@ export default {
         if (this.cluster.cache.medium_type === 'object') {
           await this.getStorage()
         } else if (this.cluster.cache.medium_type === 'nfs') {
-          this.allStorageClass = await getClusterStorageClassAPI(
+          this.allFileStorageClass = await getClusterStorageClassAPI(
             currentCluster.id
           )
           this.allPvc = await getClusterPvcAPI(currentCluster.id, namesapce)
+        }
+        if (!this.cluster.dind_cfg.storage) {
+          this.$set(this.cluster.dind_cfg, 'storage', cloneDeep(clusterInfo.dind_cfg.storage))
+        } else if (this.cluster.dind_cfg.storage.type === 'dynamic' && this.cluster.status === 'normal') {
+          this.allStorageClass = await getClusterStorageClassAPI(currentCluster.id, 'all')
         }
         this.dialogClusterFormVisible = true
         this.hasNotified = false
@@ -733,6 +819,11 @@ export default {
         })
       }
     },
+    async changeDindStorageType (type) {
+      if (type === 'dynamic') {
+        this.allStorageClass = await getClusterStorageClassAPI(this.cluster.id, 'all')
+      }
+    },
     async changeMediumType (type) {
       if (!this.hasNotified) {
         this.$message({
@@ -747,14 +838,16 @@ export default {
         await this.getStorage()
       } else if (type === 'nfs') {
         this.allPvc = await getClusterPvcAPI(id, namesapce)
-        this.allStorageClass = await getClusterStorageClassAPI(id)
+        this.allFileStorageClass = await getClusterStorageClassAPI(id)
       }
     },
     addCluster (payload) {
       createClusterAPI(payload).then(res => {
         this.getCluster()
         this.accessCluster = res
-        this.dialogClusterAccessVisible = true
+        if (payload.type === 'agent') {
+          this.dialogClusterAccessVisible = true
+        }
         this.$message({
           type: 'success',
           message: '新增成功'
@@ -829,14 +922,14 @@ export default {
       })
     },
     updateAgent (row) {
-      this.$confirm('确定更新 agent 吗?', '更新', {
+      this.$confirm('确定更新组件吗?', '更新', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         upgradeHubAgentAPI(row.id).then(res => {
           this.$message({
-            message: '更新 agent 成功',
+            message: '更新组件成功',
             type: 'success'
           })
           this.getCluster()
@@ -852,6 +945,10 @@ export default {
   created () {
     this.getCluster()
     bus.$emit(`set-topbar-title`, { title: '集群管理', breadcrumb: [] })
+  },
+  components: {
+    Resize,
+    Codemirror
   }
 }
 </script>

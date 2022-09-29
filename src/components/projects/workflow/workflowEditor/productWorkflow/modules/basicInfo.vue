@@ -161,7 +161,12 @@ export default {
       const project = this.$store.getters.projectList.find(project => {
         return project.name === this.projectName
       })
-      return project.deployType === 'external'
+      return project ? project.deployType === 'external' : false
+    }
+  },
+  created () {
+    if (this.$store.getters.projectList.length === 0) {
+      this.$store.dispatch('getProjectList')
     }
   },
   methods: {

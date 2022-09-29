@@ -108,7 +108,7 @@ export default {
         },
         {
           value: 'serviceName',
-          text: '服务名称'
+          text: '服务组件'
         },
         {
           value: 'committer',

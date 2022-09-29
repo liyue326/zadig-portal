@@ -192,13 +192,7 @@ export default {
           services = difference(allServices, productServices)
           break
         case 'update':
-          services = (this.productStatus.services || [])
-            .filter(
-              service =>
-                service.updatable === true &&
-                (service.new === false) & (service.deleted === false)
-            )
-            .map(service => service.service_name)
+          services = productServices
           break
         case 'delete':
           services = productServices

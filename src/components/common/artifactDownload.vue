@@ -1,10 +1,6 @@
 <template>
-  <div v-loading="loading"
-       class="download-artifact-container">
-
-    <el-table :data="fileList.file_names"
-              height="300"
-              style="width: 100%;">
+  <div v-loading="loading" class="download-artifact-container">
+    <el-table :data="fileList.file_names" height="300" style="width: 100%;">
       <el-table-column label="文件列表">
         <template slot-scope="scope">
           <span>{{ scope.row }}</span>
@@ -13,14 +9,9 @@
     </el-table>
     <div>
       <span class="download">
-        <a :href="downloadUrl"
-           download>
-          <el-button size="small"
-                     type="primary"
-                     :disabled="fileList.file_names.length===0"
-                     plain>下载</el-button>
+        <a :href="downloadUrl" download>
+          <el-button size="small" type="primary" :disabled="fileList.file_names.length===0" plain>下载</el-button>
         </a>
-
       </span>
     </div>
   </div>
@@ -28,7 +19,7 @@
 
 <script>
 import store from 'storejs'
-import { getArtifactWorkspaceAPI } from '@api'
+import { getArtifactWorkspaceAPI, getTestFileListAPI } from '@api'
 export default {
   props: {
     workflowName: {
@@ -44,6 +35,14 @@ export default {
       type: Boolean,
       default: false,
       required: true
+    },
+    type: {
+      type: String,
+      default: ''
+    },
+    jobName: {
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -62,11 +61,19 @@ export default {
       const projectName = this.projectName
       const workflowName = this.workflowName
       const taskId = this.taskId
+      const jobName = this.jobName
       this.loading = true
-      getArtifactWorkspaceAPI(projectName, workflowName, taskId).then((res) => {
-        this.loading = false
-        this.fileList = res
-      })
+      if (this.type === 'customWorkflow') {
+        getTestFileListAPI(workflowName, taskId, jobName, projectName).then(res => {
+          this.loading = false
+          this.fileList = res
+        })
+      } else {
+        getArtifactWorkspaceAPI(projectName, workflowName, taskId).then(res => {
+          this.loading = false
+          this.fileList = res
+        })
+      }
     }
   },
   computed: {
@@ -76,7 +83,11 @@ export default {
     downloadUrl () {
       const projectName = this.projectName
       const token = store.get('userInfo').token
-      return `/api/aslan/workflow/v2/tasks/workflow/${this.workflowName}/taskId/${this.taskId}?token=${token}&projectName=${projectName}&notHistoryFileFlag=${this.fileList.not_history_file_flag}`
+      if (this.type === 'customWorkflow') {
+        return `/api/aslan/workflow/v4/workflowtask/workflow/${this.workflowName}/taskId/${this.taskId}/job/${this.jobName}?token=${token}&projectName=${projectName}&notHistoryFileFlag=${this.fileList.not_history_file_flag}`
+      } else {
+        return `/api/aslan/workflow/v2/tasks/workflow/${this.workflowName}/taskId/${this.taskId}?token=${token}&projectName=${projectName}&notHistoryFileFlag=${this.fileList.not_history_file_flag}`
+      }
     }
   },
   mounted () {

@@ -391,11 +391,11 @@ export default {
         }])
       }
     },
-    getPresetInfo (projectNameAndEnvName) {
+    getPresetInfo (projectNameAndEnvName, initArtifactImage = true) {
       const [, namespace] = projectNameAndEnvName.split(' / ')
       this.precreateLoading = true
 
-      if (this.currentProjectEnvs.length && this.$refs.k8sArtifactRef) {
+      if (initArtifactImage && this.currentProjectEnvs.length && this.$refs.k8sArtifactRef) {
         const registryId = this.currentProjectEnvs.find(env => env.name === namespace).registry_id
         this.$refs.k8sArtifactRef.changeRegistryId(registryId)
       }
@@ -553,7 +553,7 @@ export default {
       if (this.artifactDeployEnabled && !this.isPm) {
         const invalidService = []
         this.k8sArtifactDeployData.services.forEach(item => {
-          if (item.image === '') {
+          if (item.image === '' || item.image === undefined) {
             invalidService.push(item.name)
           }
         })
@@ -673,7 +673,7 @@ export default {
       if (this.haveForcedInput) {
         const projectName = this.forcedUserInput.product_tmpl_name
         const envName = this.forcedUserInput.namespace
-        this.getPresetInfo(`${projectName} / ${envName}`)
+        this.getPresetInfo(`${projectName} / ${envName}`, false)
       }
     })
     // Determine the project type and use different types of startup methods

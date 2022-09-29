@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form-item label="服务">
+    <el-form-item v-if="!disableServiceSelection" label="服务">
       <el-select
         v-model="pickedTargetServices"
         @change="getServiceImg"
@@ -225,8 +225,20 @@ export default {
         Object.assign(this.versionInfo, this.forcedUserInput.version_args)
         this.versionInfo.labelStr = this.versionInfo.labels.join(';')
       }
-      if (this.forcedUserInput.registry_id) {
-        this.pickedRegistry = this.forcedUserInput.registry_id
+      // 克隆任务数据填充
+      if (this.forcedUserInput) {
+        if (this.forcedUserInput.registry_id) {
+          this.pickedRegistry = this.forcedUserInput.registry_id
+        } else {
+          if (res && res.length > 0) {
+            for (let i = 0; i < res.length; i++) {
+              if (res[i].is_default) {
+                this.pickedRegistry = this.pickedRegistry || res[i].id
+                break
+              }
+            }
+          }
+        }
         this.pickedTargetServices = sortBy(
           this.forcedUserInput.artifact_args.map(element => {
             element.key = element.name + '/' + element.service_name
@@ -241,11 +253,13 @@ export default {
         })
         this.getServiceImgs(
           this.forcedUserInput.artifact_args.map(r => r.image_name)
-        ).then(() => {
-          this.forcedUserInput.artifact_args.forEach((art, index) => {
-            this.changeVirtualData(false, art, index)
-          })
-        })
+        )
+        // Todo: use virtual-list
+        // .then(() => {
+        //   this.forcedUserInput.artifact_args.forEach((art, index) => {
+        //     this.changeVirtualData(false, art, index)
+        //   })
+        // })
         return
       }
       if (res && res.length > 0) {
@@ -272,6 +286,12 @@ export default {
       }
     },
     showCreateVersion: {
+      type: Boolean,
+      default () {
+        return false
+      }
+    },
+    disableServiceSelection: {
       type: Boolean,
       default () {
         return false

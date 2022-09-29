@@ -40,7 +40,7 @@ export default {
   name: 'HelmEnvTemplate',
   data () {
     return {
-      defaultEnvsValues: {}, // { key: envName, value: defaultEnvValue }
+      defaultEnvsValues: {}, // { key: envName, value: { envValue: defaultEnvValue, gitRepoConfig: null } }
       showGlobalVariable: false,
       showServiceVariable: true
     }
@@ -86,16 +86,19 @@ export default {
   computed: {
     defaultEnvValue () {
       const envName = this.handledEnv || 'DEFAULT'
+      if (!this.defaultEnvsValues[envName]) {
+        this.$set(this.defaultEnvsValues, envName, { envValue: '' })
+      }
       return {
         envName,
-        defaultValues: this.defaultEnvsValues[envName]
+        defaultValues: this.defaultEnvsValues[envName].envValue
       }
     }
   },
   watch: {
     currentEnvValue: {
       handler (val) {
-        this.$set(this.defaultEnvsValues, 'DEFAULT', val || '')
+        this.$set(this.defaultEnvsValues, 'DEFAULT', { envValue: val || '' })
         this.$refs.envValuesRef && this.$refs.envValuesRef.initEnvVariableInfo()
       },
       immediate: true
@@ -119,10 +122,15 @@ export default {
         })
     },
     getAllInfo () {
+      Object.keys(this.defaultEnvsValues).forEach(envName => {
+        const gitRepoConfig = this.defaultEnvsValues[envName].gitRepoConfig
+        if (!gitRepoConfig || !gitRepoConfig.codehostID) {
+          delete this.defaultEnvsValues[envName].gitRepoConfig
+        }
+      })
       return {
         envInfo: this.defaultEnvsValues,
-        chartInfo: this.$refs.chartValuesRef.getAllChartNameInfo(),
-        gitInfo: this.$refs.envValuesRef.envVariable.gitRepoConfig
+        chartInfo: this.$refs.chartValuesRef.getAllChartNameInfo()
       }
     }
   },
@@ -132,7 +140,7 @@ export default {
   },
   created () {
     this.envNames.forEach(env => {
-      this.$set(this.defaultEnvsValues, env, '')
+      this.$set(this.defaultEnvsValues, env, { envValue: '' })
     })
   }
 }

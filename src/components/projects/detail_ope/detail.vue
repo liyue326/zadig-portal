@@ -52,15 +52,19 @@
           <i class="icon iconfont icongongzuoliucheng"></i>
           工作流信息
         </h4>
-        <el-table :data="workflows" stripe style="width: 100%;">
+        <el-table :data="customWorkflows" stripe style="width: 100%;">
           <el-table-column label="名称">
             <template slot-scope="{ row }">
-              <router-link class="pipeline-name" :to="`/v1/projects/detail/${projectName}/pipelines/multi/${row.name}`">{{row.name}}</router-link>
+              <router-link
+                class="pipeline-name"
+                :to=" row.workflow_type === 'common_workflow'? `/v1/projects/detail/${projectName}/pipelines/custom/${row.name}`  :  `/v1/projects/detail/${projectName}/pipelines/multi/${row.name}`"
+              >{{row.name}}</router-link>
+              <el-tag v-if="row.workflow_type === 'common_workflow'" size="mini" class="mg-l16">自定义</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="步骤">
             <template slot-scope="{ row }">
-              <CusTags :values="row.enabledStages.map(stage => wordTranslation(stage, 'workflowStage'))"></CusTags>
+              <CusTags :values="row.enabledStages"></CusTags>
             </template>
           </el-table-column>
           <el-table-column label="状态">
@@ -93,10 +97,11 @@
 <script>
 import {
   getProjectInfoAPI,
-  productEnvInfoAPI,
+  getEnvInfoAPI,
   queryUserBindingsAPI,
   getProductWorkflowsInProjectAPI,
-  listProductAPI
+  listProductAPI,
+  getCustomWorkflowListAPI
 } from '@api'
 import DeleteProject from './components/deleteProject.vue'
 import { translateEnvStatus } from '@utils/wordTranslate'
@@ -109,6 +114,7 @@ export default {
     return {
       envList: [],
       workflows: [],
+      customWorkflows: [],
       userBindings: [],
       detailLoading: true
     }
@@ -123,11 +129,17 @@ export default {
         this.workflows = res.filter(item => item.projectName === projectName)
       }
     },
+    async getCustomWorkflows (projectName) {
+      const res = await getCustomWorkflowListAPI(projectName)
+      if (res) {
+        this.customWorkflows = res.workflow_list
+      }
+    },
     getEnvList () {
       const projectName = this.projectName
       listProductAPI(projectName).then(res => {
         this.envList = res.map(element => {
-          productEnvInfoAPI(projectName, element.name).then(res => {
+          getEnvInfoAPI(projectName, element.name).then(res => {
             element.status = res.status
           })
           return element
@@ -159,6 +171,20 @@ export default {
         }
         this.detailLoading = false
       }
+    },
+    initProjectInfo () {
+      this.getProject(this.projectName)
+      this.getWorkflows(this.projectName)
+      this.getCustomWorkflows(this.projectName)
+      this.getEnvList()
+      bus.$emit(`show-sidebar`, false)
+      bus.$emit('set-topbar-title', {
+        title: '',
+        breadcrumb: [
+          { title: '项目', url: '/v1/projects' },
+          { title: this.projectName, isProjectName: true, url: '' }
+        ]
+      })
     }
   },
   computed: {
@@ -177,30 +203,12 @@ export default {
   },
   watch: {
     projectName () {
-      this.getProject(this.projectName)
-      bus.$emit(`show-sidebar`, false)
-      bus.$emit('set-topbar-title', {
-        title: '',
-        breadcrumb: [
-          { title: '项目', url: '/v1/projects' },
-          { title: this.projectName, isProjectName: true, url: '' }
-        ]
-      })
+      this.initProjectInfo()
     }
   },
   mounted () {
-    this.getProject(this.projectName)
-    this.getWorkflows(this.projectName)
-    this.getEnvList()
+    this.initProjectInfo()
     this.$emit('injectComp', this)
-    bus.$emit(`show-sidebar`, false)
-    bus.$emit('set-topbar-title', {
-      title: '',
-      breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
-        { title: this.projectName, isProjectName: true, url: '' }
-      ]
-    })
   },
   components: {
     DeleteProject

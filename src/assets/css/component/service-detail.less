@@ -21,6 +21,14 @@
 @stat-gray-active: #d5e1f4;
 @stat-gray-faint: #e7edf6;
 
+@stat-light-red: #ff69b4;
+@stat-light-red-active: #f8a5ce;
+@stat-light-red-faint: #f5dbe8;
+
+@stat-dark-red: #ff1447;
+@stat-dark-red-active: #f36987;
+@stat-dark-red-faint: #fcd7df;
+
 .ns-pop {
   .title {
     color: #606266;
@@ -246,6 +254,22 @@
         background-color: @stat-gray-active;
       }
     }
+
+    &.light-red {
+      background-color: @stat-light-red;
+
+      &.active {
+        background-color: @stat-light-red-active;
+      }
+    }
+
+    &.dark-red {
+      background-color: @stat-dark-red;
+
+      &.active {
+        background-color: @stat-dark-red-active;
+      }
+    }
   }
 
   .pod-info {
@@ -317,6 +341,14 @@
         &.gray {
           background-color: @stat-gray-faint;
         }
+
+        &.light-red {
+          background-color: @stat-light-red-faint;
+        }
+
+        &.dark-red {
+          background-color: @stat-dark-red-faint;
+        }
       }
     }
 
@@ -340,12 +372,29 @@
       &.gray::before {
         border-bottom-color: @stat-gray-faint;
       }
+
+      &.light-red::before {
+        border-bottom-color: @stat-light-red-faint;
+      }
+
+      &.dark-red::before {
+        border-bottom-color: @stat-dark-red-faint;
+      }
     }
   }
 
-  .log-dialog {
+  /deep/.log-dialog {
     .el-dialog__body {
       padding-top: 15px;
+
+      .download-content {
+        display: flex;
+        margin: 10px 0;
+
+        .el-button {
+          margin-left: 10px;
+        }
+      }
     }
   }
 
@@ -425,6 +474,14 @@
 
     &.gray {
       background-color: @stat-gray;
+    }
+
+    &.light-red {
+      background-color: @stat-light-red;
+    }
+
+    &.dark-red {
+      background-color: @stat-dark-red;
     }
   }
 }

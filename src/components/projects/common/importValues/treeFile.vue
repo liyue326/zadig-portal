@@ -100,6 +100,10 @@ export default {
           } else {
             element.leaf = true
           }
+          // gitee api has not full_path
+          if (!element.full_path) {
+            element.full_path = element.parent === '/' ? element.name : element.parent + '/' + element.name
+          }
         })
         if (!this.checkOne && node.checked) {
           this.$nextTick(() => {

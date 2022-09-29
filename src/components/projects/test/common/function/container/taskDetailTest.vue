@@ -1,21 +1,16 @@
 <template>
   <div class="task-detail-test">
-    <el-card v-if="!$utils.isEmpty(testingv2) && testingv2.enabled"
-             class="box-card task-process"
-             :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
+    <el-card
+      v-if="!$utils.isEmpty(testingv2) && testingv2.enabled"
+      class="box-card task-process"
+      :body-style="{ padding: '0px', margin: '15px 0 0 0' }"
+    >
       <div class="error-wrapper">
-        <el-alert v-if="testingv2.error"
-                  title="错误信息"
-                  :description="testingv2.error"
-                  type="error"
-                  close-text="知道了">
-        </el-alert>
+        <el-alert v-if="testingv2.error" title="错误信息" :description="testingv2.error" type="error" close-text="知道了"></el-alert>
       </div>
-      <div slot="header"
-           class="clearfix subtask-header">
+      <div slot="header" class="clearfix subtask-header">
         <span>测试</span>
-        <div v-if="testingv2.status==='running'"
-             class="loader">
+        <div v-if="testingv2.status==='running'" class="loader">
           <div class="ball-scale-multiple">
             <div></div>
             <div></div>
@@ -32,35 +27,33 @@
           </el-col>
           <el-col :span="6">
             <div class="grid-content item-desc">
-              <a href="#testv2-log"
-                 :class="$translate.calcTaskStatusColor(testingv2.status,'pipeline','task')">
-                {{testingv2.status?$translate.translateTaskStatus(testingv2.status):"未运行"}}
-              </a>
+              <a
+                href="#testv2-log"
+                :class="$translate.calcTaskStatusColor(testingv2.status,'pipeline','task')"
+              >{{testingv2.status?$translate.translateTaskStatus(testingv2.status):"未运行"}}</a>
             </div>
           </el-col>
-          <el-col v-if="testingv2.status!=='running' && testingv2.status!=='prepare'"
-            :span="6">
+          <el-col v-if="testingv2.status!=='running' && testingv2.status!=='prepare'" :span="6">
             <div class="grid-content item-title">
               <i class="iconfont iconshijian"></i> 持续时间
             </div>
           </el-col>
-          <el-col v-if="testingv2.status!=='running' && testingv2.status!=='prepare'"
-            :span="6">
-            <span class="item-desc">{{$utils.timeFormat(testingv2.end_time -
-              testingv2.start_time)}}</span>
+          <el-col v-if="testingv2.status!=='running' && testingv2.status!=='prepare'" :span="6">
+            <span class="item-desc">
+              {{$utils.timeFormat(testingv2.end_time -
+              testingv2.start_time)}}
+            </span>
           </el-col>
         </el-row>
-        <el-row :gutter="0"
-                v-for="(build,index) in testingv2.job_ctx.builds"
-                :key="index">
+        <el-row :gutter="0" v-for="(build,index) in testingv2.job_ctx.builds" :key="index">
           <el-col :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont icondaima"></i> 代码库({{build.source}})
+              <i class="iconfont icondaima"></i>
+              代码库({{build.source}})
             </div>
           </el-col>
           <el-col :span="6">
-            <div class="grid-content item-desc">{{build.repo_name}}
-            </div>
+            <div class="grid-content item-desc">{{build.repo_name}}</div>
           </el-col>
           <el-col :span="6">
             <div class="grid-content item-title">
@@ -68,22 +61,21 @@
             </div>
           </el-col>
           <el-col :span="6">
-            <RepoJump :build="build" showIcon/>
+            <RepoJump :build="build" showIcon />
           </el-col>
         </el-row>
       </div>
     </el-card>
 
-    <el-card id="testv2-log"
-             v-if="!$utils.isEmpty(testingv2)&&testingv2.enabled"
-             class="box-card task-process"
-             :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
+    <el-card
+      id="testv2-log"
+      v-if="!$utils.isEmpty(testingv2)&&testingv2.enabled"
+      class="box-card task-process"
+      :body-style="{ padding: '0px', margin: '15px 0 0 0' }"
+    >
       <div class="log-container">
         <div class="log-content">
-
-          <XtermLog :id="`${pipelineName}-${taskID}-${serviceName}`"
-                     @mouseleave.native="leaveLog"
-                     :logs="testAnyLog"/>
+          <XtermLog :id="`${pipelineName}-${taskID}-${serviceName}`" @mouseleave.native="leaveLog" :logs="testAnyLog" />
         </div>
       </div>
     </el-card>
@@ -100,14 +92,14 @@ export default {
     return {
       testAnyLog: [],
       wsTestDataBuffer: [],
-      testLogStarted: false
+      testLogStarted: true
     }
   },
   computed: {
-    test_running () {
+    testIsRunning () {
       return this.testingv2 && this.testingv2.status === 'running'
     },
-    test_done () {
+    testIsDone () {
       return this.isSubTaskDone(this.testingv2)
     },
     testName () {
@@ -118,7 +110,7 @@ export default {
     }
   },
   watch: {
-    test_running (val, oldVal) {
+    testIsRunning (val, oldVal) {
       if (!oldVal && val && this.testLogStarted) {
         this.openTestLog()
       }
@@ -145,28 +137,32 @@ export default {
           this.hasNewTestMsg = false
         }, 500)
         const url = `/api/aslan/logs/sse/workflow/test/${this.pipelineName}/${this.taskID}/${this.testName}/999999/${this.serviceName}?workflowType=test&projectName=${this.projectName}`
-        this.$sse(url, { format: 'plain' }).then(sse => {
-          // Store SSE object at a higher scope
-          window.msgServer[this.serviceName] = sse
-          sse.onError(e => {
-            console.error('lost connection; giving up!', e)
-            this.$message({
-              message: `test日志获取失败`,
-              type: 'error'
+        this.$sse(url, { format: 'plain' })
+          .then(sse => {
+            // Store SSE object at a higher scope
+            window.msgServer[this.serviceName] = sse
+            sse.onError(e => {
+              console.error('lost connection; giving up!', e)
+              this.$message({
+                message: `test日志获取失败`,
+                type: 'error'
+              })
+              sse.close()
+              this.killTestLog()
             })
-            sse.close()
-            this.killTestLog()
+            // Listen for messages without a specified event
+            sse.subscribe('', data => {
+              this.hasNewTestMsg = true
+              this.wsTestDataBuffer = this.wsTestDataBuffer.concat(
+                Object.freeze(data + '\n')
+              )
+            })
           })
-          // Listen for messages without a specified event
-          sse.subscribe('', data => {
-            this.hasNewTestMsg = true
-            this.wsTestDataBuffer = this.wsTestDataBuffer.concat(Object.freeze(data + '\n'))
+          .catch(err => {
+            console.error('Failed to connect to server', err)
+            delete window.msgServer
+            clearInterval(this.testIntervalHandle)
           })
-        }).catch(err => {
-          console.error('Failed to connect to server', err)
-          delete window.msgServer
-          clearInterval(this.testIntervalHandle)
-        })
       }
     },
     killTestLog () {
@@ -177,17 +173,22 @@ export default {
     }
   },
   mounted () {
-    if (this.test_running) {
+    if (this.testIsRunning) {
       this.openTestLog()
     }
-    if (this.test_done) {
-      getWorkflowHistoryTestLogAPI(this.projectName, this.pipelineName, this.taskID, this.testName, this.serviceName, 'test').then(
-        response => {
-          this.testAnyLog = (response.split('\n')).map(element => {
-            return element + '\n'
-          })
-        }
-      )
+    if (this.testIsDone) {
+      getWorkflowHistoryTestLogAPI(
+        this.projectName,
+        this.pipelineName,
+        this.taskID,
+        this.testName,
+        this.serviceName,
+        'test'
+      ).then(response => {
+        this.testAnyLog = response.split('\n').map(element => {
+          return element + '\n'
+        })
+      })
     }
   },
   beforeDestroy () {
@@ -219,7 +220,7 @@ export default {
 </script>
 
 <style lang="less">
-@import "~@assets/css/component/subtask.less";
+@import '~@assets/css/component/subtask.less';
 
 .task-detail-test {
   .viewlog {

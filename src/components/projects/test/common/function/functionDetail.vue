@@ -24,7 +24,7 @@
 
       <section>
         <div class="primary-title not-first-child">测试变量</div>
-        <EnvVariable :preEnvs="test.pre_test" :validObj="validObj" isTest />
+        <EnvVariable :preEnvs="test.pre_test" :validObj="validObj" :fromWhere="fromWhere" />
         <div class="primary-title not-first-child">测试脚本</div>
         <div class="deploy-script">
           <Resize :resize="'both'">
@@ -149,7 +149,7 @@ export default {
           installs: [{ name: '', version: '' }],
           envs: []
         },
-        artifact_paths: [''],
+        artifact_paths: [],
         scripts: '#!/bin/bash\nset -e',
         test_result_path: '',
         test_report_path: '',
@@ -162,7 +162,12 @@ export default {
       },
       validateTestName,
       validObj: new ValidateSubmit(),
-      configDataLoading: false
+      configDataLoading: false,
+      fromWhere: {
+        origin: 'test',
+        title: '测试',
+        vars: []
+      }
     }
   },
   computed: {
@@ -215,7 +220,7 @@ export default {
             type: 'success'
           })
           this.$router.push(
-            `/v1/projects/detail/${this.projectName}/test/function`
+            `/v1/projects/detail/${this.projectName}/test`
           )
         })
       })
@@ -233,7 +238,7 @@ export default {
         },
         {
           title: '测试',
-          url: `/v1/projects/detail/${this.projectName}/test/function`
+          url: `/v1/projects/detail/${this.projectName}/test`
         },
         { title: this.isEdit ? this.name : '添加', url: '' }
       ]
@@ -273,12 +278,17 @@ export default {
           res.notify_ctls = res.notify_ctls.filter(item => item.enabled)
         }
         if (this.test.artifact_paths.length === 0) {
-          this.test.artifact_paths.push('')
+          this.test.artifact_paths.push()
         }
         if (this.test.pre_test.installs) {
           this.test.pre_test.installs = this.test.pre_test.installs.map(i => {
             i.id = `${i.name}${i.version}`
             return i
+          })
+        }
+        if (this.test.pre_test.envs) {
+          this.test.pre_test.envs.forEach(element => {
+            element.disabledKey = true
           })
         }
         this.configDataLoading = false

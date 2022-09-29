@@ -22,7 +22,7 @@
                       prop="value">
           <el-input size="small"
                     placeholder="仓库地址/命名空间/镜像名:标签"
-                    v-model="createImg.value"></el-input>
+                    v-model.trim="createImg.value"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer"
@@ -55,7 +55,7 @@
         <el-form-item label="镜像名称"
                       prop="value">
           <el-input size="small"
-                    v-model="swapImg.value"></el-input>
+                    v-model.trim="swapImg.value"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer"

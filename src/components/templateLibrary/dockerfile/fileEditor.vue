@@ -31,7 +31,7 @@
         </div>
         <div class="controls__wrap">
           <div class="controls__right">
-            <el-button v-hasPermi="{type: 'system', action: fileStatus === 'added'?'edit_template':'create_template',isBtn:true }" type="primary"
+            <el-button v-hasPermi="{type: 'system', action: fileStatus === 'added'?'edit_template':'create_template',isBtn:true, disabled: disabledSave }" type="primary"
                        size="small"
                        :disabled="disabledSave"
                        @click="updateFile">保存</el-button>

@@ -12,7 +12,8 @@
               <CodeMirror style="width: 100%; height: 100%;" ref="myCm" :value="service.yaml" :options="cmOptions" @input="onCmCodeChange"/>
             </div>
             <div class="modal-block" v-if="service.source === 'template' && showModal">
-              <el-button type="primary" size="small" @click="showModal = false">预览/编辑</el-button>
+              <el-button v-if="service.auto_sync || (service.visibility === 'public' && service.product_name !== projectName)" type="primary" size="small" @click="showModal = false">预览</el-button>
+              <el-button v-else type="primary" size="small" @click="showModal = false">预览/编辑</el-button>
             </div>
           </div>
         </div>
@@ -150,6 +151,7 @@ export default {
         ? this.service.visibility
         : 'private'
       const yaml = this.service.yaml
+      const isEdit = this.serviceInTree.status === 'added'
       const payload = {
         product_name: projectName,
         service_name: serviceName,
@@ -158,7 +160,7 @@ export default {
         yaml: yaml,
         source: 'spock'
       }
-      return saveServiceTemplateAPI(payload).then(res => {
+      return saveServiceTemplateAPI(isEdit, payload).then(res => {
         this.$message({
           type: 'success',
           message: `服务 ${payload.service_name} 保存成功`
@@ -248,8 +250,10 @@ export default {
         this.service.source === 'gitlab' ||
         this.service.source === 'github' ||
         this.service.source === 'gerrit' ||
+        this.service.source === 'gitee' ||
         (this.service.visibility === 'public' &&
-          this.service.product_name !== this.projectName)
+          this.service.product_name !== this.projectName) ||
+        (this.service.source === 'template' && this.service.auto_sync)
       ) {
         return true
       } else {
@@ -286,6 +290,7 @@ export default {
           if (
             val.source === 'gitlab' ||
             val.source === 'gerrit' ||
+            val.source === 'gitee' ||
             val.source === 'github' ||
             (val.visibility === 'public' &&
               val.product_name !== this.projectName)

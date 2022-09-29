@@ -48,6 +48,7 @@
       </el-table>
     </div>
     <span slot="footer" class="dialog-footer">
+      <span class="update-desc">确认更新后，修改的变量关联的服务会重启</span>
       <el-button
         size="small"
         type="primary"
@@ -190,6 +191,13 @@ export default {
         color: black;
       }
     }
+  }
+
+  .update-desc {
+    display: inline-block;
+    margin-right: 5px;
+    color: red;
+    font-size: 13px;
   }
 }
 </style>

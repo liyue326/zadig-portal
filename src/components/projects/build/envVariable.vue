@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-form ref="buildEnvRef" :inline="true" :model="preEnvs" class="variable-form" label-position="top" label-width="80px">
-      <span v-if="!isJenkins" class="item-title" :style="{'margin-bottom': isTest ? '12px' : '0px'}">自定义{{ isTest ? '测试' : '构建' }}变量</span>
+      <span v-if="!isJenkins" class="item-title" :style="{'margin-bottom': fromWhere.origin === 'test' ? '12px' : '0px'}">自定义{{ fromWhere.title }}变量</span>
       <el-button
         v-if="preEnvs.envs && preEnvs.envs.length===0 && !isJenkins"
         @click="addFirstBuildEnv()"
@@ -32,13 +32,13 @@
         </el-col>
         <el-col :span="4">
           <el-form-item :prop="'envs.' + build_env_index + '.key'" :rules="{required: true, message: '键 不能为空', trigger: 'blur'}">
-            <el-input placeholder="键" v-model="preEnvs.envs[build_env_index].key" size="small"></el-input>
+            <el-input placeholder="键" v-model="preEnvs.envs[build_env_index].key" size="small" :disabled="preEnvs.envs[build_env_index].disabledKey"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="4">
           <el-form-item>
             <el-select
-              v-if="preEnvs.envs[build_env_index].type==='choice'"
+              v-if="preEnvs.envs[build_env_index].command !== 'other'&&preEnvs.envs[build_env_index].type==='choice'"
               v-model="preEnvs.envs[build_env_index].value"
               placeholder="默认值"
               size="small"
@@ -47,13 +47,19 @@
               <el-option v-for="option in preEnvs.envs[build_env_index].choice_option" :key="option" :label="option" :value="option"></el-option>
             </el-select>
             <el-input
-              v-else
+              v-if="preEnvs.envs[build_env_index].type==='string' && preEnvs.envs[build_env_index].command !== 'other'"
               :disabled="isJenkins&&preEnvs.envs[build_env_index].auto_generate"
               placeholder="值"
               v-model="preEnvs.envs[build_env_index].value"
               size="small"
             ></el-input>
+            <el-select v-if="preEnvs.envs[build_env_index].command === 'other'" v-model="preEnvs.envs[build_env_index].value" filterable placeholder="请选择" size="small"  style="max-width: 176px;">
+              <el-option v-for="(item,index) in envs" :key="index" :label="item" :value="item">{{item}}</el-option>
+            </el-select>
           </el-form-item>
+        </el-col>
+        <el-col :span="1" v-if="envs.length > 0" class="mg-t16">
+          <EnvTypeSelect v-model="preEnvs.envs[build_env_index].command" isFixed isRuntime isOther/>
         </el-col>
         <el-col :span="12" v-if="isJenkins&&preEnvs.envs[build_env_index].name==='IMAGE'" class="tip">
           <el-checkbox v-model="preEnvs.envs[build_env_index].auto_generate"></el-checkbox>
@@ -99,15 +105,15 @@
     </el-dialog>
     <section class="inner-variable" v-if="!isJenkins">
       <div @click="showBuildInEnvVar = !showBuildInEnvVar" class="item-title inner-title">
-        内置{{ isTest ? '测试' : '构建' }}变量
+        内置{{ fromWhere.title }}变量
         <i
           style="margin-left: 10px;"
           :class="[showBuildInEnvVar ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"
         ></i>
       </div>
       <div v-show="showBuildInEnvVar" class="inner-variable-content">
-        <div v-for="variable in (isTest ? testVars : buildVars)" :key="variable.variable" class="var-content">
-          <span class="var-variable">{{ variable.variable }}</span>
+        <div v-for="variable in fromWhere.vars" :key="variable.variable" class="var-content">
+          <span class="var-variable" v-if="variable.variable">{{ variable.variable }}</span>
           <span class="var-desc">
             {{ variable.desc }}
             <el-button
@@ -125,8 +131,10 @@
 
 <script>
 import { cloneDeep } from 'lodash'
+import EnvTypeSelect from '../workflow/workflowEditor/customWorkflow/components/envTypeSelect.vue'
+
 export default {
-  components: {},
+  components: { EnvTypeSelect },
   props: {
     preEnvs: Object,
     isTest: {
@@ -153,6 +161,20 @@ export default {
     serviceName: {
       type: Array,
       default: () => [{ service_name: '' }]
+    },
+    fromWhere: {
+      type: Object,
+      default: () => {
+        return {
+          origin: 'build',
+          title: '构建',
+          vars: []
+        }
+      }
+    },
+    envs: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
@@ -200,6 +222,10 @@ export default {
         {
           variable: '$SERVICE',
           desc: '构建的服务名称'
+        },
+        {
+          variable: '$SERVICE_MODULE',
+          desc: '构建的服务组件名称'
         },
         {
           variable: '$DIST_DIR',
@@ -307,7 +333,7 @@ export default {
         key: '',
         value: '',
         type: 'string',
-        is_credential: true
+        is_credential: false
       })
     },
     validate () {
@@ -319,7 +345,7 @@ export default {
           key: '',
           value: '',
           type: 'string',
-          is_credential: true
+          is_credential: false
         })
       })
     },
@@ -378,6 +404,12 @@ export default {
         name: 'envVariable',
         valid: this.validate
       })
+    const origin = this.fromWhere.origin
+    if (origin === 'build') {
+      this.fromWhere.vars = this.buildVars
+    } else if (origin === 'test') {
+      this.fromWhere.vars = this.testVars
+    }
   }
 }
 </script>

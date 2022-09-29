@@ -140,7 +140,8 @@
 import DeleteProject from './components/deleteProject.vue'
 import bus from '@utils/eventBus'
 import { mapGetters } from 'vuex'
-
+import { isMobile } from 'mobile-device-detect'
+import store from 'storejs'
 export default {
   data () {
     return {
@@ -170,6 +171,14 @@ export default {
     },
     deleteProject (projectName) {
       this.$refs.deleteProject.openDialog(projectName)
+    },
+    redirectByDevice () {
+      const userInfo = store.get('userInfo')
+      if (isMobile && userInfo) {
+        if (!window.location.pathname.includes('/mobile')) {
+          this.$router.push('/mobile/projects')
+        }
+      }
     }
   },
   computed: {
@@ -178,6 +187,8 @@ export default {
   mounted () {
     this.$store.dispatch('getProjectList')
     bus.$emit('set-topbar-title', { title: '项目', breadcrumb: [] })
+    // Compatible with non-system logi
+    this.redirectByDevice()
   },
   components: {
     DeleteProject
@@ -213,6 +224,8 @@ export default {
   }
 
   .project-header {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;

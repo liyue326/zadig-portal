@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { getHelmRepoAPI, getHelmRepoChartAPI, createTemplateServiceAPI } from '@api'
+import { getHelmRepoAPI, getHelmRepoChartAPI, createTemplateServiceAPI, updateTemplateServiceAPI } from '@api'
 export default {
   name: 'ChartRepo',
   data () {
@@ -125,7 +125,8 @@ export default {
       const payload = this.chartForm
       const validateResult = await this.$refs.chartRepoForm.validate().catch((err) => { return err })
       if (validateResult) {
-        const res = await createTemplateServiceAPI(projectName, payload).catch(
+        const reqApi = this.isUpdate ? updateTemplateServiceAPI : createTemplateServiceAPI
+        const res = await reqApi(projectName, payload).catch(
           err => {
             this.importLoading = false
             console.log(err)

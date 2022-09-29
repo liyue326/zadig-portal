@@ -24,7 +24,6 @@
             <i class="iconfont iconaliyun"></i>
             <span>阿里云</span>
           </el-option>
-
           <el-option :value="2" label="腾讯云">
             <i class="iconfont icontengxunyun"></i>
             <span>腾讯云</span>
@@ -32,6 +31,10 @@
           <el-option :value="3" label="华为云">
             <i class="iconfont iconhuawei"></i>
             <span>华为云</span>
+          </el-option>
+          <el-option :value="4" label="Amazon">
+            <i class="iconfont iconaws"></i>
+            <span>Amazon</span>
           </el-option>
           <el-option :value="0" label="其他">
             <i class="iconfont iconwuliji"></i>
@@ -125,7 +128,12 @@
                 @change="(value) => { if(!value){host.probe.http_probe.response_success_flag = ''}}"
               ></el-checkbox>
               <span style="display: inline-block; margin-left: 5px;">响应结构体包含</span>
-              <el-input v-model="host.probe.http_probe.response_success_flag" size="small" :disabled="!host.probe.http_probe.response_flag" placeholder="字符串"></el-input>
+              <el-input
+                v-model="host.probe.http_probe.response_success_flag"
+                size="small"
+                :disabled="!host.probe.http_probe.response_flag"
+                placeholder="字符串"
+              ></el-input>
             </div>
           </el-form-item>
         </div>
@@ -135,7 +143,12 @@
 </template>
 
 <script>
-import { createHostAPI, updateHostAPI } from '@api'
+import {
+  createHostAPI,
+  createProjectHostAPI,
+  updateHostAPI,
+  updateProjectHostAPI
+} from '@api'
 import { cloneDeep } from 'lodash'
 const shellKeywords = [
   'alias',
@@ -342,14 +355,25 @@ export default {
       return this.$refs.host.validate().then(async () => {
         const payload = cloneDeep(this.host)
         payload.private_key = window.btoa(payload.private_key)
+        const projectName = this.$route.params.project_name
+        if (projectName) {
+          payload.project_name = projectName
+        }
         if (payload.probe.probe_type === 'tcp') {
           delete payload.probe.http_probe
         } else {
           delete payload.probe.http_probe.response_flag
         }
-        const res = await createHostAPI(payload).catch(err => {
-          console.log(err)
-        })
+        let res = {}
+        if (projectName) {
+          res = await createProjectHostAPI(projectName, payload).catch(err => {
+            console.log(err)
+          })
+        } else {
+          res = await createHostAPI(payload).catch(err => {
+            console.log(err)
+          })
+        }
         this.showAdvanced = false
         if (res) {
           this.$message({
@@ -366,6 +390,10 @@ export default {
       return this.$refs.host.validate().then(async () => {
         const id = this.host.id
         const payload = cloneDeep(this.host)
+        const projectName = this.$route.params.project_name
+        if (projectName) {
+          payload.project_name = projectName
+        }
         payload.private_key = window.btoa(payload.private_key)
         delete payload.origin_private_key
         if (payload.probe.probe_type === 'tcp') {
@@ -373,9 +401,18 @@ export default {
         } else {
           delete payload.probe.http_probe.response_flag
         }
-        const res = await updateHostAPI(id, payload).catch(err => {
-          console.log(err)
-        })
+        let res = {}
+        if (projectName) {
+          res = await updateProjectHostAPI(id, projectName, payload).catch(
+            err => {
+              console.log(err)
+            }
+          )
+        } else {
+          res = await updateHostAPI(id, payload).catch(err => {
+            console.log(err)
+          })
+        }
         this.showAdvanced = false
         if (res) {
           this.$message({

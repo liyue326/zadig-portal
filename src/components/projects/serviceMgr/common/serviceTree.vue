@@ -18,7 +18,7 @@
     </el-dialog>
     <!--end of workspace-tree-dialog-->
     <el-dialog
-      title="新建服务-从代码库同步"
+      :title="currentUpdatedServiceName ? '更新服务' : '新建服务-从代码库同步'"
       width="720px"
       center
       @close="closeSelectRepo"
@@ -43,9 +43,7 @@
                 :key="index"
                 :label="host.address + '('+host.alias+')'"
                 :value="host.id"
-              >
-               {{host.address + '('+host.alias+')'}}
-              </el-option>
+              >{{host.address + '('+host.alias+')'}}</el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="组织名/用户名" prop="repoOwner" :rules="{required: true, message: '组织名/用户名不能为空', trigger: 'change'}">
@@ -169,13 +167,35 @@
         <el-col :span="14" class="text-right">
           <div style="line-height: 32px;">
             <el-tooltip effect="dark" content="手工输入" placement="top">
-              <el-button v-if="deployType==='k8s'" v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}" size="mini" icon="el-icon-plus" @click="createService('platform')" plain circle></el-button>
+              <el-button
+                v-if="deployType==='k8s'"
+                v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}"
+                size="mini"
+                icon="el-icon-plus"
+                @click="createService('platform')"
+                plain
+                circle
+              ></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="从代码库同步" placement="top">
-              <el-button v-if="deployType==='k8s'" v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}" size="mini" @click="createService('repo')" icon="iconfont icon icongit" plain circle></el-button>
+              <el-button
+                v-if="deployType==='k8s'"
+                v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}"
+                size="mini"
+                @click="createService('repo')"
+                icon="iconfont icon icongit"
+                plain
+                circle
+              ></el-button>
             </el-tooltip>
             <el-dropdown placement="bottom" style="margin-left: 10px;">
-              <el-button size="mini" icon="iconfont icon iconvery-template" plain circle v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}"></el-button>
+              <el-button
+                size="mini"
+                icon="iconfont icon iconvery-template"
+                plain
+                circle
+                v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}"
+              ></el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item @click.native="createService('template')">使用模板新建</el-dropdown-item>
                 <el-dropdown-item @click.native="createService('namespace')">从 Kubernetes 导入</el-dropdown-item>
@@ -376,6 +396,7 @@ import {
   getRepoNameByIdAPI,
   getBranchInfoByIdAPI,
   loadRepoServiceAPI,
+  updateLoadRepoServiceAPI,
   validPreloadService,
   getCodeProviderAPI,
   serviceTemplateAPI,
@@ -455,12 +476,7 @@ export default {
         url: [
           {
             required: true,
-            message: '请输入 URL 地址',
-            trigger: 'blur'
-          },
-          {
-            type: 'url',
-            message: '请输入正确的 URL，包含协议',
+            message: '请输入 URL，包含协议',
             trigger: ['blur', 'change']
           }
         ]
@@ -665,7 +681,10 @@ export default {
       this.$refs.sourceForm.validate(valid => {
         if (valid) {
           this.dialogImportFromRepoLoading = true
-          loadRepoServiceAPI(
+          const reqApi = this.currentUpdatedServiceName
+            ? updateLoadRepoServiceAPI
+            : loadRepoServiceAPI
+          reqApi(
             this.projectName,
             codehostId,
             repoOwner,
@@ -788,6 +807,7 @@ export default {
             this.$refs.serviceNamedRef.focus()
           })
         } else if (cmd === 'repo') {
+          this.currentUpdatedServiceName = ''
           if (res && res.length > 0) {
             this.dialogImportFromRepoVisible = true
             this.showNewServiceInput = false
@@ -1002,7 +1022,12 @@ export default {
       this.source.repoUUID = repoUUID
       this.source.namespace = repoItem.namespace || ''
       if (repoName && repoOwner) {
-        getBranchInfoByIdAPI(id, this.source.namespace, repoName, repoUUID).then(res => {
+        getBranchInfoByIdAPI(
+          id,
+          this.source.namespace,
+          repoName,
+          repoUUID
+        ).then(res => {
           this.$set(this.codeInfo, 'branches', res)
         })
         this.source.branchName = ''
@@ -1017,6 +1042,7 @@ export default {
         this.openImportYamlDialog = true
       } else {
         this.dialogImportFromRepoVisible = true
+        this.currentUpdatedServiceName = data.service_name
         this.source.codehostId = data.codehost_id
         this.source.repoOwner = data.repo_owner
         this.source.repoName = data.repo_name

@@ -24,6 +24,12 @@ const sourceRules = {
     required: true,
     message: '分支不能为空',
     trigger: 'change'
+  }],
+  valuesPaths: [{
+    type: 'array',
+    required: true,
+    message: '请选择文件',
+    trigger: 'change'
   }]
 }
 export default {
@@ -81,10 +87,15 @@ export default {
         this.$set(this.codeInfo, 'repos', res)
       })
     },
+    // select set namespace
     getBranchInfoById (id, owner, repo) {
       this.source.branch = ''
+      const repoItem = this.codeInfo.repos.find(item => {
+        return item.name === repo
+      })
+      this.source.namespace = repoItem.namespace || ''
       if (repo && owner) {
-        getBranchInfoByIdAPI(id, owner, repo).then(res => {
+        getBranchInfoByIdAPI(id, this.source.namespace, repo).then(res => {
           this.$set(this.codeInfo, 'branches', res)
         })
       }
@@ -113,8 +124,7 @@ export default {
         repo: '',
         branch: '',
         valuesPaths: [],
-        path: '',
-        isDir: false
+        namespace: ''
       }
       this.$nextTick(() => {
         this.$refs.repoForm && this.$refs.repoForm.clearValidate()

@@ -19,7 +19,7 @@
       <BuildDeploy v-show="currentTab==='buildDeploy'"
                    :editMode="editMode"
                    :build_stage="workflowInfo.build_stage"
-                   :product_tmpl_name="workflowInfo.product_tmpl_name"
+                   :projectName="workflowInfo.product_tmpl_name"
                    :presets="presets"/>
       <ArtifactDeploy v-show="currentTab==='artifactDeploy'"
                       :editMode="editMode"
@@ -87,6 +87,7 @@ import Trigger from './modules/trigger.vue'
 import Notify from './modules/notify.vue'
 import Extension from './modules/extension.vue'
 import { getWorkflowDetailAPI, workflowPresetAPI, createWorkflowAPI, updateWorkflowAPI } from '@api'
+import { uniqBy } from 'lodash'
 
 export default {
   data () {
@@ -176,7 +177,9 @@ export default {
   watch: {
     'workflowInfo.product_tmpl_name' (val) {
       workflowPresetAPI(val).then(res => {
-        this.presets = res
+        this.presets = uniqBy(res, (item) => {
+          return item.target.service_name + '/' + item.target.service_module
+        })
       })
     }
   },

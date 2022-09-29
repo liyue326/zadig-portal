@@ -32,7 +32,30 @@
         <div class="breadcrumb-container">
           <div class="project-switcher"></div>
           <el-breadcrumb v-if="content.breadcrumb && content.breadcrumb.length > 0" separator=">">
-            <el-breadcrumb-item v-for="(item,index) in content.breadcrumb" :to="item.url" :key="index">{{parseTitle(item)}}</el-breadcrumb-item>
+            <el-breadcrumb-item v-for="(item,index) in content.breadcrumb" :to="item.url" :key="index">
+              <span>{{ item.title }}</span>
+              <el-popover
+                placement="bottom"
+                width="180"
+                trigger="hover"
+                v-if="item.list && item.list.length"
+                popper-class="sub-project-list-popover"
+              >
+                <div class="option-list-container">
+                  <div
+                    v-for="(proItem, index) in item.list"
+                    :key="index"
+                    class="product-option"
+                    :class="{'active': proItem.title === item.title }"
+                    @click="toggleSubUrl(item, proItem)"
+                  >
+                    <span class="left">{{ proItem.title }}</span>
+                    <i class="el-icon-close" v-if="proItem.deleteOpe" @click.stop="proItem.deleteOpe(proItem.name)"></i>
+                  </div>
+                </div>
+                <i slot="reference" class="el-icon-caret-bottom list-popover-icon"></i>
+              </el-popover>
+            </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
       </div>
@@ -141,6 +164,12 @@
                       <span class="profile-list__text">系统设置</span>
                     </li>
                   </router-link>
+                  <router-link v-if="hasPlutus" to="/v1/enterprise/">
+                    <li class="profile-list__item">
+                      <i class="iconfont iconcompany-info"></i>
+                      <span class="profile-list__text">企业管理</span>
+                    </li>
+                  </router-link>
                 </ul>
                 <ul class="profile-list profile-list__with-icon">
                   <router-link to="/v1/profile/info">
@@ -191,10 +220,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['projectList', 'showSidebar']),
+    ...mapGetters(['projectList', 'showSidebar', 'projectAliasByName']),
     ...mapState({
       role: state => state.login.role,
-      userInfo: state => state.login.userinfo
+      userInfo: state => state.login.userinfo,
+      hasPlutus: state => state.checkPlutus.hasPlutus
     }),
     filteredProjectList () {
       return this.projectList.filter(item => {
@@ -238,22 +268,21 @@ export default {
     changeTitle (params) {
       this.content = params
     },
-    parseTitle (item) {
-      if (item.isProjectName) {
-        const project = this.projectList.find(i => {
-          return item.title === i.name
-        })
-        if (project) {
-          const alias = project.alias || project.name
-          return alias
-        }
-      } else {
-        return item.title
-      }
+    toggleSubUrl (item, proItem) {
+      item.title = proItem.title
+      item.name = proItem.name || ''
+      item.url = proItem.url ? '/v1' + proItem.url : ''
+      this.$router.push(`/v1${proItem.url}`)
     }
   },
   created () {
     bus.$on('set-topbar-title', params => {
+      params.breadcrumb.forEach(bc => {
+        if (bc && bc.isProjectName) {
+          bc.name = bc.title
+          bc.title = this.projectAliasByName(bc.name)
+        }
+      })
       this.changeTitle(params)
     })
   },
@@ -410,6 +439,7 @@ export default {
   top: 0;
   right: 0;
   left: 66px;
+  z-index: 2;
   height: 40px;
   padding: 0 30px;
   font-size: 14px;
@@ -439,6 +469,11 @@ export default {
       justify-content: flex-start;
       min-width: 0;
       margin-right: 10px;
+
+      .list-popover-icon {
+        color: @themeColor;
+        cursor: pointer;
+      }
 
       .logo-container {
         display: flex;
@@ -599,6 +634,32 @@ export default {
             color: @themeColor;
           }
         }
+      }
+    }
+  }
+}
+
+.sub-project-list-popover {
+  .option-list-container {
+    max-height: 300px;
+    margin: -5px -12px -5px -5px;
+    padding-right: 5px;
+    overflow: auto;
+
+    .product-option {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+
+      .left {
+        flex: 1 1 auto;
+      }
+
+      &:hover,
+      &.active {
+        background: rgba(0, 102, 255, 0.07);
       }
     }
   }

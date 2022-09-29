@@ -18,7 +18,7 @@
               <el-tag size="mini" type="success" effect="dark" class="help-tag">帮助</el-tag>
             </a>
           </span>
-          <el-switch v-model="versionHook.enable" style="margin-left: 10px;" @change="saveHook"></el-switch>
+          <el-switch v-model="versionHook.enable" style="margin-left: 10px;" @change="saveHook" :disabled="!isProjectAdmin"></el-switch>
         </span>
         <el-form ref="hookRef" :model="versionHook" v-if="versionHook.enable" inline class="hook-form">
           <el-form-item prop="hook_host" :rules="{required: true, message: '请选择外部系统', trigger: 'blur'}">
@@ -60,6 +60,14 @@
       <el-table-column prop="create_by" label="所属项目" v-if="!projectName">
         <template slot-scope="scope">
           <span>{{ scope.row.versionInfo.productName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" v-if="showStatus">
+        <template slot-scope="{ row }">
+          <el-tag
+            :type="helmStatusEnum[row.versionInfo.status].tag || 'info'"
+            size="small"
+          >{{ helmStatusEnum[row.versionInfo.status].text || '未知' }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="标签">
@@ -104,18 +112,21 @@
 <script>
 import bus from '@utils/eventBus'
 import { cloneDeep } from 'lodash'
+import store from 'storejs'
 import {
   getVersionListAPI,
   getVersionServiceListAPI,
   deleteVersionAPI,
   getSingleProjectAPI,
   getExternalSystemsAPI,
-  updateSingleProjectAPI
+  updateSingleProjectAPI,
+  queryUserBindingsAPI
 } from '@api'
 export default {
   data () {
     return {
       loading: false,
+      userBindings: [],
       versionList: [],
       serviceList: [],
       selectedService: '',
@@ -124,6 +135,25 @@ export default {
         enable: false,
         hook_host: '',
         path: ''
+      },
+      showStatus: false,
+      helmStatusEnum: {
+        success: {
+          text: '成功',
+          tag: 'success'
+        },
+        failed: {
+          text: '失败',
+          tag: 'danger'
+        },
+        creating: {
+          text: '创建中',
+          tag: 'info'
+        },
+        retrying: {
+          text: '重试中',
+          tag: 'warning'
+        }
       }
     }
   },
@@ -210,6 +240,16 @@ export default {
             })
           })
         })
+    },
+    async getUserBinding (projectName) {
+      const userInfo = store.get('userInfo')
+      const userBindings = await queryUserBindingsAPI(
+        userInfo.uid,
+        projectName
+      ).catch(error => console.log(error))
+      if (userBindings) {
+        this.userBindings = userBindings
+      }
     }
   },
   computed: {
@@ -224,7 +264,17 @@ export default {
         return false
       } else if (project && project.deployType === 'helm') {
         this.initData()
+        this.showStatus = true
         return true
+      } else {
+        return false
+      }
+    },
+    isProjectAdmin () {
+      if (this.$utils.roleCheck('admin')) {
+        return true
+      } else if (this.userBindings.length > 0) {
+        return this.userBindings.some(item => item.role === 'project-admin')
       } else {
         return false
       }
@@ -244,6 +294,7 @@ export default {
           { title: '版本管理', url: `` }
         ]
       })
+      this.getUserBinding(this.projectName)
     } else {
       bus.$emit(`set-topbar-title`, {
         title: '',

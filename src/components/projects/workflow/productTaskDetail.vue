@@ -25,7 +25,7 @@
                 <i class="el-icon-warning" style="color: red;"></i>
               </el-tooltip>
             </el-form-item>
-            <el-form-item v-if="taskDetail.releases.length > 0 && taskDetail.status==='passed'" label="交付清单">
+            <el-form-item v-if="taskDetail.releases && taskDetail.releases.length > 0 && taskDetail.status==='passed'" label="交付清单">
               <router-link
                 :to="`/v1/delivery/version/detail/${projectName}/${taskDetail.releases[0].id}?version=${taskDetail.releases[0].version}&type=k8s`"
               >
@@ -58,7 +58,7 @@
           <div class="build-summary" v-if="buildSummary.length > 0">
             <el-table :data="buildSummary" style="width: 90%;" class="blank-background-header">
               <el-table-column label="服务" min-width="160">
-                <template slot-scope="scope">{{$utils.showServiceName(scope.row.service_name)}}</template>
+                <template slot-scope="scope">{{scope.row.service_name}}</template>
               </el-table-column>
               <el-table-column label="代码" min-width="160">
                 <template slot-scope="scope">
@@ -94,7 +94,7 @@
                   <span v-else>暂无 Issue</span>
                 </template>
               </el-table-column>
-              <el-table-column label="环境变量" width="100">
+              <el-table-column label="变量" width="100">
                 <template slot-scope="{ row }">
                   <el-popover placement="left" width="400" trigger="hover">
                     <el-table :data="row.envs" class="blank-background-header">
@@ -152,6 +152,7 @@
                 :docker_build="scope.row.docker_buildSubTask"
                 :isWorkflow="true"
                 :serviceName="scope.row._target"
+                :originServiceName="scope.row.buildv2SubTask.service"
                 :pipelineName="workflowName"
                 :projectName="projectName"
                 :taskID="taskID"
@@ -163,7 +164,7 @@
 
           <el-table-column prop="_target" label="服务" min-width="200px">
             <template slot-scope="scope">
-              <span>{{$utils.showServiceName(scope.row._target)}}</span>
+              <span>{{$utils.showServiceName(scope.row._target,scope.row.buildv2SubTask.service)}}</span>
             </template>
           </el-table-column>
 
@@ -234,7 +235,7 @@
 
           <el-table-column prop="_target" label="服务" min-width="200px">
             <template slot-scope="scope">
-              <span>{{$utils.showServiceName(scope.row._target)}}</span>
+              <span>{{$utils.showServiceName(scope.row._target,scope.row.deploySubTask.service_name)}}</span>
             </template>
           </el-table-column>
 
@@ -379,21 +380,19 @@
 
           <el-table-column label="分发" min-width="250px">
             <template slot-scope="scope">
-              <span :class="colorTranslation(scope.row.release_imageSubTask.distribute_info[0].distribute_status, 'pipeline', 'task')">{{ myTranslate(scope.row.release_imageSubTask.distribute_info[0].distribute_status) }}</span>
-              <!-- {{ makePrettyElapsedTime(scope.row) }}
-              <el-tooltip v-if="calcElapsedTimeNum(scope.row)<0" content="本地系统时间和服务端可能存在不一致，请同步。" placement="top">
-                <i class="el-icon-warning" style="color: red;"></i>
-              </el-tooltip> -->
+              <template  v-if="scope.row.release_imageSubTask">
+                <span :class="colorTranslation(scope.row.release_imageSubTask.distribute_info[0].distribute_status, 'pipeline', 'task')">{{'镜像：' + myTranslate(scope.row.release_imageSubTask.distribute_info[0].distribute_status) }}</span>
+              </template>
+              <template v-if="scope.row.distribute2kodoSubTask">
+                <span :class="colorTranslation(scope.row.distribute2kodoSubTask.status, 'pipeline', 'task')">{{ '对象存储：' + myTranslate(scope.row.distribute2kodoSubTask.status) }}</span>
+              </template>
             </template>
           </el-table-column>
 
           <el-table-column label="部署" min-width="250px">
             <template slot-scope="scope">
-              <span v-if="checkDistributeDeploy(scope.row.release_imageSubTask.distribute_info)" :class="colorTranslation(scope.row.release_imageSubTask.distribute_info[0].deploy_status, 'pipeline', 'task')">{{ myTranslate(scope.row.release_imageSubTask.distribute_info[0].deploy_status) }}</span>
-              <!-- {{ makePrettyElapsedTime(scope.row) }}
-              <el-tooltip v-if="calcElapsedTimeNum(scope.row)<0" content="本地系统时间和服务端可能存在不一致，请同步。" placement="top">
-                <i class="el-icon-warning" style="color: red;"></i>
-              </el-tooltip> -->
+              <span v-if="scope.row.release_imageSubTask && checkDistributeDeploy(scope.row.release_imageSubTask.distribute_info)" :class="colorTranslation(scope.row.release_imageSubTask.distribute_info[0].deploy_status, 'pipeline', 'task')">{{ myTranslate(scope.row.release_imageSubTask.distribute_info[0].deploy_status) }}</span>
+              <span v-else>N/A</span>
             </template>
           </el-table-column>
         </el-table>
@@ -642,7 +641,7 @@ export default {
           currentIssues = null
         }
         return {
-          service_name: element._target,
+          service_name: this.$utils.showServiceName(element._target, element.buildv2SubTask.service),
           builds: _.get(element, 'buildv2SubTask.job_ctx.builds', ''),
           issues: currentIssues ? currentIssues.issues : [],
           envs: envs[element._target] || []

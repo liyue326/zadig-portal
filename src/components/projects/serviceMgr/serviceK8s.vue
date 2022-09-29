@@ -148,9 +148,10 @@
         </div>
       </div>
       <div v-if="isOnboarding" class="controls__wrap">
-          <div class="controls__right">
+          <div class="controls__right onboarding">
             <el-button type="primary"
                        size="small"
+                       :disabled="!enableOnboardingNext"
                        @click="showOnboardingNext">下一步</el-button>
           </div>
       </div>
@@ -330,7 +331,9 @@ export default {
     },
     deleteService (serviceName) {
       this.deletedService = serviceName
-      this.updateEnvDialogVisible = true
+      if (!this.isOnboarding) {
+        this.updateEnvDialogVisible = true
+      }
     },
     autoUpgradeEnv () {
       const payload = this.checkedEnvList.map(item => {
@@ -416,6 +419,14 @@ export default {
         env.vars = cloneDeep(this.detectedEnvs.filter(item => item.services.includes(this.service.service_name)))
         return env
       })
+    },
+    enableOnboardingNext () {
+      const services = this.services.filter(service => service.status === 'added')
+      if (services.length > 0) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   mounted () {

@@ -53,7 +53,7 @@
         <div class="description">
 
           <p> 该项目不存在可构建的服务组件，请前往 项目->服务 中创建服务</p>
-          <router-link :to="`/v1/projects/detail/${product_tmpl_name}/services`">
+          <router-link :to="`/v1/projects/detail/${projectName}/services`">
             <el-button type="primary"
                        size="small"
                        round
@@ -127,6 +127,7 @@
 
 <script type="text/javascript">
 import { getAssociatedBuildsAPI } from '@api'
+import { keyBy } from 'lodash'
 import buildOperate from './components/buildOperate.vue'
 import bus from '@utils/eventBus'
 
@@ -141,7 +142,7 @@ export default {
   components: { buildOperate },
   computed: {
     presetMap () {
-      return _.keyBy(this.presets, (i) => {
+      return keyBy(this.presets, (i) => {
         return i.target.service_name + '/' + i.target.service_module
       })
     },
@@ -174,7 +175,7 @@ export default {
       required: true,
       type: Boolean
     },
-    product_tmpl_name: {
+    projectName: {
       required: true,
       type: String
     },
@@ -184,7 +185,7 @@ export default {
     }
   },
   watch: {
-    product_tmpl_name (newVal, oldVal) {
+    projectName (newVal, oldVal) {
       if (oldVal) {
         this.serviceConfigs = []
       }

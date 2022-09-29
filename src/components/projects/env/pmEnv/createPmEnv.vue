@@ -38,7 +38,7 @@
                 <div v-for="service in typeServiceMap" :key="`${service.service_name}-${service.type}`" class="service-block">
                   <template v-if="service.type==='pm'" class="container-images">
                     <el-form-item label="请关联主机资源" label-width="40%">
-                      <el-button v-if="allHost.length === 0" @click="$router.push('/v1/system/host')" type="text">创建主机</el-button>
+                      <el-button v-if="allHost.reduce((pre, cur) => pre + cur.options.length, 0) === 0" @click="$router.push('/v1/system/host')" type="text">创建主机</el-button>
                       <el-select
                         v-else
                         v-model="service.host_with_labels"
@@ -48,11 +48,16 @@
                         placeholder="请选择要关联的主机"
                         size="small"
                       >
-                        <el-option-group label="主机标签">
-                          <el-option v-for="(item,index) in allHostLabels" :key="index" :label="`${item}`" :value="item"></el-option>
-                        </el-option-group>
-                        <el-option-group label="主机列表">
-                          <el-option v-for="(host,index) in  allHost" :key="index" :label="`${host.name}-${host.ip}`" :value="host.id"></el-option>
+                        <el-option-group
+                          v-for="group in allHost"
+                          :key="group.label"
+                          :label="group.label">
+                          <el-option
+                            v-for="item in group.options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
                         </el-option-group>
                       </el-select>
                     </el-form-item>
@@ -87,8 +92,9 @@
 <script>
 import {
   initProjectEnvAPI,
-  createProductAPI,
+  createEnvAPI,
   getHostListAPI,
+  getProjectHostListAPI,
   getHostLabelListAPI
 } from '@api'
 import bus from '@utils/eventBus'
@@ -139,14 +145,33 @@ export default {
         this.allHostLabels = res
       })
       const key = this.$utils.rsaEncrypt()
-      getHostListAPI(key).then(res => {
-        this.allHost = res
+      Promise.all([getProjectHostListAPI(key, this.projectName), getHostListAPI(key)]).then(res => {
+        const projectOptions = res[0].map(item => {
+          item.label = item.name
+          item.value = item.id
+          return item
+        })
+        const systemOptions = res[1].map(item => {
+          item.label = item.name
+          item.value = item.id
+          return item
+        })
+        this.allHost = [
+          {
+            label: '项目资源',
+            options: projectOptions
+          },
+          {
+            label: '系统资源',
+            options: systemOptions
+          }
+        ]
       })
     },
     addHost (service) {
       const allHostIds = this.allHost.map(item => {
-        return item.id
-      })
+        return item.options.map(option => option.id)
+      }).flat()
       const labels = service.host_with_labels.filter(item => {
         return allHostIds.indexOf(item) < 0
       })
@@ -209,7 +234,8 @@ export default {
           function sleep (time) {
             return new Promise(resolve => setTimeout(resolve, time))
           }
-          createProductAPI(payload).then(
+          this.$store.commit('SET_MASK_STATUS', true)
+          createEnvAPI(payload).then(
             res => {
               // Add delay to solve the back-end permission synchronization problem
               sleep(5000).then(() => {
@@ -226,6 +252,7 @@ export default {
             },
             () => {
               this.startDeployLoading = false
+              this.$store.commit('SET_MASK_STATUS', false)
             }
           )
         } else {
@@ -243,7 +270,8 @@ export default {
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: `${this.projectName}`,
+          title: this.projectName,
+          isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         { title: '环境', url: '' },

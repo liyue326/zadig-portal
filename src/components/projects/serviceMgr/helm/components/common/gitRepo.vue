@@ -1,5 +1,5 @@
 <template>
-  <div class="git-repo-container">
+  <div class="git-repo-container" v-loading="loading" element-loading-spinner="*" element-loading-background="rgba(255, 255, 255, 0.2)">
     <div v-if="!controlParam.hiddenRepoSelect" class="repo-attr">
       <span>仓库属性</span>
       <el-radio-group v-model="gitName" :disabled="isUpdate">
@@ -187,7 +187,8 @@ import {
   getRepoOwnerByIdAPI,
   getBranchInfoByIdAPI,
   getRepoFilesAPI,
-  createTemplateServiceAPI
+  createTemplateServiceAPI,
+  updateTemplateServiceAPI
 } from '@api'
 import GitFileTree from './gitFileTree'
 import GerritFileTree from '@/components/common/gitFileTree.vue'
@@ -240,12 +241,7 @@ export default {
         url: [
           {
             required: true,
-            message: '请输入 URL 地址',
-            trigger: 'blur'
-          },
-          {
-            type: 'url',
-            message: '请输入正确的 URL，包含协议',
+            message: '请输入 URL，包含协议',
             trigger: ['blur', 'change']
           }
         ]
@@ -426,10 +422,8 @@ export default {
           }
         }
       }
-      const res = await createTemplateServiceAPI(
-        projectName,
-        payload
-      ).catch(error => console.log(error))
+      const reqApi = this.isUpdate ? updateTemplateServiceAPI : createTemplateServiceAPI
+      const res = await reqApi(projectName, payload).catch(error => console.log(error))
       if (res) {
         this.closeFileTree(res)
       }

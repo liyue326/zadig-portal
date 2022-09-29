@@ -79,7 +79,7 @@ export default {
           envInfo,
           chartInfo
         } = this.$refs.helmEnvTemplateRef.getAllInfo()
-        this.currentInfo.defaultValues = envInfo.DEFAULT || ''
+        this.currentInfo.defaultValues = envInfo.DEFAULT.envValue || ''
         this.currentInfo.chartValues = chartInfo
       }
       this.dialogVisible = false

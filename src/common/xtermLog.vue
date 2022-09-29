@@ -46,6 +46,10 @@ export default {
     fontSize: {
       required: false,
       default: '13'
+    },
+    from: {
+      type: String,
+      default: 'product'
     }
   },
   watch: {
@@ -54,6 +58,12 @@ export default {
         this.term.write(new_val[i] + '\r')
       }
       this.index = new_val.length
+    },
+    from: function (newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        this.term.clear()
+        this.index = 0
+      }
     }
   },
   mounted () {

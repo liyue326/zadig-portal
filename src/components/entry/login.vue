@@ -6,7 +6,10 @@
           <div class="login-inner-form" v-show="!showForgotPassword && !showSignUp">
             <div class="details">
               <header>
-                <a href="#"><img src="@assets/icons/logo/default-logo.png" alt="logo"></a>
+                <a href="#">
+                  <img v-if="bigLogoUrl" :src="bigLogoUrl" alt="logo" />
+                  <img v-else src="@assets/icons/logo/default-logo.png" alt="logo" />
+                </a>
               </header>
               <section>
                 <el-form :model="loginForm" status-icon :rules="rules" ref="loginForm" hide-required-asterisk>
@@ -68,7 +71,7 @@
 <script>
 import moment from 'moment'
 import { isMobile } from 'mobile-device-detect'
-import { checkConnectorsAPI, checkRegistrationAPI } from '@api'
+import { checkConnectorsAPI, checkRegistrationAPI, getEnterpriseInfoAPI, getLicenseStatusAPI } from '@api'
 import ForgetPassword from './components/forgetPassword.vue'
 import SignUp from './components/signUp.vue'
 import store from 'storejs'
@@ -86,6 +89,7 @@ export default {
       showRegistration: false,
       retrieveToken: '',
       loading: false,
+      enterpriseInfo: null,
       loginForm: {
         account: '',
         password: ''
@@ -99,9 +103,9 @@ export default {
       moment,
       copywriting: {
         common: {
-          title: '高效研发从现在开始',
+          title: 'Zadig，让工程师更加专注创造～',
           content:
-            '面向开发者设计的高可用 CI/CD：Zadig 强大的云原生多环境能力，轻松实现本地联调、微服务并行构建、集成测试和持续部署。'
+            '工程师热爱的云原生持续交付平台：具备灵活易用的高并发工作流、面向开发者的云原生环境、高效协同的测试管理、强大免运维的模板库、客观精确的效能洞察以及云原生 IDE 插件等重要特性，为工程师提供统一的协作平面。'
         }
       }
     }
@@ -144,7 +148,7 @@ export default {
     },
     redirectByDevice () {
       if (isMobile) {
-        this.$router.push('/mobile')
+        this.$router.push('/mobile/projects')
       } else {
         if (
           typeof this.$route.query.redirect !== 'undefined' &&
@@ -155,6 +159,19 @@ export default {
           this.$router.push('/v1/projects')
         }
       }
+    },
+    async getLicenseStatus () {
+      const license = await getLicenseStatusAPI().catch(err => console.log(err))
+      if (license) {
+        if (!license.is_inited) {
+          // this.$router.replace('/license')
+          window.location.href = '/plutus-vendor/license'
+        } else {
+          getEnterpriseInfoAPI().then(res => {
+            this.enterpriseInfo = res
+          })
+        }
+      }
     }
   },
   computed: {
@@ -163,9 +180,17 @@ export default {
     },
     showCopywriting () {
       return this.copywriting.common
+    },
+    bigLogoUrl () {
+      if (this.enterpriseInfo) {
+        return this.enterpriseInfo.big_logo
+      } else {
+        return ''
+      }
     }
   },
   async mounted () {
+    this.getLicenseStatus()
     const token = this.$route.query.token
     // 邮箱通过 Token 设置新密码接收参数
     const retrieveToken = this.$route.query.idtoken
@@ -279,7 +304,9 @@ export default {
         }
 
         img {
+          width: 200px;
           height: 60px;
+          object-fit: contain;
         }
 
         h3 {

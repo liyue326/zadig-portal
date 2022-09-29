@@ -28,12 +28,23 @@
           <el-radio label="user_defined">
             <span>自定义目录</span>
             <br v-if="mini" />
-            <el-input
-              :style=" {width: mini? '100%' : '298px', 'margin-left': mini ? '0' : '5px'}"
-              v-model="buildConfig.cache_user_dir"
-              placeholder="请输入绝对路径例如 $WORKSPACE/.m2"
-              size="mini"
-            ></el-input>
+            <el-form
+              ref="advancedConfigCache"
+              :model="buildConfig"
+              label-position="left"
+              class="secondary-form build-advanced-form"
+              label-width="50px"
+              inline-message
+            >
+              <el-form-item v-if="buildConfig.cache_dir_type === 'user_defined'" label="路径" prop="cache_user_dir" :rules="{required: buildConfig.cache_dir_type === 'user_defined', trigger: ['change', 'blur'],message: '请输入路径'}">
+                <el-input
+                  :style=" {width: mini? '100%' : '298px', 'margin-left': mini ? '0' : '5px'}"
+                  v-model="buildConfig.cache_user_dir"
+                  placeholder="请输入绝对路径例如 $WORKSPACE/.m2"
+                  size="mini"
+                ></el-input>
+              </el-form-item>
+            </el-form>
           </el-radio>
         </el-radio-group>
       </el-form-item>
@@ -169,6 +180,27 @@ export default {
         this.$emit('validateFailed')
         return Promise.reject()
       })
+    },
+    validateCache () {
+      return this.$refs.advancedConfigCache.validate().catch(() => {
+        this.$emit('validateFailed')
+        return Promise.reject('advancedConfigCacheValid')
+      })
+    }
+  },
+  watch: {
+    'buildConfig.cache_enable': {
+      handler (newVal, oldVal) {
+        if (newVal && !this.hiddenCache) {
+          this.validObj.addValidate({
+            name: 'advancedConfigCacheValid',
+            valid: this.validateCache
+          })
+        } else {
+          this.validObj.deleteValidate({ name: 'advancedConfigCacheValid' })
+        }
+      },
+      immediate: true
     }
   },
   created () {

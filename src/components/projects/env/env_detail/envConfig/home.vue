@@ -41,7 +41,11 @@ export default {
     },
     actionConfig (evt) {
       if (evt.actionType === 'history') {
-        this.$refs.versionRef.showVersionList(evt.name, this.currentConfig, evt.services)
+        this.$refs.versionRef.showVersionList(
+          evt.name,
+          this.currentConfig,
+          evt.services
+        )
       } else {
         this.repoConfig = {
           actionType: evt.actionType,
@@ -64,7 +68,8 @@ export default {
             showImport: evt.showImport || false,
             checkAssociated:
               this.currentConfig !== 'Ingress' && evt.actionType === 'edit'
-          }
+          },
+          gitRepoConfig: evt.gitRepoConfig
         }
         this.cmOption = {
           readOnly: evt.readOnly || false
@@ -79,19 +84,33 @@ export default {
         return
       }
 
-      let payload = {}
       let method = null
+
+      const repoConfig = this.repoConfig.gitRepoConfig
+      let payload = {
+        yamlData: this.repoConfig.overrideYaml,
+        gitRepoConfig: {
+          branch: repoConfig.branch,
+          codehost_id: repoConfig.codehostID,
+          owner: repoConfig.owner,
+          repo: repoConfig.repo,
+          values_paths: repoConfig.valuesPaths,
+          namespace: repoConfig.namespace
+        },
+        autoSync: repoConfig.autoSync || false
+      }
+
       if (actionType === 'add') {
-        payload = {
-          yamlData: this.repoConfig.overrideYaml
-        }
         method = 'createConfigByType'
       } else if (actionType === 'edit') {
         payload = {
+          ...payload,
           name: this.repoConfig.name,
           restart_associated_svc: this.repoConfig.restart_associated_svc,
           services: this.repoConfig.services,
-          yamlData: this.repoConfig.overrideYaml
+
+          // When editing, determine whether it is from a rollback operation by whether to display the import information
+          fromRollback: !this.repoConfig.showParams.showImport
         }
         method = 'updateConfigByType'
       }

@@ -110,7 +110,6 @@ export default {
     align-items: center;
     justify-content: space-between;
     height: 55px;
-    margin: 0 5px;
     background-color: #fff;
     border-top: 1px solid #ccc;
 

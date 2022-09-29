@@ -8,7 +8,9 @@
             <el-row>
               <template v-if="!row.use_default">
                 <el-col :span="7">
+                  <el-input v-if="row.source==='other'" v-model="row.branchOrTag.name" placeholder="请输入分支或标签" size="small"></el-input>
                   <el-select
+                    v-else
                     v-model="row.branchOrTag"
                     remote
                     :remote-method="(query)=>{searchRepoInfo(row,query)}"
@@ -17,7 +19,7 @@
                     clearable
                     value-key="id"
                     size="small"
-                    :placeholder="row.source==='other'?'请输入分支或标签':'请选择分支或标签'"
+                    placeholder="请选择分支或标签"
                     @change="changeBranchOrTag(row)"
                   >
                     <el-option-group v-for="group in row.branchAndTagList" :key="group.label" :label="group.label">
@@ -134,7 +136,7 @@ export default {
             repo_owner: repo.repo_owner,
             repo_name: repo.repo_name,
             pr: repo.pr,
-            branch: repo.branch,
+            branch: repo.branchOrTag.name,
             repo_namespace: repo.repo_namespace
           }
         } else {

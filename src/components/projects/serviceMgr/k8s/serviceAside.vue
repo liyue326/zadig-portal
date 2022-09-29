@@ -101,7 +101,7 @@
             <section class="aside-section">
               <h4>
                 <span>
-                  <i class="iconfont icongongjuxiang"></i>
+                  <i class="iconfont iconchakanbianliang"></i>
                 </span> 系统内置变量
                 <el-tooltip effect="dark" content="在服务配置中使用 $Namespace$，$Product$，$Service$，$EnvName$ 方式引用" placement="top">
                   <span>
@@ -122,7 +122,7 @@
             <section class="aside-section">
               <h4>
                 <span>
-                  <i class="iconfont icontanhao"></i>
+                  <i class="iconfont iconchakanbianliang"></i>
                 </span> 全局变量
                 <el-tooltip effect="dark" :content="'全局变量通过'+' {{'+'.key}} ' +' 引用，项目中的所有服务均可使用'" placement="top">
                   <span>

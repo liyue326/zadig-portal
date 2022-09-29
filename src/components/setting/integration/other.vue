@@ -70,7 +70,7 @@ const externalInfo = {
 
 const validateURL = (rule, value, callback) => {
   if (value === '') {
-    callback(new Error('请输入系统访问地址'))
+    callback(new Error('请输入系统访问地址，包含协议'))
   } else {
     if (value.endsWith('/')) {
       callback(new Error('URL 末尾不能包含 /'))
@@ -89,11 +89,6 @@ export default {
         trigger: ['blur', 'change']
       },
       server: [
-        {
-          type: 'url',
-          message: '请输入正确的 URL，包含协议',
-          trigger: ['blur', 'change']
-        },
         {
           required: true,
           trigger: ['blur', 'change'],

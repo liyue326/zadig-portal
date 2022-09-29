@@ -173,22 +173,24 @@ export default {
           clusterID: info.infos.clusterID || this.defaultInfo.clusterID,
           registry_id: info.infos.registry_id || this.defaultInfo.registry_id,
           chartValues: [],
-          defaultValues: envInfo[info.initName] || '',
-          namespace: `${projectName}-env-${info.envName}`
-        }
-        const payload = payloadObj[info.initName]
-        if (payload.defaultValues) {
-          payload.valuesData = envInfo.valuesData
-          payload.valuesData.autoSync = envInfo.valuesData.gitRepoConfig.autoSync
+          defaultValues: envInfo[info.initName].envValue || '',
+          namespace: `${projectName}-env-${info.envName}`,
+          valuesData: envInfo[info.initName].gitRepoConfig
+            ? {
+              autoSync: envInfo[info.initName].gitRepoConfig.autoSync,
+              yamlSource: 'repo',
+              gitRepoConfig: envInfo[info.initName].gitRepoConfig
+            }
+            : null
         }
       })
-
       chartInfo.forEach(chart => {
         payloadObj[chart.envName].chartValues.push(chart)
         chart.envName = payloadObj[chart.envName].envName
       })
 
       const payload = Object.values(payloadObj)
+
       this.isCreating = true
       const res = await createHelmEnvAPI(projectName, payload).catch(err => {
         console.log(err)

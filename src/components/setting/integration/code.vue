@@ -667,7 +667,7 @@ const validateSSH = (rule, value, callback) => {
   if (value === '') {
     callback(new Error('请输入服务 URL'))
   } else {
-    const reg = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}(:[1-9]\d{0,4})?/
+    const reg = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z0-9]{2,14}(:[1-9]\d{0,4})?/
     if (!reg.test(value)) {
       callback(new Error('请输入正确的格式'))
     } else {
@@ -721,13 +721,9 @@ export default {
           trigger: ['blur']
         },
         address: [{
-          type: 'url',
-          message: '请输入正确的 URL，包含协议',
-          trigger: ['blur', 'change']
-        }, {
           required: true,
-          trigger: 'change',
-          validator: validateGitURL
+          trigger: ['blur', 'change'],
+          message: '请输入 URL，包含协议'
         }],
         region: {
           required: true,

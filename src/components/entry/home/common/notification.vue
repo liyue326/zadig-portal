@@ -45,7 +45,7 @@
                     <span class="status"
                           style="margin-right: 10px;">{{wordTranslation(notification.content.status,'pipeline','task')}}</span>
                     <router-link @click.native="markAsRead(notification, index)"
-                                 :to="`/v1/projects/detail/${notification.content.product_name}/pipelines/${notification.content.type==='single'?notification.content.type:'multi'}/${notification.content.pipeline_name}/${notification.content.task_id}`">
+                                 :to="`/v1/projects/detail/${notification.content.product_name}/pipelines/${notification.content.type==='single'?notification.content.type:'multi'}/${notification.content.pipeline_name}/${notification.content.task_id}?status=${notification.content.status}`">
                       <em>{{notification.content.pipeline_name}}
                         <span class="notification-id">{{'#' +
                           notification.content.task_id}}</span>
@@ -343,8 +343,9 @@ export default {
 
         h3 {
           margin: 0;
-          color: #2f2936;
-          font-size: 14px;
+          color: #303133;
+          font-weight: 400;
+          font-size: 13px;
 
           em {
             color: #303133;

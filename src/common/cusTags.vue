@@ -1,12 +1,18 @@
 <template>
   <div class="cus-tags" :class="{ 'cus-select': check }">
-    <span
-      v-for="(value, index) in values"
-      :key="index"
-      class="cut-tag"
-      :class="{ current: index === currentTag }"
-      @click="toggleTag(index, value)"
-    >{{ value }}</span>
+    <el-tooltip effect="dark" placement="top-start">
+      <div slot="content">{{values.toString()}}</div>
+      <div>
+        <span
+          v-for="(value, index) in values.slice(0,2)"
+          :key="index"
+          class="cut-tag"
+          :class="{ current: index === currentTag }"
+          @click="toggleTag(index, value)"
+        >{{ value }}</span>
+        <span class="cut-tag" v-if="values.length >2">...</span>
+      </div>
+    </el-tooltip>
   </div>
 </template>
 
@@ -55,8 +61,12 @@ export default {
   .cut-tag {
     position: relative;
     display: inline-block;
+    max-width: 5em;
     padding: 0 1em;
+    overflow: hidden;
     line-height: 2;
+    text-overflow: ellipsis;
+    word-wrap: none;
     border: 1px solid @borderGray;
 
     &::before {

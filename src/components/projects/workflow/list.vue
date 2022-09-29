@@ -50,10 +50,12 @@
 
     <el-dialog title="选择工作流类型" :visible.sync="showSelectWorkflowType" width="450px">
       <div class="type-content">
-        <el-radio v-model="selectWorkflowType" label="product">产品-工作流</el-radio>
+        <el-radio v-model="selectWorkflowType" label="product">工作流</el-radio>
         <div class="type-desc">具有对项目环境构建、部署、测试和服务版本交付的能力</div>
-        <el-radio v-model="selectWorkflowType" label="common">通用-工作流</el-radio>
-        <div class="type-desc">可自定义工作流程，内置构建、K8s 部署、小程序发版等步骤</div>
+        <!-- <el-radio v-model="selectWorkflowType" label="common">通用-工作流</el-radio>
+        <div class="type-desc">可自定义工作流程，内置构建、K8s 部署、小程序发版等步骤</div> -->
+        <el-radio v-model="selectWorkflowType" label="custom">自定义工作流<el-tag type="success" size="small" class="mg-l8">new</el-tag></el-radio>
+        <div class="type-desc">可自定义工作流步骤和自由编排执行顺序</div>
       </div>
       <div slot="footer">
         <el-button size="small" @click="showSelectWorkflowType = false">取 消</el-button>
@@ -74,6 +76,14 @@
     <el-dialog title="运行 通用-工作流" :visible.sync="showStartCommonWorkflowBuild" :close-on-click-modal="false">
       <RunCommonWorkflow :value="showStartCommonWorkflowBuild" :workflow="commonToRun" />
     </el-dialog>
+    <el-dialog :visible.sync="isShowRunCustomWorkflowDialog" title="执行工作流" custom-class="run-workflow" width="60%" class="dialog">
+      <RunCustomWorkflow
+        v-if="workflowToRun.name"
+        :workflowName="workflowToRun.name"
+        :projectName="projectName"
+        @success="hideAfterSuccess"
+      />
+    </el-dialog>
   </div>
 </template>
 
@@ -81,17 +91,17 @@
 import VirtualListItem from './list/virtualListItem'
 import RunProductWorkflow from './common/runWorkflow.vue'
 import RunCommonWorkflow from './common/runCommonWorkflow.vue'
+import RunCustomWorkflow from './common/runCustomWorkflow'
 import VirtualList from 'vue-virtual-scroll-list'
 import qs from 'qs'
 import {
-  getProductWorkflowsAPI,
-  getProductWorkflowsInProjectAPI,
   getWorkflowDetailAPI,
   deleteProductWorkflowAPI,
   copyWorkflowAPI,
   getCommonWorkflowListAPI,
-  getCommonWorkflowListInProjectAPI,
-  deleteCommonWorkflowAPI
+  getCustomWorkflowListAPI,
+  getCustomWorkfloweTaskPresetAPI,
+  deleteWorkflowAPI
 } from '@api'
 import bus from '@utils/eventBus'
 import { mapGetters } from 'vuex'
@@ -114,12 +124,14 @@ export default {
       selectWorkflowType: 'product',
 
       showStartCommonWorkflowBuild: false,
+      isShowRunCustomWorkflowDialog: false,
       commonToRun: {}
     }
   },
   provide () {
     return {
       startProductWorkflowBuild: this.startProductWorkflowBuild,
+      startCustomWorkflowBuild: this.startCustomWorkflowBuild,
       copyWorkflow: this.copyWorkflow,
       deleteProductWorkflow: this.deleteProductWorkflow,
       renamePipeline: this.renamePipeline,
@@ -218,6 +230,8 @@ export default {
         path = '/workflows/product/create'
       } else if (type === 'common') {
         path = '/workflows/common/create'
+      } else {
+        path = `/v1/projects/detail/${this.projectName}/pipelines/custom/create`
       }
       this.$router.push(
         `${path}?projectName=${this.projectName ? this.projectName : ''}`
@@ -225,16 +239,9 @@ export default {
     },
     async getWorkflows (projectName) {
       this.workflowListLoading = true
-      let productWorkflows = []
       let commonWorkflows = []
       if (this.projectName) {
-        productWorkflows = await getProductWorkflowsInProjectAPI(
-          projectName
-        ).catch(err => {
-          console.log(err)
-          return []
-        })
-        commonWorkflows = await getCommonWorkflowListInProjectAPI(
+        commonWorkflows = await getCustomWorkflowListAPI(
           projectName
         ).catch(err => {
           console.log(err)
@@ -244,10 +251,6 @@ export default {
           list.type = 'common'
         })
       } else {
-        productWorkflows = await getProductWorkflowsAPI().catch(err => {
-          console.log(err)
-          return []
-        })
         commonWorkflows = await getCommonWorkflowListAPI().catch(err => {
           console.log(err)
           return []
@@ -256,9 +259,9 @@ export default {
           list.type = 'common'
         })
       }
+      // use new api includes add data
       this.workflowListLoading = false
       this.workflowsList = [
-        ...productWorkflows,
         ...commonWorkflows.workflow_list
       ]
     },
@@ -313,7 +316,7 @@ export default {
         }
       })
         .then(({ value }) => {
-          deleteCommonWorkflowAPI(workflow.project_name, workflow.id).then(
+          deleteWorkflowAPI(workflow.name, this.projectName).then(
             res => {
               this.getWorkflows(this.projectName)
               this.$message.success(`${value}删除成功！`)
@@ -336,8 +339,22 @@ export default {
           console.log(err)
         })
     },
+    startCustomWorkflowBuild (workflow) {
+      this.workflowToRun = {}
+      getCustomWorkfloweTaskPresetAPI(workflow.name, this.projectName)
+        .then(res => {
+          this.isShowRunCustomWorkflowDialog = true
+          this.workflowToRun = res
+        })
+        .catch(() => {
+          this.isShowRunCustomWorkflowDialog = false
+        })
+    },
     hideProductTaskDialog () {
       this.showStartProductBuild = false
+    },
+    hideAfterSuccess () {
+      this.isShowRunCustomWorkflowDialog = false
     },
     copyWorkflow (workflow) {
       const oldName = workflow.name
@@ -418,7 +435,8 @@ export default {
     RunProductWorkflow,
     VirtualListItem,
     VirtualList,
-    RunCommonWorkflow
+    RunCommonWorkflow,
+    RunCustomWorkflow
   }
 }
 </script>

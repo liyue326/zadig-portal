@@ -1,12 +1,13 @@
 <template>
   <div class="status-detail-wrapper">
-    <section v-if="runningCount === 0 && pendingCount === 0" class="no-running">
+    <section v-if="task.running === 0 && task.pending === 0 && task.customRunning === 0 && task.customPending === 0" class="no-running">
       <img src="@assets/icons/illustration/runStatus.svg" alt />
       <p>暂无正在运行的任务</p>
     </section>
     <section v-else class="running-time">
       <ProductWorkflowStatus :productWorkflowTasks="productWorkflowTasks" :expandId="productExpandId" />
       <CommonWorkflowStatus :commonWorkflowTasks="commonWorkflowTasks" />
+      <CustomWorkflowStatus :customWorkflowTasks="customWorkflowTasks" />
       <TestStatus :testTasks="testTasks" />
       <ScannerStatus :scannerTasks="scannerTasks" />
     </section>
@@ -14,10 +15,16 @@
 </template>
 
 <script>
-import { taskRunningSSEAPI, taskPendingSSEAPI } from '@api'
+import {
+  taskRunningSSEAPI,
+  taskPendingSSEAPI,
+  getRunningStatusCustomWorkflowListAPI,
+  getPendingStatusCustomWorkflowListAPI
+} from '@api'
 import bus from '@utils/eventBus'
 import ProductWorkflowStatus from './container/productWorkflowStatus'
 import CommonWorkflowStatus from './container/commonWorkflowStatus'
+import CustomWorkflowStatus from './container/customWorkflowStatus'
 import TestStatus from './container/testStatus'
 import ScannerStatus from './container/scannerStatus'
 export default {
@@ -25,13 +32,19 @@ export default {
     return {
       task: {
         running: null,
-        pending: null
+        pending: null,
+        customRunning: null,
+        customPending: null
       },
       productWorkflowTasks: {
         pending: [],
         running: []
       },
       commonWorkflowTasks: {
+        running: [],
+        pending: []
+      },
+      customWorkflowTasks: {
         running: [],
         pending: []
       },
@@ -70,6 +83,12 @@ export default {
             }
           })
           .closeWhenDestroy(this)
+        getRunningStatusCustomWorkflowListAPI()
+          .then(res => {
+            this.customWorkflowTasks.running = res.data
+            this.task.customRunning = res.data.length
+          })
+          .closeWhenDestroy(this)
       } else if (type === 'queue') {
         taskPendingSSEAPI()
           .then(res => {
@@ -88,15 +107,13 @@ export default {
             this.task.pending = res.data.length
           })
           .closeWhenDestroy(this)
+        getPendingStatusCustomWorkflowListAPI()
+          .then(res => {
+            this.customWorkflowTasks.pending = res.data
+            this.task.customPending = res.data.length
+          })
+          .closeWhenDestroy(this)
       }
-    }
-  },
-  computed: {
-    runningCount () {
-      return this.task.running
-    },
-    pendingCount () {
-      return this.task.pending
     }
   },
   mounted () {
@@ -108,7 +125,8 @@ export default {
     ProductWorkflowStatus,
     TestStatus,
     ScannerStatus,
-    CommonWorkflowStatus
+    CommonWorkflowStatus,
+    CustomWorkflowStatus
   }
 }
 </script>

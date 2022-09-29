@@ -80,7 +80,7 @@
         ></AdvancedConfig>
       </section>
       <section>
-        <OtherSteps ref="otherStepsRef" :buildConfig="buildConfig" :validObj="validObj" :mini="mini" :usedToHost="usedToHost"></OtherSteps>
+        <OtherSteps ref="otherStepsRef" :buildPostConfig="buildConfig.post_build" :validObj="validObj" :mini="mini" :usedToHost="usedToHost"></OtherSteps>
       </section>
     </div>
   </section>
@@ -281,7 +281,7 @@ export default {
       }
       // template_id: useTemplate
       if (!buildConfig.template_id) {
-        this.$refs.otherStepsRef.initStepStatus(buildConfig)
+        this.$refs.otherStepsRef.initStepStatus(buildConfig.post_build)
 
         this.$refs.buildEnvRef.initData()
 

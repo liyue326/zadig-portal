@@ -28,7 +28,7 @@
                     :span-method="objectSpanMethod"
                     style="width: 100%;">
             <el-table-column label="主机名称">
-              <template slot-scope="scope">
+              <template slot-scope="scope" v-if="scope.row.pm_info">
                 <span>{{ scope.row.pm_info.name }}</span>
               </template>
             </el-table-column>
@@ -38,7 +38,7 @@
               </template>
             </el-table-column>
             <el-table-column label="主机标签">
-              <template slot-scope="scope">
+              <template slot-scope="scope" v-if="scope.row.pm_info">
                 <span>{{ scope.row.pm_info.label }}</span>
               </template>
             </el-table-column>

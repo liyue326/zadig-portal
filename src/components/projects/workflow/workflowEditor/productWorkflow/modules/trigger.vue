@@ -350,7 +350,8 @@ import {
   getBranchInfoByIdAPI,
   singleTestAPI,
   getAllBranchInfoAPI,
-  checkRegularAPI
+  checkRegularAPI,
+  getAssociatedBuildsAPI
 } from '@api'
 import { uniqBy, get, debounce, cloneDeep } from 'lodash'
 
@@ -452,6 +453,7 @@ export default {
     }
     return {
       testInfos: [],
+      webhookRepos: [],
       gotScheduleRepo: false,
       currentForcedUserInput: {},
       projectEnvs: [],
@@ -584,23 +586,23 @@ export default {
         const params =
           (this.workflowToRun.test_stage &&
             this.workflowToRun.test_stage.tests &&
-            this.workflowToRun.test_stage.tests.map(t => {
-              return t.test_name
+            this.workflowToRun.test_stage.tests.map(item => {
+              return item
             })) ||
           []
         this.getTestInfos(params)
       })
     },
-    getTestInfos (test_names = []) {
+    getTestInfos (testItems = []) {
       const allPro = []
-      test_names.forEach(test_name => {
+      testItems.forEach(item => {
         allPro.push(
           new Promise((resolve, reject) => {
-            singleTestAPI(test_name, this.projectName)
+            singleTestAPI(item.test_name, item.project)
               .then(res => {
                 const test = {}
                 test.namespace = this.workflowToRun.env_name
-                test.test_module_name = test_name
+                test.test_module_name = item.test_name
                 test.envs = res.pre_test.envs
                 test.builds = res.repos
                 resolve(test)
@@ -683,10 +685,11 @@ export default {
       this.firstShowPolicy = false
       this.showEnvUpdatePolicy = false
     },
-    editWebhook (index) {
+    async editWebhook (index) {
       this.webhookEditMode = true
       this.showEnvUpdatePolicy = true
       this.currenteditWebhookIndex = index
+      await this.getWebhookRepos()
       const webhookSwap = this.$utils.cloneObj(this.webhook.items[index])
       if (
         webhookSwap.main_repo.codehost_id &&
@@ -739,6 +742,7 @@ export default {
         this.$refs.webhookNamedRef.focus()
         this.$refs.triggerForm.clearValidate()
       })
+      this.getWebhookRepos()
     },
     updateWebhook (action) {
       const webhookSwap = this.$utils.cloneObj(this.webhookSwap)
@@ -842,6 +846,28 @@ export default {
     switchMode () {
       this.webhookSwap.is_yaml = !this.webhookSwap.is_yaml
       this.$refs.triggerForm.clearValidate()
+    },
+    async getWebhookRepos () {
+      const projectName = this.projectName
+      const allBuilds = await getAssociatedBuildsAPI(projectName)
+      let webhookRepos = []
+      if (allBuilds) {
+        this.workflowToRun.build_stage.modules.forEach(item => {
+          allBuilds.forEach(element => {
+            if (item.target.service_name === element.service_name && item.target.service_module === element.service_module) {
+              const currentBuild = element.module_builds.find(build => {
+                return build.name === item.target.build_name
+              })
+              webhookRepos = webhookRepos.concat(currentBuild.repos)
+            }
+          })
+        })
+        webhookRepos.forEach(repo => {
+          repo.key = `${repo.repo_owner}/${repo.repo_name}`
+          this.$set(repo, 'is_regular', false)
+        })
+        this.webhookRepos = uniqBy(webhookRepos, 'key')
+      }
     }
   },
   computed: {
@@ -859,20 +885,6 @@ export default {
           : (this.webhookEditMode = newValue)
       }
     },
-    webhookRepos: {
-      get: function () {
-        let repos = []
-        this.presets.forEach(element => {
-          repos = repos.concat(element.repos)
-        })
-        repos = uniqBy(repos, value => value.repo_owner + '/' + value.repo_name)
-        repos.forEach(repo => {
-          repo.key = `${repo.repo_owner}/${repo.repo_name}`
-          this.$set(repo, 'is_regular', false)
-        })
-        return repos
-      }
-    },
     webhookTargets: {
       get: function () {
         const targets = []
@@ -884,7 +896,7 @@ export default {
               element.target.service_module + '/' + element.target.service_name
           })
         })
-        return targets
+        return uniqBy(targets, value => value.key)
       }
     },
     isK8sEnv () {
@@ -905,10 +917,7 @@ export default {
     },
     'workflowToRun.test_stage.tests' (newVal) {
       if (this.workflowToRun.test_stage.enabled) {
-        const test_names = newVal.map(t => {
-          return t.test_name
-        })
-        this.getTestInfos(test_names)
+        this.getTestInfos(newVal)
       }
     },
     'workflowToRun.test_stage.enabled' (newVal) {

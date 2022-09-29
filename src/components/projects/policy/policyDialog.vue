@@ -20,7 +20,6 @@
             <span class="member" v-for="member in changedInfo[key].members" :key="member">{{ member }}</span>
           </div>
           <div v-for="workflow in changedInfo[key].workflows" :key="workflow.name">
-            <!-- <span style="font-style: italic;">{{ workflow.type | desc }}</span> -->
             {{ workflow.collaboration_type === 'new' ? '独享': '共享' }}工作流 {{ workflow.name }} ：
             <span
               v-for="(verb, index) in workflow.verbs"
@@ -30,7 +29,6 @@
             权限
           </div>
           <div v-for="product in changedInfo[key].products" :key="product.name">
-            <!-- <span style="font-style: italic;">{{ product.type | desc }}</span> -->
             {{ product.collaboration_type === 'new' ? '独享': '共享' }}环境 {{ product.name }} ：
             <span
               v-for="(verb, index) in product.verbs"

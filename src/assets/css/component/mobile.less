@@ -1,4 +1,4 @@
-.mobile-block {
+/deep/ .mobile-block {
   display: block;
 
   .mobile-block-title {
@@ -22,4 +22,14 @@
       padding-top: 20px;
     }
   }
+}
+
+/deep/ .van-tabbar-item__icon .van-icon {
+  display: block;
+  font-size: 22px;
+}
+
+// https://github.com/o2team/H5Skills/issues/4
+/deep/ .van-tag {
+  line-height: normal;
 }
