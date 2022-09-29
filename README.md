@@ -31,5 +31,5 @@ yarn run build
 yarn run build --report
 ```
 
-# How to skip console check
+# How to skip console check 
 git commit -m 'feat: message' --no-verify
