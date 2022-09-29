@@ -11,7 +11,7 @@ echo  "${green}start checking keyword${reset}"
 
 for FILE in `git diff --name-only --cached`; do
 
-    if [[ $FILE == *".sh"* ]] || [[ $FILE == *"vendor/*"* ]] ||[[$FILE == *"node_modules/*"*]]||[[$FILE == *"public/*"*]]; then
+    if [[ $FILE == *".vue"* ]] || [[ $FILE == *"vendor/*"* ]] ||[[$FILE == *"node_modules/*"*]]||[[$FILE == *"public/*"*]]; then
         echo $FILE
         continue
     fi
