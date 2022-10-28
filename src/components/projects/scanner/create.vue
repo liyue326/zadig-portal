@@ -25,9 +25,7 @@
 
         <el-form-item label="扫描环境" prop="image_id">
           <el-select v-model="scannerConfig.image_id" placeholder="选择扫描环境" size="small">
-            <el-option v-for="(sys,index) in systems" :key="index" :label="sys.label" :value="sys.id">
-              {{sys.label}}
-            </el-option>
+            <el-option v-for="(sys,index) in systems" :key="index" :label="sys.label" :value="sys.id">{{sys.label}}</el-option>
             <el-option disabled value="NEWCUSTOM" v-if="scannerConfig.scanner_type !== 'sonarQube'">
               <router-link to="/v1/system/imgs" class="env-link">
                 <i class="el-icon-circle-plus-outline" style="margin-right: 3px;"></i>
@@ -40,6 +38,31 @@
           <el-select v-model="scannerConfig.sonar_id" placeholder="选择 Sonar 地址" size="small">
             <el-option v-for="(item, index) in sonarList" :key="index" :label="item.server_address" :value="item.id"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item v-if="scannerConfig.installs.length===0" label="依赖的软件包" class="secondary-label">
+          <el-button @click="addFirstApp()" type="primary" size="mini" plain>新增</el-button>
+        </el-form-item>
+        <el-form-item
+          v-else
+          v-for="(app,appIndex) in scannerConfig.installs"
+          :key="appIndex"
+          :prop="`installs.${appIndex}.name`"
+          :rules="{required: false, message: '不能为空', trigger: 'blur'}"
+          :label="appIndex === 0 ? `依赖的软件包` : ''"
+          class="secondary-label"
+        >
+          <el-select v-model="scannerConfig.installs[appIndex]" placeholder="请选择" size="small" value-key="id" filterable>
+            <el-option
+              v-for="(app, index) in scannerConfig.installs[appIndex].name ? [scannerConfig.installs[appIndex]].concat(remainingApps) : remainingApps"
+              :key="index"
+              :label="`${app.name} ${app.version} `"
+              :value="{'name':app.name,'version':app.version,'id':app.id}"
+            ></el-option>
+          </el-select>
+          <span>
+            <el-button v-if="scannerConfig.installs.length >= 1" @click="deleteApp(appIndex)" type="danger" size="mini" plain>删除</el-button>
+            <el-button v-if="appIndex===scannerConfig.installs.length-1" @click="addApp(appIndex)" type="primary" size="mini" plain>新增</el-button>
+          </span>
         </el-form-item>
       </el-form>
 
@@ -66,6 +89,18 @@
           <Resize :resize="'both'">
             <Editor v-model="scannerConfig.parameter"></Editor>
           </Resize>
+        </div>
+        <div class="primary-title not-first-child">
+          <span>前置脚本</span>
+        </div>
+        <div class="deploy-script">
+          <Resize :resize="'both'">
+            <Editor v-model="scannerConfig.pre_script"></Editor>
+          </Resize>
+        </div>
+        <div class="primary-title not-first-child">
+          <span class="mg-r8">质量门禁检查</span>
+          <el-checkbox v-model="scannerConfig.check_quality_gate"></el-checkbox>
         </div>
       </section>
 
@@ -107,7 +142,12 @@
       <router-link :to="`/v1/projects/detail/${projectName}/scanner`">
         <el-button style="margin-right: 15px;" type="primary" :disabled="saveLoading" plain>取消</el-button>
       </router-link>
-      <el-button v-hasPermi="{projectName: projectName, action: isEdit?'edit_scan':'create_scan',isBtn:true}" @click="saveScanner" type="primary" :loading="saveLoading">{{ isEdit ? '确认修改' : '立即新建' }}</el-button>
+      <el-button
+        v-hasPermi="{projectName: projectName, action: isEdit?'edit_scan':'create_scan',isBtn:true}"
+        @click="saveScanner"
+        type="primary"
+        :loading="saveLoading"
+      >{{ isEdit ? '确认修改' : '立即新建' }}</el-button>
     </footer>
   </div>
 </template>
@@ -125,12 +165,13 @@ import {
   querySonarAPI,
   createCodeScannerAPI,
   updateCodeScannerAPI,
-  getCodeScannerDetailAPI
+  getCodeScannerDetailAPI,
+  getAllAppsAPI
 } from '@api'
 
 import bus from '@utils/eventBus'
 
-import { cloneDeep } from 'lodash'
+import { cloneDeep, differenceBy } from 'lodash'
 
 const validateName = (rule, value, callback) => {
   if (value === '') {
@@ -176,6 +217,9 @@ export default {
         image_id: '', // scanner environment
         sonar_id: '',
         repos: [],
+        installs: [],
+        pre_script: '',
+        check_quality_gate: false,
         parameter: '# Sonar 参数\n', // sonar parameters
         script: '#!/bin/bash\nset -e', // for other type
         advanced_settings: {
@@ -218,9 +262,37 @@ export default {
     },
     isEdit () {
       return !!this.scannerId
+    },
+    remainingApps () {
+      return differenceBy(this.allApps, this.scannerConfig.installs, 'id')
     }
   },
   methods: {
+    getAllApps () {
+      if (this.systems.length === 0) {
+        // be used on Dependent Packages
+        getAllAppsAPI().then(res => {
+          const apps = this.$utils.sortVersion(res, 'name', 'asc')
+          this.allApps = apps.map(app => {
+            return {
+              name: app.name,
+              version: app.version,
+              id: app.name + app.version
+            }
+          })
+        })
+      }
+    },
+    addFirstApp () {
+      this.scannerConfig.installs.push({
+        name: '',
+        version: '',
+        id: ''
+      })
+    },
+    deleteApp (index) {
+      this.scannerConfig.installs.splice(index, 1)
+    },
     saveScanner () {
       this.validate().then(async () => {
         const payload = cloneDeep(this.scannerConfig)
@@ -341,6 +413,7 @@ export default {
     } else {
       this.loading = false
     }
+    this.getAllApps()
   },
   components: {
     Editor,
