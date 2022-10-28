@@ -254,10 +254,11 @@ export default {
       }
     },
     makeAvgSuccessRate (number) {
-      if (number) {
+      const x = String(number).indexOf('.') + 1
+      if (x > 0) {
         return (number * 100).toFixed(2) + '%'
       } else {
-        return ''
+        return (number * 100) + '%'
       }
     },
     makeTaskDetailLink (projectName, taskInfo, type) {
