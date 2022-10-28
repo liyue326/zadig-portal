@@ -247,10 +247,11 @@ export default {
       this.isShowCopyDialog = false
     },
     makeAvgRunTime (number) {
-      if (number > 0) {
+      const x = String(number).indexOf('.') + 1
+      if (x > 0) {
         return number.toFixed(1) + 's'
       } else {
-        return ''
+        return number + 's'
       }
     },
     makeAvgSuccessRate (number) {
