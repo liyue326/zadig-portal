@@ -29,7 +29,7 @@ export default {
   },
   mounted () {
     if (this.processEnv && this.processEnv.NODE_ENV === 'production') {
-      console.log('%cHello ZADIG！', 'color: #e20382;font-size: 13px;')
+      window.console.log('%cHello ZADIG！', 'color: #e20382;font-size: 13px;')
       const buildInfo = []
       if (this.processEnv.VERSION) {
         buildInfo.push(`${this.processEnv.VERSION}`)
@@ -46,12 +46,12 @@ export default {
       if (this.processEnv.COMMIT_ID) {
         buildInfo.push(`${this.processEnv.COMMIT_ID.substring(0, 7)}`)
       }
-      console.log(
+      window.console.log(
         `%cBuild:${buildInfo.join(' ')}`,
         'color: #e20382;font-size: 13px;'
       )
       if (this.processEnv.BUILD_TIME) {
-        console.log(
+        window.console.log(
           `%cTime:${moment
             .unix(this.processEnv.BUILD_TIME)
             .format('YYYYMMDDHHmm')}`,
