@@ -107,7 +107,7 @@ export default {
         }
         this.loadValueYamls = true
         const res = await getConfigYamlAPI(params).catch(error =>
-          console.log(error)
+          window.console.log(error)
         )
         this.loadValueYamls = false
         if (res) {

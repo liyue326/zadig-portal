@@ -121,7 +121,7 @@ export default {
   methods: {
     async getProducts () {
       const res = await getEnvironmentsAPI(this.projectName).catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (res && res.length > 0) {
         this.envInfos = res.map(re => {
@@ -186,7 +186,7 @@ export default {
 
       this.isCreating = true
       const res = await createHelmEnvAPI(projectName, payload).catch(err => {
-        console.log(err)
+        window.console.log(err)
         this.isCreating = false
       })
       if (res) {
@@ -195,7 +195,7 @@ export default {
     },
     async checkEnvStatus () {
       const res = await getEnvironmentsAPI(this.projectName).catch(err => {
-        console.log(err)
+        window.console.log(err)
         if (this.sId) this.sId = setTimeout(this.checkEnvStatus, 2000)
       })
       if (res) {

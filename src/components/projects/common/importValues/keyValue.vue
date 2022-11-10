@@ -119,7 +119,7 @@ export default {
           return Promise.resolve(true)
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           return Promise.reject(false)
         })
     }

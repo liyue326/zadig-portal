@@ -79,7 +79,7 @@ export default {
         this.projectName,
         1,
         1000
-      ).catch(err => console.log(err))
+      ).catch(err => window.console.log(err))
       if (res) {
         const groupMap = {}
         this.groupList = (res.variable_set_list || []).map(group => {

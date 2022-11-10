@@ -222,7 +222,7 @@ export default {
         },
         payload
       ).catch(error => {
-        console.log(error)
+        window.console.log(error)
       })
       if (res) {
         if (kvFlag) {
@@ -359,7 +359,7 @@ export default {
       const res = await fn(this.projectName, envName, serviceNames).catch(
         err => {
           this.disabledEnv.push(envName)
-          console.log(err)
+          window.console.log(err)
         }
       )
       this.getChartValuesFinished--

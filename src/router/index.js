@@ -1133,7 +1133,7 @@ const router = new VueRouter({
 })
 
 router.onError((error) => {
-  console.log(error, router)
+  window.console.log(error, router)
   const pattern = /Loading chunk (\d)+ failed/g
   const isChunkLoadFailed = error.message.match(pattern)
   if (isChunkLoadFailed) {

@@ -58,7 +58,7 @@ export default {
     async getRoles () {
       this.loading = true
       const projectName = this.projectName
-      const roles = await queryRoleAPI(projectName).catch(error => console.log(error))
+      const roles = await queryRoleAPI(projectName).catch(error => window.console.log(error))
       if (roles) {
         this.roles = roles
       }
@@ -73,9 +73,9 @@ export default {
       }).then(async () => {
         let res = null
         if (row.isPublic) {
-          res = await deletePublicRoleAPI(row.name, projectName).catch(error => console.log(error))
+          res = await deletePublicRoleAPI(row.name, projectName).catch(error => window.console.log(error))
         } else {
-          res = await deleteRoleAPI(row.name, projectName).catch(error => console.log(error))
+          res = await deleteRoleAPI(row.name, projectName).catch(error => window.console.log(error))
         }
         if (res) {
           this.$message.success('删除成功')

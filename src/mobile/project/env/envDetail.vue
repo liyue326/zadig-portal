@@ -360,7 +360,7 @@ export default {
         })
         .catch(err => {
           if (err === 'CANCEL') {
-            console.log(err)
+            window.console.log(err)
           }
         })
     },

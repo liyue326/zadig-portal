@@ -166,7 +166,7 @@ export default {
           })
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           return []
         })
     },

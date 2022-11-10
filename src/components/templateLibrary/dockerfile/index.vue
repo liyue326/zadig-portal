@@ -93,7 +93,7 @@ export default {
         const res = await getDockerfileAPI(
           id
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (res) {
           res.status = 'added'

@@ -331,7 +331,7 @@ export default {
           }
           this.addTimerDialogVisible = false
         } else {
-          console.log('error submit!!')
+          window.console.log('error submit!!')
           return false
         }
       })

@@ -64,7 +64,7 @@ export default {
     async getEnvVariablesYaml (envName, baseEnvName = envName) {
       const res = await this.initEnvVariablesYaml(envName, baseEnvName).catch(
         err => {
-          console.log(err)
+          window.console.log(err)
           this.initEnvVariableInfo(envName)
         }
       )

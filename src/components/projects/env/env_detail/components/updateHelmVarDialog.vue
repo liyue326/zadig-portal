@@ -36,7 +36,7 @@ export default {
     },
     async updateHelmEnvVar () {
       const res = await this.$refs.envValuesRef.validate().catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (!res) {
         return

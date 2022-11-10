@@ -50,7 +50,7 @@ export default {
     async getPolicyDefinitions () {
       const res = await queryPolicyDefinitionsAPI(
         this.projectName
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (res) {
         const policyMap = {}
         res.forEach(re => {

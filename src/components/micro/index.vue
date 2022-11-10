@@ -55,7 +55,7 @@ export default {
     initGlobalStateFn () {
       this.actions = initGlobalState(this.currentInfo)
       this.actions.onGlobalStateChange((state, prev) => {
-        console.log('onGlobalStateChange', state, prev)
+        window.console.log('onGlobalStateChange', state, prev)
         this.currentInfo = state
         if (!state.breadcrumb.filter(bc => !bc).length) {
           bus.$emit(`set-topbar-title`, {
@@ -81,7 +81,7 @@ export default {
     })
   },
   mounted () {
-    addGlobalUncaughtErrorHandler(event => console.log('global error: ', event))
+    addGlobalUncaughtErrorHandler(event => window.console.log('global error: ', event))
     this.initGlobalStateFn()
     // if (window.qiankunStarted) return
     // window.qiankunStarted = true

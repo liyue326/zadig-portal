@@ -326,7 +326,7 @@ export default {
     },
     async deployHelmEnv () {
       const res = await this.$refs.helmEnvTemplateRef.validate().catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (!res) {
         return

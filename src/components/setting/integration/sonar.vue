@@ -89,7 +89,7 @@ export default {
     },
     async getSonar () {
       const key = this.$utils.rsaEncrypt()
-      const res = await querySonarAPI(key).catch(error => console.log(error))
+      const res = await querySonarAPI(key).catch(error => window.console.log(error))
       if (res) {
         this.tableData = res
       }

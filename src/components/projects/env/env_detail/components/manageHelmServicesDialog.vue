@@ -116,7 +116,7 @@ export default {
           this.closeDialog()
           this.fetchAllData()
         }).catch(error => {
-          console.log(error)
+          window.console.log(error)
           if (error.response && error.response.data.code === 6094) {
             const HtmlStrings = []
             for (const service in error.response.data.extra) {
@@ -138,7 +138,7 @@ export default {
         })
       } else if (this.opeType === 'add' || this.opeType === 'update') {
         const res = await this.$refs.chartValuesRef.validate().catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (!res) {
           return
@@ -159,7 +159,7 @@ export default {
             this.fetchAllData()
           })
           .catch(err => {
-            console.log(err)
+            window.console.log(err)
           })
           .finally(() => {
             this.loading = false

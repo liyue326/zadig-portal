@@ -84,7 +84,7 @@ export default {
       this.loading = true
       const uid = storejs.get('userInfo').uid
       const res = await getCurrentUserInfoAPI(uid).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       if (res) {
         this.loading = false

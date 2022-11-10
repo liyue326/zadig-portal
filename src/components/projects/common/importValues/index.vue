@@ -120,7 +120,7 @@ export default {
         this.loadValueYamls = true
         const res = await getValuesYamlFromGitAPI(
           this.importRepoInfoUse.gitRepoConfig
-        ).catch(error => console.log(error))
+        ).catch(error => window.console.log(error))
         this.loadValueYamls = false
         if (res) {
           this.showGitImportDialog = false

@@ -166,7 +166,7 @@ export default {
       }
     },
     async getLicenseStatus () {
-      const license = await getLicenseStatusAPI().catch(err => console.log(err))
+      const license = await getLicenseStatusAPI().catch(err => window.console.log(err))
       if (license) {
         if (!license.is_inited) {
           // this.$router.replace('/license')
@@ -220,7 +220,7 @@ export default {
     } else if (token) {
       const res = await this.$store
         .dispatch('OTHERLOGIN', token)
-        .catch(error => console.log(error))
+        .catch(error => window.console.log(error))
       if (res) {
         this.redirectByDevice()
       }

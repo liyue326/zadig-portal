@@ -108,7 +108,7 @@ export default {
     async getRoleDetail (role) {
       let res = null
       res = await queryRoleDetailAPI(role.name, '*').catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       res.rules.forEach(item => {
         if (item.kind === 'resource') {
@@ -151,7 +151,7 @@ export default {
     },
     async getPolicyDefinitions () {
       const res = await getRolePolicyListAPI('system').catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       if (res) {
         res.forEach(group => {
@@ -211,7 +211,7 @@ export default {
             desc
           }
           result = await updateRoleAPI(params).catch(error =>
-            console.log(error)
+            window.console.log(error)
           )
           if (result) {
             this.$message.success('修改成功')
@@ -224,7 +224,7 @@ export default {
             name,
             desc,
             rules: rules
-          }).catch(error => console.log(error))
+          }).catch(error => window.console.log(error))
           if (result) {
             this.$message.success('添加成功')
             this.isShowDialogRoleVisible = false

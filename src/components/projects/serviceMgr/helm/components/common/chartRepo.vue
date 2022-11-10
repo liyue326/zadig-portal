@@ -129,7 +129,7 @@ export default {
         const res = await reqApi(projectName, payload).catch(
           err => {
             this.importLoading = false
-            console.log(err)
+            window.console.log(err)
           }
         )
         if (res) {

@@ -67,7 +67,7 @@ export default {
   actions: {
     async queryService ({ dispatch, commit }, payload) {
       const service = []
-      const res = await Api.getHelmChartService(payload.projectName).catch(error => console.log(error))
+      const res = await Api.getHelmChartService(payload.projectName).catch(error => window.console.log(error))
       if (res) {
         commit(Mutation.QUERY_ORDER_SERVICE, res.services || [])
         res.serviceInfos = res.service_infos ? res.service_infos : []
@@ -125,14 +125,14 @@ export default {
         file_content: payload.commitCache.slice(-1)[0].txt
       }
       const serviceName = payload.commitCache.slice(-1)[0].service_name
-      const res = await Api.updateHelmChartAPI(serviceName, payload.projectName, params).catch(error => console.log(error))
+      const res = await Api.updateHelmChartAPI(serviceName, payload.projectName, params).catch(error => window.console.log(error))
       if (res) {
         dispatch('queryService', { projectName: payload.projectName })
         return Promise.resolve(res)
       }
     },
     async queryFilePath ({ dispatch }, { payload, source }) {
-      const res = await Api.getHelmChartServiceFilePath(payload).catch(error => console.log(error))
+      const res = await Api.getHelmChartServiceFilePath(payload).catch(error => window.console.log(error))
       if (res) {
         res.map((child, index) => {
           child.id = payload.serviceName + '-' + child.name + '-' + index
@@ -150,7 +150,7 @@ export default {
       }
     },
     async queryFileContent ({ dispatch }, payload) {
-      const res = await Api.getHelmChartServiceFileContent(payload).catch(error => console.log(error))
+      const res = await Api.getHelmChartServiceFileContent(payload).catch(error => window.console.log(error))
       if (res) {
         return Promise.resolve(res)
       }

@@ -742,7 +742,7 @@ export default {
           this.projectName,
           this.envName,
           payload
-        ).catch(err => console.log(err))
+        ).catch(err => window.console.log(err))
         if (res) {
           this.$message.success(`环境默认镜像仓库更新成功`)
         }
@@ -840,7 +840,7 @@ export default {
         })
         .catch(err => {
           if (err === 'CANCEL') {
-            console.log(err)
+            window.console.log(err)
           }
         })
     },
@@ -853,7 +853,7 @@ export default {
           projectName,
           operation
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
           clearTimeout(this.shareEnvStatusId)
         })
         if (res) {
@@ -880,7 +880,7 @@ export default {
         this.fetchEnvRevision()
         this.checkProjectFeature()
       } catch (err) {
-        console.log('ERROR:' + err)
+        window.console.log('ERROR:' + err)
       }
     },
     fetchEnvRevision () {
@@ -935,7 +935,7 @@ export default {
         })
         .catch(err => {
           if (err === 'CANCEL') {
-            console.log(err)
+            window.console.log(err)
           }
         })
     },
@@ -1192,7 +1192,7 @@ export default {
         })
         .catch(err => {
           if (err === 'CANCEL') {
-            console.log(err)
+            window.console.log(err)
           }
         })
     },

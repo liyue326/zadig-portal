@@ -146,7 +146,7 @@ export default {
       }
       this.historyLoading = true
       const res = await getObjectHistoryVersionAPI(params).catch(err =>
-        console.log(err)
+        window.console.log(err)
       )
 
       if (res) {

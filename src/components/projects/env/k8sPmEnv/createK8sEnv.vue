@@ -762,7 +762,7 @@ export default {
             }
           )
         } else {
-          console.log('not-valid')
+          window.console.log('not-valid')
         }
       })
     },

@@ -320,7 +320,7 @@ export default {
               currentInfo.tableData = res
             })
             .catch(err => {
-              console.log(err)
+              window.console.log(err)
               currentInfo.tableData = []
             })
         )
@@ -361,7 +361,7 @@ export default {
           commonEnvCfgType: this.currentType
         }
         const res = await deleteConfigObjectAPI(params).catch(err =>
-          console.log(err)
+          window.console.log(err)
         )
         if (res) {
           this.$message.success(`删除 ${objectName} 成功！`)
@@ -383,7 +383,7 @@ export default {
           this.getConfigByType(this.currentType)
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           return 'error'
         })
     },
@@ -413,7 +413,7 @@ export default {
           this.getConfigByType(this.currentType)
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           return 'error'
         })
     }

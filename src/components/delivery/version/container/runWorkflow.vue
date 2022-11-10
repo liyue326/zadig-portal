@@ -139,7 +139,7 @@ export default {
         this.$emit('success')
         this.$router.push(`/v1/projects/detail/${projectName}/pipelines/multi/${pipelineName}/${taskId}?status=running&display_name=${displayName}`)
       }).catch(error => {
-        console.log(error)
+        window.console.log(error)
         if (error.response && error.response.data.code === 6168) {
           const projectName = error.response.data.extra.productName
           const envName = error.response.data.extra.envName

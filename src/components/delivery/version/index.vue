@@ -246,7 +246,7 @@ export default {
       const userBindings = await queryUserBindingsAPI(
         userInfo.uid,
         projectName
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (userBindings) {
         this.userBindings = userBindings
       }

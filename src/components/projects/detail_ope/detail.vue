@@ -157,12 +157,12 @@ export default {
     async getProject (projectName) {
       const userInfo = store.get('userInfo')
       const projectInfo = await getProjectInfoAPI(projectName).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       const userBindings = await queryUserBindingsAPI(
         userInfo.uid,
         projectName
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (projectInfo && userBindings) {
         this.userBindings = userBindings
         if (projectInfo.onboarding_status) {

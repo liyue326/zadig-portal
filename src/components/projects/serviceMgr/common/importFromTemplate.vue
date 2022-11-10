@@ -180,7 +180,7 @@ export default {
         const projectName = this.projectName
         const res = await getKubernetesTemplateDetailAPI(id, projectName).catch(
           err => {
-            console.log(err)
+            window.console.log(err)
           }
         )
         if (res) {
@@ -229,13 +229,13 @@ export default {
             payload,
             projectName
           ).catch(err => {
-            console.log(err)
+            window.console.log(err)
           })
           : await loadServiceFromKubernetesTemplateAPI(
             payload,
             projectName
           ).catch(err => {
-            console.log(err)
+            window.console.log(err)
           })
 
         if (res) {

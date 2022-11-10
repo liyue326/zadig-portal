@@ -78,7 +78,7 @@ export default {
       const res = await getVariablesGroupByIdAPI(
         this.projectName,
         this.id
-      ).catch(err => console.log(err))
+      ).catch(err => window.console.log(err))
       if (res) {
         this.groupDetail = res
       }
@@ -95,7 +95,7 @@ export default {
         const res = await (this.id
           ? updateVariablesGroupAPI(this.projectName, this.id, payload)
           : createVariablesGroupAPI(this.projectName, payload)
-        ).catch(err => console.log(err))
+        ).catch(err => window.console.log(err))
         this.handleLoading = false
         if (res) {
           this.$message.success(`${this.id ? '更新' : '创建'}成功！`)

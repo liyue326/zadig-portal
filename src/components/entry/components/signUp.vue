@@ -85,7 +85,7 @@ export default {
         if (valid) {
           const payload = this.signUpForm
           const res = await userSignUpAPI(payload).catch(error =>
-            console.log(error)
+            window.console.log(error)
           )
           if (res) {
             this.$message.success('用户注册成功')

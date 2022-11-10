@@ -70,7 +70,7 @@ const analyticsRequest = (to, from) => {
     analyticsRequestAPI(payload)
       .then()
       .catch((err) => {
-        console.log(err)
+        window.console.log(err)
       })
   }
 }

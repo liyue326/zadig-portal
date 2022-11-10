@@ -98,7 +98,7 @@ export default {
       const status = val.status
       if (id && status === 'added') {
         const res = await getKubernetesTemplateDetailAPI(id).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (res) {
           res.status = 'added'

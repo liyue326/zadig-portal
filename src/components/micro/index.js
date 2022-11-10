@@ -36,27 +36,27 @@ export const registerApps = ({ delivery, release_center }) => {
   registerMicroApps(microApps, {
     beforeLoad: (app) => {
     //   store.commit('app/loadingMicro', true)
-      console.log('before load app.name====>>>>>', app.name)
+      window.console.log('before load app.name====>>>>>', app.name)
     },
     beforeMount: [
       (app) => {
-        console.log('[LifeCycle] before mount %c%s', 'color: green;', app.name)
+        window.console.log('[LifeCycle] before mount %c%s', 'color: green;', app.name)
       }
     ],
     afterMount: [
       (app) => {
         // store.commit('app/loadingMicro', false)
-        console.log('[LifeCycle] after mount %c%s', 'color: green;', app.name)
+        window.console.log('[LifeCycle] after mount %c%s', 'color: green;', app.name)
       }
     ],
     beforeUnmount: [
       (app) => {
-        console.log('[LifeCycle] before unmount %c%s', 'color: green;', app.name)
+        window.console.log('[LifeCycle] before unmount %c%s', 'color: green;', app.name)
       }
     ],
     afterUnmount: [
       (app) => {
-        console.log('[LifeCycle] after unmount %c%s', 'color: green;', app.name)
+        window.console.log('[LifeCycle] after unmount %c%s', 'color: green;', app.name)
       }
     ]
   })

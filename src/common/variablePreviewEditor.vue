@@ -84,7 +84,7 @@ export default {
           projectName,
           serviceName,
           payload
-        ).catch(err => console.log(err))
+        ).catch(err => window.console.log(err))
         if (res) {
           this.renderedYaml = res
           this.$nextTick(() => {
@@ -95,7 +95,7 @@ export default {
           }
           const errors = await validateYamlAPI(projectName, validatePayload).catch(
             error => {
-              console.log(error)
+              window.console.log(error)
             }
           )
           if (errors && errors.length > 0) {

@@ -214,11 +214,11 @@ export default {
         let res = {}
         if (this.type === 'project') {
           res = await importProjectHostAPI(this.projectName, payload).catch(err => {
-            console.log(err)
+            window.console.log(err)
           })
         } else {
           res = await importHostAPI('', payload).catch(err => {
-            console.log(err)
+            window.console.log(err)
           })
         }
 

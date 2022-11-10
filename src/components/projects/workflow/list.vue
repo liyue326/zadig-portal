@@ -317,7 +317,7 @@ export default {
           projectName,
           this.view
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
           return []
         })
         commonWorkflows.workflow_list.forEach(list => {
@@ -325,7 +325,7 @@ export default {
         })
       } else {
         commonWorkflows = await getCommonWorkflowListAPI().catch(err => {
-          console.log(err)
+          window.console.log(err)
           return []
         })
         commonWorkflows.workflow_list.forEach(list => {
@@ -409,7 +409,7 @@ export default {
         })
         .catch(err => {
           this.showStartProductBuild = false
-          console.log(err)
+          window.console.log(err)
         })
     },
     startCustomWorkflowBuild (workflow) {
@@ -485,7 +485,7 @@ export default {
       const userBindings = await queryUserBindingsAPI(
         userInfo.uid,
         projectName
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (userBindings) {
         this.userBindings = userBindings
       }

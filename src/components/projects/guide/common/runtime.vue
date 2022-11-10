@@ -147,7 +147,7 @@ export default {
           this.$set(this, 'envStatus', res)
           resolve(res)
         }).catch((err) => {
-          console.log(err)
+          window.console.log(err)
         })
       })
       getEnv.then((env_res) => {

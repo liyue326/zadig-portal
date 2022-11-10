@@ -570,7 +570,7 @@ export default {
           )
         })
         .catch(error => {
-          console.log(error)
+          window.console.log(error)
           // handle error
           if (error.response && error.response.data.code === 6168) {
             const projectName = error.response.data.extra.productName

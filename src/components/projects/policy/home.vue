@@ -132,7 +132,7 @@ export default {
       const res = await queryPolicyDefinitionsAPI(
         this.projectName,
         'project'
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (res) {
         Object.keys(this.policy).forEach(key => {
           const current = res
@@ -165,7 +165,7 @@ export default {
     },
     async getWorkflows () {
       const res = await getCustomWorkflowListAPI(this.projectName).catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (res) {
         this.workflowList = res.workflow_list
@@ -181,7 +181,7 @@ export default {
     },
     async getEnvNameList () {
       const res = await listProductAPI(this.projectName).catch(err =>
-        console.log(err)
+        window.console.log(err)
       )
       if (res) {
         this.envList = res.filter(env => !env.base_name).map(env => env.name)
@@ -189,7 +189,7 @@ export default {
     },
     async getAllCollaboration () {
       const res = await getAllCollaborationAPI(this.projectName).catch(err =>
-        console.log(err)
+        window.console.log(err)
       )
       if (res) {
         const fn = item => {

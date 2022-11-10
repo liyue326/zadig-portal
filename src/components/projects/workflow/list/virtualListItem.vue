@@ -236,7 +236,7 @@ export default {
             this.copyWorkflowInfo.display_name
           )
         } else {
-          console.log('error submit!!')
+          window.console.log('error submit!!')
           return false
         }
       })
@@ -278,7 +278,7 @@ export default {
         this.workflowInfo = await getWorkflowDetailAPI(
           workflow.projectName,
           workflow.name
-        ).catch(error => console.log(error))
+        ).catch(error => window.console.log(error))
         if (_.get(this.workflowInfo, 'schedules.items', '[]').length) {
           this.$set(this.source, 'showTimer', true)
           this.$forceUpdate()
@@ -289,7 +289,7 @@ export default {
       const workflowInfo = this.workflowInfo
       workflowInfo.schedule_enabled = !workflowInfo.schedule_enabled
       const res = await updateWorkflowAPI(this.workflowInfo).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       if (res) {
         if (workflowInfo.schedule_enabled) {

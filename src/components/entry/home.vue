@@ -63,7 +63,7 @@ export default {
           domain: window.location.hostname,
           user_count: res
         })
-        uploadUserNumberAPI(payload).catch(err => console.log(err))
+        uploadUserNumberAPI(payload).catch(err => window.console.log(err))
       })
     }
   },

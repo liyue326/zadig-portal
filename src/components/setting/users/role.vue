@@ -93,7 +93,7 @@ export default {
         name: keyword
       }
       const res = await getRoleListAPI(payload).catch(error => {
-        console.log(error)
+        window.console.log(error)
         this.loading = false
       }
 
@@ -115,7 +115,7 @@ export default {
         }
       )
         .then(() => {
-          console.log(row)
+          window.console.log(row)
           deleteSystemRoleAPI(row.name).then(res => {
             this.$message({
               type: 'success',
@@ -125,7 +125,7 @@ export default {
           })
         })
         .catch(error => {
-          console.log(error)
+          window.console.log(error)
           this.$message({
             type: 'info',
             message: '已取消删除'

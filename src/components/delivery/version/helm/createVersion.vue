@@ -71,7 +71,7 @@ export default {
     async nextStep () {
       const res = await this.$refs.versionComp
         .validate()
-        .catch(error => console.log(error))
+        .catch(error => window.console.log(error))
       if (res) {
         if (this.activeStep === 2) {
           this.createHelmVersion()
@@ -92,7 +92,7 @@ export default {
       const res = await createHelmVersionAPI(
         deliveryRelease.productName,
         deliveryRelease
-      ).catch(err => console.log(err))
+      ).catch(err => window.console.log(err))
       this.createLoading = false
       if (res) {
         this.$message.success(

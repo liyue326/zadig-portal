@@ -86,7 +86,7 @@ export default {
       this.$refs.retrieveForm.validate(async valid => {
         if (valid) {
           const res = await retrievePasswordAPI(this.retrieveForm.account).catch((error) =>
-            console.log(error)
+            window.console.log(error)
           )
           if (res) {
             this.currentStep = 'sendmail'
@@ -99,7 +99,7 @@ export default {
       this.$refs.form.validate(async valid => {
         if (valid) {
           const res = await changePasswordAPI({ password: this.form.password, token: this.retrieveToken }).catch(error =>
-            console.log(error)
+            window.console.log(error)
           )
           if (res) {
             this.$message.success('重置成功')

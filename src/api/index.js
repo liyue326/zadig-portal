@@ -129,7 +129,7 @@ http.interceptors.response.use(
       !error.response.config.url.includes(ignoreErrReq)) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.log(error.response)
+      window.console.log(error.response)
       if (error.response.config.url.includes(ignorePrefix) && error.response.status === 404) {
         return Promise.reject(error)
       } else if (document.title !== '登录') {
@@ -152,7 +152,7 @@ http.interceptors.response.use(
       }
     } else {
       // Something happened in setting up the request that triggered an Error
-      console.log('Error', error.message)
+      window.console.log('Error', error.message)
     }
     return Promise.reject(error)
   }
@@ -182,7 +182,7 @@ function makeEventSource (basePath, config) {
     normalHandlers.forEach((h) => h({ data: JSON.parse(e.data) }))
   }
   evtSource.onerror = (e) => {
-    console.log(e)
+    window.console.log(e)
   }
 
   const ret = {

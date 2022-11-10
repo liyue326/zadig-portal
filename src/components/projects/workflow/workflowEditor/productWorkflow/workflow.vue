@@ -271,7 +271,7 @@ export default {
             this.$router.push(`/v1/projects/detail/${this.workflowInfo.product_tmpl_name}/pipelines/multi/${this.workflowInfo.name}?display_name=${this.workflowInfo.display_name}`)
           }
         })
-      }).catch(err => console.log(err))
+      }).catch(err => window.console.log(err))
     },
     saveDistributeDeploy ($event) {
       this.workflowInfo.distribute_stage = $event

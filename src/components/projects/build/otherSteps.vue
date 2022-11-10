@@ -374,7 +374,7 @@ export default {
     async getDockerfileTemplate (id) {
       const projectName = this.$route.params.project_name
       const res = await getDockerfileAPI(id, projectName).catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (res) {
         this.dockerfileTemplate = res

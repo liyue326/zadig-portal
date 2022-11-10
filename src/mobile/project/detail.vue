@@ -140,7 +140,7 @@ export default {
     async getProject () {
       const projectName = this.projectName
       this.projectInfo = await getProjectInfoAPI(projectName).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
     },
     async getWorkflows () {

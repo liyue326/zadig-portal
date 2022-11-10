@@ -109,7 +109,7 @@ export default {
         const res = await updateDockerfileTemplateAPI(
           fileId, payload
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (res) {
           this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })
@@ -121,7 +121,7 @@ export default {
       } else if (status === 'named') {
         const res = await createDockerfileTemplateAPI(payload
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (res) {
           this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })

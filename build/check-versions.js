@@ -39,16 +39,16 @@ module.exports = function () {
   }
 
   if (warnings.length) {
-    console.log('')
-    console.log(chalk.yellow('To use this template, you must update following to modules:'))
-    console.log()
+    window.console.log('')
+    window.console.log(chalk.yellow('To use this template, you must update following to modules:'))
+    window.console.log()
 
     for (let i = 0; i < warnings.length; i++) {
       const warning = warnings[i]
-      console.log('  ' + warning)
+      window.console.log('  ' + warning)
     }
 
-    console.log()
+    window.console.log()
     process.exit(1)
   }
 }

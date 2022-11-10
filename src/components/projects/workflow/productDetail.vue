@@ -230,7 +230,7 @@ export default {
           return res
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           return []
         })
     },

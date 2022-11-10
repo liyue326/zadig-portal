@@ -89,7 +89,7 @@ export default {
         this.taskDialogVisible = true
         this.workflow = res
       }).catch(err => {
-        console.log(err)
+        window.console.log(err)
         this.taskDialogVisible = false
       })
     },

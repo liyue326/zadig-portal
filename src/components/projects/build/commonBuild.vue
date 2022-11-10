@@ -176,7 +176,7 @@ export default {
             })
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           this.saveLoading = false
         })
     },
@@ -257,7 +257,7 @@ export default {
       const buildConfig = await getBuildConfigDetailAPI(
         buildConfigName,
         this.projectName
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (buildConfig) {
         buildConfig.pre_build.installs.forEach(element => {
           element.id = element.name + element.version
@@ -356,7 +356,7 @@ export default {
     },
     async getJenkins () {
       const key = this.$utils.rsaEncrypt()
-      const res = await queryJenkins(key).catch(error => console.log(error))
+      const res = await queryJenkins(key).catch(error => window.console.log(error))
       if (res) {
         this.jenkinsList = res
       }

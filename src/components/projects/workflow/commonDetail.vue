@@ -193,7 +193,7 @@ export default {
     },
     async getWorkflow () {
       const res = await getCommonWorkflowListInProjectAPI(this.projectName).catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (res) {
         this.usedInPolicy = res.workflow_list.find(re => re.name === this.workflowName).base_refs || []

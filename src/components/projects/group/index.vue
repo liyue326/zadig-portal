@@ -78,7 +78,7 @@ export default {
         this.projectName,
         page,
         perPage
-      ).catch(err => console.log(err))
+      ).catch(err => window.console.log(err))
       this.loading = false
       if (res) {
         this.groupList = res.variable_set_list.map(variable => {

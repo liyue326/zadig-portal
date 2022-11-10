@@ -49,7 +49,7 @@ export default {
       }
       if (this.chartInfo.type !== 'delete') {
         const res = await this.$refs.chartValuesRef.validate().catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (!res) {
           return

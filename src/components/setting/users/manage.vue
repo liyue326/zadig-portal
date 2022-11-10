@@ -257,7 +257,7 @@ export default {
         name: keyword
       }
       const usersData = await getUsersAPI(payload).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       if (usersData) {
         this.totalUser = usersData.total_count
@@ -291,7 +291,7 @@ export default {
           })
         })
         .catch(error => {
-          console.log(error)
+          window.console.log(error)
           this.$message({
             type: 'info',
             message: '已取消删除'
@@ -316,7 +316,7 @@ export default {
               })
 
               await updateSystemRoleBindingsAPI(res.uid, params).catch(error =>
-                console.log(error)
+                window.console.log(error)
               )
             }
             this.$refs.addUserForm.resetFields()
@@ -367,7 +367,7 @@ export default {
         per_page: page_size
       }
       const res = await getRoleListAPI(payload).catch(error => {
-        console.log(error)
+        window.console.log(error)
       }
       )
 

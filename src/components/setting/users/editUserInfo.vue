@@ -114,11 +114,11 @@ export default {
             params.push(obj)
           })
           await updateSystemRoleBindingsAPI(payload.uid, params).catch(error =>
-            console.log(error)
+            window.console.log(error)
           )
         } else {
           await updateSystemRoleBindingsAPI(payload.uid, []).catch(error =>
-            console.log(error)
+            window.console.log(error)
           )
         }
         this.$message.success('用户信息修改成功')
@@ -128,7 +128,7 @@ export default {
     },
     async deleteBindings (name) {
       await deleteSystemRoleBindingsAPI(name).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
     },
     async addBindings () {
@@ -138,7 +138,7 @@ export default {
         uid: this.clonedUserInfo.uid
       }
       await addSystemRoleBindingsAPI(payload).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
     },
     async getRoleList (page_size = 0, page_index = 0) {
@@ -148,7 +148,7 @@ export default {
         per_page: page_size
       }
       const res = await getRoleListAPI(payload).catch(error => {
-        console.log(error)
+        window.console.log(error)
         this.loading = false
       }
       )

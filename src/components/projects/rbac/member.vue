@@ -201,7 +201,7 @@ export default {
     },
     async getRoleBindings () {
       const res = await queryRoleBindingsAPI(this.projectName).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       if (res) {
         const members = res
@@ -235,11 +235,11 @@ export default {
     },
     async getRole () {
       const roles = await queryRoleAPI(this.projectName).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       const publicRoles = await queryPublicRoleAPI(
         this.projectName
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (roles && publicRoles) {
         this.rolesFiltered = roles
         publicRoles.forEach(item => {

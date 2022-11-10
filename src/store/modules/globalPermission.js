@@ -23,7 +23,7 @@ const actions = {
         commit(types.SET_GLOBAL_PERMISSION, res)
       },
       (err) => {
-        console.log(err)
+        window.console.log(err)
       }
     )
   },

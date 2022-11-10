@@ -31,7 +31,7 @@ export default class ValidateSubmit {
         this.validateRes = res
       })
       .catch((err) => {
-        console.log('check failed', err)
+        window.console.log('check failed', err)
         this.validateBoo = false
       })
     return [this.validateRes, this.validateBoo]

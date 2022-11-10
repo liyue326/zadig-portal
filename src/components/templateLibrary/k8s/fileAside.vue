@@ -111,7 +111,7 @@ export default {
         const res = await getKubernetesTemplateBuildReferenceAPI(
           this.fileContent.id
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (res) {
           this.referenceList = res

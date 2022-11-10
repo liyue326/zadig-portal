@@ -59,7 +59,7 @@ export default {
     },
     async queryCodeSource () {
       const key = this.$utils.rsaEncrypt()
-      const res = await getCodeSourceMaskedAPI(key).catch(error => console.log(error))
+      const res = await getCodeSourceMaskedAPI(key).catch(error => window.console.log(error))
       if (res) {
         this.allCodeHosts = res.filter(item => item.type !== 'other')
       }
@@ -69,7 +69,7 @@ export default {
       this.source.repo = ''
       this.source.branch = ''
       const res = await getRepoOwnerByIdAPI(id, key).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       if (res) {
         this.codeInfo.repoOwners = res
@@ -112,7 +112,7 @@ export default {
         type,
         encodeURI(owner),
         query
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (res) {
         this.codeInfo.repos = res
       }

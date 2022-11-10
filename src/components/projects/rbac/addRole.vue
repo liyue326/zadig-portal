@@ -103,9 +103,9 @@ export default {
       let res = null
       const projectName = this.projectName
       if (role.isPublic) {
-        res = await queryPublicRoleDetailAPI(role.name, projectName).catch(error => console.log(error))
+        res = await queryPublicRoleDetailAPI(role.name, projectName).catch(error => window.console.log(error))
       } else {
-        res = await queryRoleDetailAPI(role.name, projectName).catch(error => console.log(error))
+        res = await queryRoleDetailAPI(role.name, projectName).catch(error => window.console.log(error))
       }
       res.rules.forEach(item => {
         if (item.kind === 'resource') {
@@ -156,7 +156,7 @@ export default {
       }
       const currentProject = this.$store.getters.projectList.find(project => project.name === projectName)
       const projectType = currentProject && projectTypeMap[currentProject.deployType]
-      const res = await queryPolicyDefinitionsAPI(projectName, 'project', projectType).catch(error => console.log(error))
+      const res = await queryPolicyDefinitionsAPI(projectName, 'project', projectType).catch(error => window.console.log(error))
       if (res) {
         res.forEach(group => {
           group.rules.forEach(item => {
@@ -201,9 +201,9 @@ export default {
         if (this.isEdit) {
           let result = null
           if (this.form.isPublic) {
-            result = await updatePublicRoleAPI({ name: this.form.name, rules: rules }, projectName).catch(error => console.log(error))
+            result = await updatePublicRoleAPI({ name: this.form.name, rules: rules }, projectName).catch(error => window.console.log(error))
           } else {
-            result = await updateRoleAPI({ name: this.form.name, rules: rules, projectName: projectName }, projectName).catch(error => console.log(error))
+            result = await updateRoleAPI({ name: this.form.name, rules: rules, projectName: projectName }, projectName).catch(error => window.console.log(error))
           }
           if (result) {
             this.$message.success('修改成功')
@@ -213,9 +213,9 @@ export default {
         } else {
           let result = null
           if (this.form.isPublic) {
-            result = await addPublicRoleAPI({ name: this.form.name, rules: rules }, projectName).catch(error => console.log(error))
+            result = await addPublicRoleAPI({ name: this.form.name, rules: rules }, projectName).catch(error => window.console.log(error))
           } else {
-            result = await addRoleAPI({ name: this.form.name, rules: rules, projectName: projectName }, projectName).catch(error => console.log(error))
+            result = await addRoleAPI({ name: this.form.name, rules: rules, projectName: projectName }, projectName).catch(error => window.console.log(error))
           }
           if (result) {
             this.$message.success('添加成功')

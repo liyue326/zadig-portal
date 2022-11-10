@@ -79,7 +79,7 @@ export default {
         const res = await getDockerfileTemplateBuildReferenceAPI(
           this.fileContent.id
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (res) {
           this.buildReference = res

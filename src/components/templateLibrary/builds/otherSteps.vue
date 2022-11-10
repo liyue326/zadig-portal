@@ -373,7 +373,7 @@ export default {
     },
     async getDockerfileTemplate (id) {
       const res = await getDockerfileAPI(id).catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (res) {
         this.dockerfileTemplate = res

@@ -33,7 +33,7 @@ const actions = {
     return Promise.resolve(true)
   },
   async LOGIN (context, args) {
-    const userInfo = await userLoginAPI(args).catch(error => console.log(error))
+    const userInfo = await userLoginAPI(args).catch(error => window.console.log(error))
     if (userInfo) {
       store.set('userInfo', userInfo) // 存储用户信息，包括 Token
       context.dispatch('GETUSERROLE').then((role) => {
@@ -55,7 +55,7 @@ const actions = {
   async GETUSERROLE (context) {
     const userInfo = store.get('userInfo')
     if (userInfo) {
-      const roleBinding = await queryUserBindingsAPI(userInfo.uid).catch(error => console.log(error))
+      const roleBinding = await queryUserBindingsAPI(userInfo.uid).catch(error => window.console.log(error))
       if (roleBinding) {
         const role = roleBinding.map(item => (item.role))
         store.set('role', role)

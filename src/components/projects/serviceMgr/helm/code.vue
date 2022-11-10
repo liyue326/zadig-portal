@@ -333,7 +333,7 @@ export default {
               })
             }
           })
-          .catch(error => console.log(error))
+          .catch(error => window.console.log(error))
       })
     },
     newFile (type) {

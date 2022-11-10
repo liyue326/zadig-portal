@@ -23,7 +23,7 @@ const actions = {
         commit(types.SET_PROJECT_PERMISSION, { projectName, permission: res })
       },
       (err) => {
-        console.log(err)
+        window.console.log(err)
       }
     )
   },

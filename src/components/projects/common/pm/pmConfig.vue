@@ -694,7 +694,7 @@ export default {
           block: 'center'
         })
         errDiv.querySelector('input').focus()
-        console.log(err)
+        window.console.log(err)
       })
       if (res) {
         let buildConfigPayload = await this.$refs.zadigFormRef.validate()
@@ -891,7 +891,7 @@ export default {
           envNameList = this.envNameList
         } else {
           const resList = await listProductAPI(projectName).catch(error =>
-            console.log(error)
+            window.console.log(error)
           )
           if (resList) {
             resList.forEach(element => {
@@ -905,7 +905,7 @@ export default {
           pmServiceName,
           'pm',
           projectName
-        ).catch(error => console.log(error))
+        ).catch(error => window.console.log(error))
         if (res) {
           this.pmService = res
           if (

@@ -94,7 +94,7 @@ export default {
         projectName,
         pageStart,
         pageSize
-      ).catch(err => console.log(err))
+      ).catch(err => window.console.log(err))
       if (res) {
         this.scannerInfo = res.scan_info
         this.scannerTasks = res.scan_tasks

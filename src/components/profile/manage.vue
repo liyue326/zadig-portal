@@ -177,7 +177,7 @@ export default {
     async getCurrentUserInfo () {
       this.loading = true
       const res = await getCurrentUserInfoAPI(this.userinfo.uid).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       if (res) {
         this.loading = false

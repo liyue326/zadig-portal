@@ -115,7 +115,7 @@ export default {
           this.closeDialog()
           this.fetchAllData()
         }).catch(error => {
-          console.log(error)
+          window.console.log(error)
           if (error.response && error.response.data.code === 6094) {
             const HtmlStrings = []
             for (const service in error.response.data.extra) {

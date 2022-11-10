@@ -143,7 +143,7 @@ export default {
         this.taskDialogVisible = true
         this.workflow = res
       }).catch(err => {
-        console.log(err)
+        window.console.log(err)
         this.taskDialogVisible = false
       })
     },
@@ -159,7 +159,7 @@ export default {
               this.$set(this, 'pipeStatus', res)
             })
             .catch(err => {
-              console.log(err)
+              window.console.log(err)
             })
             .then(() => {
               if (this.pipeTimer) this.pipeTimer = setTimeout(fn, 1000)

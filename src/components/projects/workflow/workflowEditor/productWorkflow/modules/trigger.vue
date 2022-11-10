@@ -569,7 +569,7 @@ export default {
             resolve(testInfos)
           })
           .catch(err => {
-            console.log('Get test repo error', err)
+            window.console.log('Get test repo error', err)
             reject(testInfos)
           })
       })
@@ -644,7 +644,7 @@ export default {
           })
         })
         .catch(err => {
-          console.log('ERROR:  ', err)
+          window.console.log('ERROR:  ', err)
         })
     },
     deleteTestBuildData () {

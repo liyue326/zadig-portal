@@ -138,14 +138,14 @@ export default {
       })
     },
     async getJenkinsJob () {
-      const res = await queryJenkinsJob(this.initJenkinsBuild.jenkins_build.jenkins_id).catch(error => console.log(error))
+      const res = await queryJenkinsJob(this.initJenkinsBuild.jenkins_build.jenkins_id).catch(error => window.console.log(error))
       if (res) {
         this.jenkinsJobList = res
       }
     },
     async changeJobName (value) {
       const res = await queryJenkinsParams(this.initJenkinsBuild.jenkins_build.jenkins_id, value).catch(error =>
-        console.log(error)
+        window.console.log(error)
       )
       if (res) {
         this.transformParams(res)

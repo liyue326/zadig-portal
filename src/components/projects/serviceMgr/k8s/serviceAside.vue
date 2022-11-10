@@ -440,7 +440,7 @@ export default {
                 this.$refs.addKeyForm.resetFields()
                 this.$refs.addValueForm.resetFields()
                 this.addKeyInputVisable = false
-                console.log('error')
+                window.console.log('error')
               })
           } else {
             return false

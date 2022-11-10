@@ -122,7 +122,7 @@ export default {
       } else if (status === 'named') {
         const res = await createKubernetesTemplateAPI(payload
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
         if (res) {
           this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })

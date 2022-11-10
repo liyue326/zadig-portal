@@ -170,7 +170,7 @@ export default {
           this.variables = res
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           this.variables = []
         })
     },
@@ -227,7 +227,7 @@ export default {
       const reqApi = this.isUpdate ? updateTemplateServiceAPI : createTemplateServiceAPI
       const res = await reqApi(projectName, payload).catch(
         err => {
-          console.log(err)
+          window.console.log(err)
         }
       )
       this.importLoading = false
@@ -274,7 +274,7 @@ export default {
         projectName,
         payload
       ).catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       clearTimeout(sId)
       this.importLoading = false
@@ -314,10 +314,10 @@ export default {
       if (this.$refs.importValues) {
         valid1 = await this.$refs.importValues
           .validate()
-          .catch(err => console.log(err))
+          .catch(err => window.console.log(err))
       }
       const valid2 = await this.$refs.tempForm.validate().catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (!valid1 || !valid2) {
         return

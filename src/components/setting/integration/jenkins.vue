@@ -99,7 +99,7 @@ export default {
     },
     async getJenkins () {
       const key = this.$utils.rsaEncrypt()
-      const res = await queryJenkins(key).catch(error => console.log(error))
+      const res = await queryJenkins(key).catch(error => window.console.log(error))
       if (res) {
         this.tableData = res
       }

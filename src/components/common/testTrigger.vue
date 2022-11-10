@@ -336,7 +336,7 @@ export default {
       })
     },
     async addWebhook () {
-      const res = await this.$refs.triggerForm.validate().catch(err => console.log(err))
+      const res = await this.$refs.triggerForm.validate().catch(err => window.console.log(err))
       if (!res) {
         return
       }
@@ -360,7 +360,7 @@ export default {
       this.webhookAddMode = false
     },
     async saveWebhook () {
-      const res = await this.$refs.triggerForm.validate().catch(err => console.log(err))
+      const res = await this.$refs.triggerForm.validate().catch(err => window.console.log(err))
       if (!res) {
         return
       }

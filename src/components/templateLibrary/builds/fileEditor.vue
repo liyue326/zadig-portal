@@ -105,7 +105,7 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           this.saveLoading = false
         })
     },
@@ -123,7 +123,7 @@ export default {
     async getCurrentBuild (buildConfigName) {
       const buildConfig = await getBuildTemplateDetailAPI(
         buildConfigName
-      ).catch(error => console.log(error))
+      ).catch(error => window.console.log(error))
       if (buildConfig) {
         this.buildConfig = buildConfig
         if (this.buildConfig.pre_build.envs) {

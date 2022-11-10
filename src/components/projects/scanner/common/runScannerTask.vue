@@ -158,7 +158,7 @@ export default {
       this.startTaskLoading = true
       const res = await runCodeScannerTaskAPI(id, payload, projectName).catch(error => {
         this.startTaskLoading = false
-        console.log(error)
+        window.console.log(error)
       })
       if (res) {
         const projectName = this.projectName
@@ -181,7 +181,7 @@ export default {
       const id = this.scannerInfo.id
       const projectName = this.projectName
       const res = await getCodeScannerDetailAPI(id, projectName).catch(error => {
-        console.log(error)
+        window.console.log(error)
       })
       if (res) {
         this.scannerInfoDetail = res
@@ -208,7 +208,7 @@ export default {
         infos: allReposForQuery
       }
       const res = await getAllBranchInfoAPI(payload).catch(error => {
-        console.log(error)
+        window.console.log(error)
       })
       if (res) {
         // make these repo info more friendly

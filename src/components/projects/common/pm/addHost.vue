@@ -367,11 +367,11 @@ export default {
         let res = {}
         if (projectName) {
           res = await createProjectHostAPI(projectName, payload).catch(err => {
-            console.log(err)
+            window.console.log(err)
           })
         } else {
           res = await createHostAPI(payload).catch(err => {
-            console.log(err)
+            window.console.log(err)
           })
         }
         this.showAdvanced = false
@@ -405,12 +405,12 @@ export default {
         if (projectName) {
           res = await updateProjectHostAPI(id, projectName, payload).catch(
             err => {
-              console.log(err)
+              window.console.log(err)
             }
           )
         } else {
           res = await updateHostAPI(id, payload).catch(err => {
-            console.log(err)
+            window.console.log(err)
           })
         }
         this.showAdvanced = false

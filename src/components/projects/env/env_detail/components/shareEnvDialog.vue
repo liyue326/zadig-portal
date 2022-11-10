@@ -118,7 +118,7 @@ export default {
       const clusterId = this.clusterId
       const result = await checkingClusterIstioAPI(clusterId).catch(err => {
         this.checkIstioLoading = false
-        console.log(err)
+        window.console.log(err)
       })
       this.checkIstioLoading = false
       if (result) {
@@ -139,7 +139,7 @@ export default {
       ).catch(err => {
         this.checkWorkloadsLoading = false
         this.serviceWithoutWorkloads = []
-        console.log(err)
+        window.console.log(err)
       })
       this.checkWorkloadsLoading = false
       if (result && result.length === 0) {
@@ -153,7 +153,7 @@ export default {
       const projectName = this.projectName
       const envName = this.envName
       const res = await enableShareEnvAPI(envName, projectName).catch(err => {
-        console.log(err)
+        window.console.log(err)
         this.shareEnvDialogVisible = false
       })
       if (res) {
@@ -170,7 +170,7 @@ export default {
       const envName = this.envName
       const res = await disableShareEnvAPI(envName, projectName).catch(err => {
         this.shareEnvDialogVisible = false
-        console.log(err)
+        window.console.log(err)
       })
       if (res) {
         this.$message({

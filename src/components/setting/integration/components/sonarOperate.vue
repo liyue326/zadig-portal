@@ -93,7 +93,7 @@ export default {
         this.edit()
       } else {
         const res = await addSonarAPI(this.addForm).catch((error) =>
-          console.log(error)
+          window.console.log(error)
         )
         if (res && res.message === 'success') {
           this.$message.success('新增成功')
@@ -104,7 +104,7 @@ export default {
     },
     async edit () {
       const res = await editSonarAPI(this.addForm).catch((error) =>
-        console.log(error)
+        window.console.log(error)
       )
       if (res && res.message === 'success') {
         this.$message.success('保存成功')

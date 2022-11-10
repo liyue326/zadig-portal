@@ -208,7 +208,7 @@ export default {
           this.pageLoading = false
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           this.pageLoading = false
         })
     },
@@ -228,7 +228,7 @@ export default {
             })
         })
         .catch(err => {
-          console.log(err)
+          window.console.log(err)
           this.$message.error(`更新规则失败！`)
           this.addLoading = false
         })

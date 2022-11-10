@@ -252,7 +252,7 @@ export default {
             this.justStoreSwitchNode = { data, node, levelOneNodeLabel }
             this.selectAndSwitchTreeNode()
           } else if (action === 'close') {
-            console.log('关闭')
+            window.console.log('关闭')
           }
         })
       } else {

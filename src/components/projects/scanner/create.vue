@@ -329,7 +329,7 @@ export default {
           ? updateCodeScannerAPI(this.scannerId, payload)
           : createCodeScannerAPI(payload)
         ).catch(error => {
-          console.log(error)
+          window.console.log(error)
         })
         this.saveLoading = false
         if (res) {

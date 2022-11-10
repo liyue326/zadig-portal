@@ -242,7 +242,7 @@ export default {
         fileName,
         filePath
       ).catch(err => {
-        console.log(err)
+        window.console.log(err)
       })
       if (res) {
         data.yamlContent = res

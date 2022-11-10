@@ -85,11 +85,11 @@ export default {
           this.tempData.name,
           this.tempData
         ).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
       } else {
         res = await createChartTemplateAPI(this.tempData).catch(err => {
-          console.log(err)
+          window.console.log(err)
         })
       }
 
