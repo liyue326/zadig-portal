@@ -196,6 +196,31 @@
             <span style="display: inline-block; padding-right: 10px;" v-for="branch in matchedBranchNames" :key="branch">{{ branch }}</span>
           </div>
         </el-form-item>
+        <el-form-item
+          label="目标分支"
+          prop="main_repo.branch"
+          v-else
+          :rules="[
+          { required: true, message: '请选择目标分支', trigger: ['blur', 'change'] }
+        ]"
+        >
+          <el-select
+            style="width: 100%;"
+            v-model="currentWebhook.main_repo.branch"
+            size="small"
+            filterable
+            allow-create
+            clearable
+            placeholder="请选择分支"
+          >
+            <el-option
+              v-for="(branch,index) in webhookBranches[currentWebhook.repo.repo_name]"
+              :key="index"
+              :label="branch.name"
+              :value="branch.name"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item v-if="currentWebhook.repo.source==='gerrit'" label="触发事件" prop="main_repo.events">
           <el-checkbox-group v-model="currentWebhook.main_repo.events">
             <el-checkbox style="display: block;" label="change-merged">Change merged</el-checkbox>
