@@ -2,17 +2,18 @@
   <el-dialog :title="dialogTitle" :visible.sync="updateHelmEnvDialogVisible" width="60%">
     <div class="content">
       <el-checkbox-group v-model="checkedEnvList">
-        <el-checkbox v-for="(env, index) in envList" :key="index" :label="env">{{env.name}}</el-checkbox>
+        <el-checkbox v-for="(env, index) in envList" :key="index" :label="env">{{env.env_name}}</el-checkbox>
       </el-checkbox-group>
       <ChartValues
         v-if="chartInfo.type !== 'delete' && chartInfo.chartNames.length"
         class="chart-value"
         ref="chartValuesRef"
-        :envNames="checkedEnvList.map(env => env.name)"
+        :envNames="checkedEnvList.map(env => env.env_name)"
         :chartNames="chartInfo.chartNames"
         showEnvTabs
         :showServicesTab="false"
-        :envScene="`updateEnv`" />
+        :envScene="`updateEnv`"
+        :envInfos="envMap" />
     </div>
     <div class="overwrite-warning" v-show="checkedEnvList.find(env => env.is_existed)">
       <p>Zadig 中定义的服务将覆盖所选命名空间中的同名服务，请谨慎操作！</p>
@@ -36,13 +37,14 @@ export default {
   data () {
     return {
       checkedEnvList: [],
-      envList: []
+      envList: [],
+      envMap: {}
     }
   },
   methods: {
     async autoUpgradeEnv () {
       const payload = {
-        envNames: this.checkedEnvList.map(env => env.name),
+        envNames: this.checkedEnvList.map(env => env.env_name),
         replacePolicy: 'notUseEnvImage',
         chartValues: [],
         deletedServices: []
@@ -82,13 +84,20 @@ export default {
       const serviceName = this.chartInfo.actionServiceName
       const projectName = this.projectName
       const envNameList = await getServiceDeployableEnvsAPI(projectName, serviceName)
-      if (envNameList.length) {
-        this.envList = envNameList.map(env => {
+      if (envNameList.envs.length) {
+        const envMap = {}
+        this.envList = envNameList.envs.map(env => {
+          envMap[env.env_name] = {
+            ...env,
+            services: [this.chartInfo.actionServiceName],
+            hasDeployed: env.services.includes(this.chartInfo.actionServiceName)
+          }
           return {
-            name: env,
+            ...env,
             is_existed: false
           }
         })
+        this.envMap = envMap
       }
     }
   },
