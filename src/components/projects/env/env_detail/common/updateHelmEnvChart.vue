@@ -357,7 +357,7 @@ export default {
           null
         )
         envInfos[envName] = {
-          ...cloneDeep(initInfo || chartInfoTemp),
+          ...cloneDeep({ ...chartInfoTemp, ...initInfo }),
           ...cloneDeep(chart),
           envName: envName === 'DEFAULT' ? '' : envName,
           yamlSource:
