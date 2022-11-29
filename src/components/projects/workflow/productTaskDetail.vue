@@ -763,7 +763,7 @@ export default {
       }
     },
     rerun () {
-      const taskUrl = `/v1/projects/detail/${this.projectName}/pipelines/multi/${this.workflowName}/${this.taskID}`
+      const taskUrl = `/v1/projects/detail/${this.projectName}/pipelines/multi/${this.workflowName}/${this.taskID}?display_name=${this.displayName}`
       restartWorkflowAPI(this.projectName, this.workflowName, this.taskID).then(
         res => {
           this.$message.success('任务已重新启动')
