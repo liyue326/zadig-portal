@@ -39,6 +39,11 @@
               <i v-hasPermi="{projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'},isBtn:true}" @click="updateService(scope.row)" class="iconfont icongengxin operation"></i>
             </el-tooltip>
           </template>
+          <template v-if="serviceStatus[scope.row.service_name] && serviceStatus[scope.row.service_name].raw.deploy_strategy === 'import'">
+            <el-tooltip  effect="dark" content="该服务尚未通过 Zadig 部署，可执行「更新服务」或「重启服务」操作使用 Zadig 上管理的服务配置重新部署" placement="top">
+              <i class="el-icon-warning gray"></i>
+            </el-tooltip>
+          </template>
         </template>
       </el-table-column>
       <el-table-column align="left" label="状态" width="220px">
