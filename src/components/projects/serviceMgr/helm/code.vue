@@ -406,6 +406,15 @@ export default {
         commitCache: this.commitCache
       }
       this.$store.dispatch('updateHelmChart', params).then(res => {
+        this.$store.commit(
+          'CHART_NAMES',
+          this.commitCache.map(cache => {
+            return {
+              serviceName: cache.service_name,
+              type: 'create'
+            }
+          })
+        )
         this.clearCommitCache()
       })
     },

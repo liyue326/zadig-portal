@@ -22,7 +22,7 @@
         <el-tabs v-if="showEnvTabs" v-model="selectedEnv" :before-leave="switchTabs">
           <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env" :disabled="disabledEnv.includes(env)"></el-tab-pane>
         </el-tabs>
-        <div v-if="hasPlutus && checkResource" class="release-check">
+        <div v-if="showCheckResource" class="release-check">
           <el-radio-group v-model="usedChartNameInfo.deploy_strategy">
             <el-radio label="import" :disabled="!usedChartNameInfo.deployed">仅导入服务</el-radio>
             <el-radio label="deploy">执行部署</el-radio>
@@ -142,7 +142,8 @@ export default {
       type: Boolean,
       default: true
     },
-    checkResource: Object
+    checkResource: Object,
+    envInfos: Object // basic information of envNames, for check resource
   },
   data () {
     this.cmOption = {
@@ -213,7 +214,13 @@ export default {
     },
     ...mapState({
       hasPlutus: state => state.checkPlutus.hasPlutus
-    })
+    }),
+    showCheckResource () {
+      return this.hasPlutus && (
+        this.checkResource ||
+        (this.envInfos && this.envInfos[this.selectedEnv] && !this.envInfos[this.selectedEnv].hasDeployed)
+      )
+    }
   },
   methods: {
     closeReview () {
@@ -357,7 +364,7 @@ export default {
           null
         )
         envInfos[envName] = {
-          ...cloneDeep(initInfo || chartInfoTemp),
+          ...cloneDeep({ ...chartInfoTemp, ...initInfo }),
           ...cloneDeep(chart),
           envName: envName === 'DEFAULT' ? '' : envName,
           yamlSource:
@@ -475,7 +482,10 @@ export default {
         })
       })
     },
-    checkSvcResource: debounce(async function (payload) {
+    checkSvcResource: debounce(async function (payload, envName) {
+      if (!this.hasPlutus) {
+        return
+      }
       // payload: env_name, namespace, cluster_id
       const res = await checkHelmSvcResourceAPI(
         this.projectName,
@@ -487,7 +497,7 @@ export default {
             re => re.status === 'undeployed'
           )
           const cur = this.allChartNameInfo[resource.service_name][
-            this.selectedEnv
+            envName || this.selectedEnv
           ]
           cur.deploy_strategy = deployed ? 'import' : 'deploy'
           cur.deployed = deployed
@@ -521,6 +531,11 @@ export default {
               return
             }
             this.getChartValuesYaml({ envName: env })
+            if (this.hasPlutus && this.envInfos && this.envInfos[env] && !this.envInfos[env].hasDeployed) {
+              const payload = cloneDeep(this.envInfos[env])
+              delete payload.hasDeployed
+              this.checkSvcResource(payload, payload.env_name)
+            }
           })
         }
       },

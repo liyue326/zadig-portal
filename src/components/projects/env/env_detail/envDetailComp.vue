@@ -312,6 +312,7 @@
             :fetchAllData="fetchAllData"
             :searchServicesByChart="searchServicesByChart"
             :isProd="isProd"
+            :serviceStatus="serviceStatus"
           />
           <ServiceList
             class="right"
