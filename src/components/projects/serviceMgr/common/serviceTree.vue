@@ -263,14 +263,25 @@
                 <el-tag v-if="data.type === 'k8s'" type="primary" effect="dark" size="mini" style="cursor: not-allowed;">共享</el-tag>
               </span>
               <span v-else :style="{'visibility': showHover[data.service_name] || data.visibility==='public' ? 'visible': 'hidden'}">
-                <el-tooltip effect="dark" placement="top">
+                <el-tooltip
+                  v-if="checkPermissionSyncMixin({projectName: projectName, action: 'edit_service'})"
+                  effect="dark"
+                  placement="top"
+                >
                   <div slot="content">共享服务可在其他项目的服务编排中使用</div>
                   <el-tag
-                    v-hasPermi="{projectName: projectName, action: 'edit_service',isBtn:true}"
                     v-if="data.type === 'k8s'"
                     :type="data.visibility==='public'?'primary':'info'"
                     :effect="data.visibility==='public'?'dark':'plain'"
                     @click="changeServicePermission(data)"
+                    size="mini"
+                  >共享</el-tag>
+                </el-tooltip>
+                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                  <el-tag
+                    v-if="data.type === 'k8s'"
+                    :type="data.visibility==='public'?'primary':'info'"
+                    :effect="data.visibility==='public'?'dark':'plain'"
                     size="mini"
                   >共享</el-tag>
                 </el-tooltip>
@@ -929,11 +940,9 @@ export default {
       })
       const type = item ? item.kind : 'group'
       const id = this.source.codehostId
-      getRepoNameByIdAPI(id, type, encodeURI(repoOwner), '').then(
-        res => {
-          this.$set(this.codeInfo, 'repos', res)
-        }
-      )
+      getRepoNameByIdAPI(id, type, encodeURI(repoOwner), '').then(res => {
+        this.$set(this.codeInfo, 'repos', res)
+      })
       this.source.branchName = ''
       this.source.path = ''
       this.source.services = []
@@ -946,12 +955,7 @@ export default {
       const type = item ? item.kind : 'group'
       this.$refs.sourceForm.clearValidate()
       if (repoOwner) {
-        getRepoNameByIdAPI(
-          id,
-          type,
-          encodeURI(repoOwner),
-          key
-        ).then(res => {
+        getRepoNameByIdAPI(id, type, encodeURI(repoOwner), key).then(res => {
           this.$set(this.codeInfo, 'repos', res)
         })
       }
@@ -1025,11 +1029,7 @@ export default {
         this.source.namespace = repoOwner
       }
       if (repoName && repoOwner) {
-        getBranchInfoByIdAPI(
-          id,
-          this.source.namespace,
-          repoName
-        ).then(res => {
+        getBranchInfoByIdAPI(id, this.source.namespace, repoName).then(res => {
           this.$set(this.codeInfo, 'branches', res)
         })
         this.source.branchName = ''
