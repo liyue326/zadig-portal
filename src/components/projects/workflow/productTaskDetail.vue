@@ -229,7 +229,7 @@
         >
           <el-table-column type="expand">
             <template slot-scope="scope">
-              <TaskDetailArtifactDeploy :deploy="scope.row.deploySubTask" />
+              <TaskDetailArtifactDeploy :deploy="scope.row.deploySubTask" :workflowName="workflowName" :taskID="taskID"  />
             </template>
           </el-table-column>
 

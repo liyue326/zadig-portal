@@ -34,6 +34,7 @@
           v-if="workflowToRun.workflowName"
           :workflowName="workflowToRun.workflowName"
           :projectName="workflowToRun.projectName"
+          :displayName="workflowToRun.displayName"
           :imageConfigs="imagesAndConfigs"
         />
       </div>
@@ -234,6 +235,7 @@ export default {
       workflowToRun: {
         workflowName: '',
         projectName: '',
+        displayName: '',
         version: ''
       },
       loading: false,
@@ -277,6 +279,7 @@ export default {
       this.workflowToRun.projectName = this.currentVersionDetail.versionInfo.productName
       this.workflowToRun.version = this.currentVersionDetail.versionInfo.version
       this.workflowToRun.workflowName = this.currentVersionDetail.versionInfo.workflowName
+      this.workflowToRun.displayName = this.currentVersionDetail.versionInfo.workflowDisplayName
     },
     getVersionDetail () {
       const versionId = this.versionId
@@ -309,9 +312,11 @@ export default {
       }
       if (current_version_info.deployInfo) {
         current_version_info.deployInfo.forEach(artifactDeploy => {
+          const serviceName = artifactDeploy.serviceName.includes('_') ? artifactDeploy.serviceName.split('_')[0] : artifactDeploy.serviceName
+          const containerName = artifactDeploy.containerName.includes('_') ? artifactDeploy.containerName.split('_')[0] : artifactDeploy.containerName
           this.imagesAndConfigs.push({
-            serviceName: artifactDeploy.serviceName,
-            containerName: artifactDeploy.containerName,
+            serviceName: serviceName,
+            containerName: containerName,
             registryName: artifactDeploy.image,
             yamlContents: artifactDeploy.yamlContents,
             registryId: artifactDeploy.registry_id
