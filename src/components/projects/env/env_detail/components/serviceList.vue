@@ -9,40 +9,40 @@
               {{ scope.row.service_display_name || scope.row.service_name }}
             </span>
           </router-link>
-          <template
-            v-if="serviceStatus[scope.row.service_name] && serviceStatus[scope.row.service_name]['tpl_updatable'] && envSource!=='helm'"
-          >
+          <template v-if="serviceStatus[scope.row.service_name] && envSource!=='helm'">
             <template v-if="serviceStatus[scope.row.service_name].raw.deploy_strategy === 'import'">
-              <el-tooltip  effect="dark" content="该服务尚未通过 Zadig 部署，可执行「更新服务」或「重启服务」操作使用 Zadig 上管理的服务配置重新部署" placement="top">
-                <i class="el-icon-warning-outline operation"></i>
+                <el-tooltip  effect="dark" content="该服务尚未通过 Zadig 部署，可执行「更新服务」或「重启服务」操作使用 Zadig 上管理的服务配置重新部署" placement="top">
+                  <i class="el-icon-warning-outline operation"></i>
+                </el-tooltip>
+              </template>
+            <template v-if="serviceStatus[scope.row.service_name]['tpl_updatable']">
+              <el-popover placement="right" popper-class="diff-popper" width="600" trigger="click">
+                <el-tabs v-model="activeDiffTab" type="card">
+                  <el-tab-pane name="template">
+                    <span slot="label">
+                      <i class="el-icon-tickets"></i> 模板对比
+                    </span>
+                    <div class="diff-container">
+                      <div class="diff-content">
+                        <pre
+                          :class="{ 'added': section.added, 'removed': section.removed }"
+                          v-for="(section,index) in combineTemplate"
+                          :key="index"
+                        >{{section.value}}</pre>
+                      </div>
+                    </div>
+                  </el-tab-pane>
+                </el-tabs>
+                <span slot="reference" class="service-updateable">
+                  <el-tooltip effect="dark" content="配置变更" placement="top">
+                    <i @click="openPopper(scope.row)" class="el-icon-question icon operation"></i>
+                  </el-tooltip>
+                </span>
+              </el-popover>
+              <el-tooltip  effect="dark" content="更新服务" placement="top">
+                <i v-hasPermi="{projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'},isBtn:true}" @click="updateService(scope.row)" class="iconfont icongengxin operation"></i>
               </el-tooltip>
             </template>
-            <el-popover placement="right" popper-class="diff-popper" width="600" trigger="click">
-              <el-tabs v-model="activeDiffTab" type="card">
-                <el-tab-pane name="template">
-                  <span slot="label">
-                    <i class="el-icon-tickets"></i> 模板对比
-                  </span>
-                  <div class="diff-container">
-                    <div class="diff-content">
-                      <pre
-                        :class="{ 'added': section.added, 'removed': section.removed }"
-                        v-for="(section,index) in combineTemplate"
-                        :key="index"
-                      >{{section.value}}</pre>
-                    </div>
-                  </div>
-                </el-tab-pane>
-              </el-tabs>
-              <span slot="reference" class="service-updateable">
-                <el-tooltip effect="dark" content="配置变更" placement="top">
-                  <i @click="openPopper(scope.row)" class="el-icon-question icon operation"></i>
-                </el-tooltip>
-              </span>
-            </el-popover>
-            <el-tooltip  effect="dark" content="更新服务" placement="top">
-              <i v-hasPermi="{projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'},isBtn:true}" @click="updateService(scope.row)" class="iconfont icongengxin operation"></i>
-            </el-tooltip>
           </template>
         </template>
       </el-table-column>

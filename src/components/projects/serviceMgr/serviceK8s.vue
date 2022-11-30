@@ -64,7 +64,7 @@
                   </template>
                 </el-table-column>
               </el-table>
-              <div v-else style="margin-top: 10px;">该服务未引用全局变量！</div>
+              <div v-else-if="!(hasPlutus && !env.hasDeployed)" style="margin-top: 10px;">该服务未引用全局变量！</div>
             </el-tab-pane>
           </el-tabs>
         </div>
