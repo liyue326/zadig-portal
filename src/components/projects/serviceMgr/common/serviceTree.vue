@@ -280,7 +280,7 @@
                 <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
                   <el-tag
                     v-if="data.type === 'k8s'"
-                    :type="data.visibility==='public'?'primary':'info'"
+                    type="info"
                     :effect="data.visibility==='public'?'dark':'plain'"
                     size="mini"
                   >共享</el-tag>
