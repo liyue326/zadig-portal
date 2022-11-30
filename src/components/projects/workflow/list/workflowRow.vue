@@ -35,7 +35,10 @@
                 </el-tooltip>
               </router-link>
             </div>
-            <div class="gray-desc workflow-desc">{{ description?description:'-' }}</div>
+            <el-tooltip v-if="description" effect="dark" :content="description" placement="top">
+              <div class="gray-desc workflow-desc">{{ $utils.tailCut(description,25) }}</div>
+            </el-tooltip>
+            <div v-else class="gray-desc workflow-desc">-</div>
           </div>
         </div>
       </section>
@@ -295,9 +298,11 @@ export default {
 
       &.workflow-desc {
         display: flex;
+        max-width: 300px;
         margin-top: 4px;
         overflow: hidden;
         white-space: nowrap;
+        text-overflow: ellipsis;
       }
     }
 
