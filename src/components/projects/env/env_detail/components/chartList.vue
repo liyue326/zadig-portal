@@ -30,6 +30,11 @@
           </el-tooltip>
         </span>
         <span class="chart-right">
+          <template v-if="serviceStatus[chart.serviceName] && serviceStatus[chart.serviceName].raw.deploy_strategy === 'import'">
+            <el-tooltip  effect="dark" content="该服务尚未通过 Zadig 部署，可执行「更新服务」操作使用 Zadig 上管理的服务配置重新部署" placement="top">
+              <i class="el-icon-warning-outline common-icon"></i>
+            </el-tooltip>
+          </template>
           <el-tooltip v-if="chart.updatable" effect="dark" content="服务配置有变更" placement="top">
             <i class="el-icon-question common-icon"></i>
           </el-tooltip>
@@ -106,7 +111,8 @@ export default {
     envSource: String,
     fetchAllData: Function,
     isProd: Boolean,
-    searchServicesByChart: Function
+    searchServicesByChart: Function,
+    serviceStatus: Object
   },
   data () {
     this.cmOption = {
@@ -360,7 +366,7 @@ export default {
       }
 
       .chart-right {
-        flex: 0 0 70px;
+        flex: 0 0 90px;
         color: @themeColor;
         text-align: right;
 
