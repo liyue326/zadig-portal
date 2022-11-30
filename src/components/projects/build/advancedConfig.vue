@@ -143,12 +143,33 @@
         </el-form-item>
         <el-button type="text" @click="addVars">+添加</el-button>
       </el-form-item>
+      <div class="item-title" v-if="isShowShareStorage">共享存储</div>
+      <el-form-item
+        label="开启共享存储"
+        v-if="isShowShareStorage"
+      >
+        <el-switch v-model="currentResource.share_storage_info.enabled"  :disabled="!isCanOpenShareStorage" @change="handleSwitchChange($event,currentResource)" active-color="#0066ff"></el-switch>
+        <el-tooltip v-if="!isCanOpenShareStorage" content="集群无共享存储资源，请前往「系统设置」-「集群管理」配置" placement="top">
+          <i class="el-icon-warning" style="color: red; vertical-align: -2px;"></i>
+        </el-tooltip>
+      </el-form-item>
+      <el-form-item
+        label="选择共享目录"
+        v-if="isShowShareStorage&&isCanOpenShareStorage&&currentResource.share_storage_info.enabled"
+      >
+        <el-select v-model="currentResource.share_storage_info.share_storages" size="small" value-key="name" filterable multiple>
+          <el-option :label="`${item.name}(${item.path})`" :value="item" v-for="item in shareStorage" :key="item.name">
+            <span>{{item.name}}</span>
+            <span style="color: #ccc;">({{item.path}})</span>
+          </el-option>
+        </el-select>
+      </el-form-item>
     </el-form>
   </section>
 </template>
 
 <script>
-import { getClusterListAPI } from '@api'
+import { getClusterListAPI, getClusterStatusAPI } from '@api'
 import { mapState } from 'vuex'
 
 export default {
@@ -179,6 +200,14 @@ export default {
     hiddenVars: {
       default: false,
       type: Boolean
+    },
+    isShowShareStorage: {
+      default: false,
+      type: Boolean
+    },
+    shareStorage: {
+      default: () => [],
+      type: Array
     },
     useDockerDaemon: Boolean
   },
@@ -227,11 +256,18 @@ export default {
       }
     })
     return {
-      clusters: []
+      clusters: [],
+      isCanOpenShareStorage: false
     }
   },
   computed: {
     currentResource () {
+      if (!this.buildConfig[this.secondaryProp].share_storage_info) {
+        this.$set(this.buildConfig[this.secondaryProp], 'share_storage_info', {
+          enabled: false,
+          share_storages: []
+        })
+      }
       return this.buildConfig[this.secondaryProp]
     },
     ...mapState({
@@ -239,6 +275,16 @@ export default {
     })
   },
   methods: {
+    handleSwitchChange (val, item) {
+      if (!val) {
+        item.share_storage_info.share_storages = []
+      }
+    },
+    getClusterStatus (type, projectName, name, id) {
+      getClusterStatusAPI(type, projectName, name, id).then(res => {
+        this.isCanOpenShareStorage = res
+      })
+    },
     initAdvancedConfig (buildConfig = this.buildConfig) {
       const currentResource = buildConfig[this.secondaryProp]
       if (this.isCreate || !currentResource.cluster_id) {
@@ -310,6 +356,14 @@ export default {
           })
         } else {
           this.validObj.deleteValidate({ name: 'advancedConfigCacheValid' })
+        }
+      },
+      immediate: true
+    },
+    'currentResource.cluster_id': {
+      handler (newVal, oldVal) {
+        if (newVal && this.isShowShareStorage) {
+          this.getClusterStatus('', '', '', newVal)
         }
       },
       immediate: true

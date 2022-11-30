@@ -2311,3 +2311,6 @@ export function getCanaryServiceListAPI (clusterID, namespace) {
 export function getWorkflowGlobalVarsAPI (currentJobName, payload) {
   return http.post(`/api/aslan/workflow/v4/output/${currentJobName}`, payload)
 }
+export function getClusterStatusAPI (type, projectName, name, id) {
+  return http.get(`/api/aslan/workflow/v4/sharestorage?type=${type}&project=${projectName}&name=${name}&id=${id}`)
+}

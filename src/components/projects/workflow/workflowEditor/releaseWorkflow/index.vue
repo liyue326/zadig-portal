@@ -77,6 +77,9 @@
                 class="mg-b24"
                 :globalEnv="globalEnv"
                 :ref="jobType.build"
+                :workflowInfo="payload"
+                :curStageIndex="curStageIndex"
+                :curJobIndex="curJobIndex"
               />
               <el-select size="small" v-model="service" multiple filterable clearable>
                 <el-option
@@ -106,8 +109,15 @@
                 @click="addServiceAndBuild(job.spec.service_and_builds)"
               >+ 添加</el-button>
             </div>
-            <JobPlugin v-if="job.type === jobType.plugin" :job="job" :ref="jobType.plugin" :globalEnv="globalEnv"   :curStageIndex="curStageIndex"
-              :curJobIndex="curJobIndex"/>
+            <JobPlugin
+              v-if="job.type === jobType.plugin"
+              :job="job"
+              :ref="jobType.plugin"
+              :globalEnv="globalEnv"
+              :workflowInfo="payload"
+              :curStageIndex="curStageIndex"
+              :curJobIndex="curJobIndex"
+            />
             <JobDeploy
               :projectName="projectName"
               v-if="job.type === jobType.deploy"
@@ -240,18 +250,7 @@
         </div>
       </span>
       <div v-if="curDrawer === 'high'">
-        <div class="mg-b16">运行策略</div>
-        <el-form>
-          <el-form-item>
-            <span class="mg-r16">
-              <span>并发运行</span>
-              <el-tooltip effect="dark" content="当同时更新多个不同服务时，产生的多个任务将会并发执行，以提升工作流运行效率" placement="top">
-                <i class="pointer el-icon-question"></i>
-              </el-tooltip>
-            </span>
-            <el-switch v-model="multi_run"></el-switch>
-          </el-form-item>
-        </el-form>
+        <Settings :workflowInfo="payload" ref="settings" />
       </div>
       <div v-if="curDrawer === 'env'">
         <Env :preEnvs="payload" ref="env" />
@@ -336,6 +335,7 @@ import JobK8sResourceUpdate from './components/jobs/jobK8sResourceUpdate'
 import JobImageDistribute from './components/jobs/jobImageDistribute.vue'
 import RunCustomWorkflow from '../../common/runCustomWorkflow'
 import Env from './components/base/env.vue'
+import Settings from './components/base/settings'
 import Webhook from './components/base/webhook.vue'
 import Notify from './components/base/notify.vue'
 import jsyaml from 'js-yaml'
@@ -432,7 +432,8 @@ export default {
     codemirror,
     Env,
     Webhook,
-    Notify
+    Notify,
+    Settings
   },
   computed: {
     modelId () {
@@ -947,8 +948,10 @@ export default {
     },
     handleDrawerChange () {
       if (this.curDrawer === 'high') {
-        this.$set(this.payload, 'multi_run', this.multi_run)
-        this.isShowDrawer = false
+        this.$refs.settings.validate().then(() => {
+          this.$set(this.payload, 'share_storages', this.$refs.settings.getData())
+          this.isShowDrawer = false
+        })
       }
       if (this.curDrawer === 'env') {
         this.$refs.env.validate().then(() => {

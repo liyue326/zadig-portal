@@ -204,18 +204,7 @@
         </div>
       </span>
       <div v-if="curDrawer === 'high'">
-        <div class="mg-b16">运行策略</div>
-        <el-form>
-          <el-form-item>
-            <span class="mg-r16">
-              <span>并发运行</span>
-              <el-tooltip effect="dark" content="当同时更新多个不同服务时，产生的多个任务将会并发执行，以提升工作流运行效率" placement="top">
-                <i class="pointer el-icon-question"></i>
-              </el-tooltip>
-            </span>
-            <el-switch v-model="multi_run"></el-switch>
-          </el-form-item>
-        </el-form>
+        <Settings :workflowInfo="payload" ref="settings" />
       </div>
       <div v-if="curDrawer === 'env'">
         <Env :preEnvs="payload" ref="env" />
@@ -296,6 +285,7 @@ import RunCustomWorkflow from '../../common/runCustomWorkflow'
 import Env from './components/base/env.vue'
 import Webhook from './components/base/webhook.vue'
 import Notify from './components/base/notify.vue'
+import Settings from './components/base/settings'
 import jsyaml from 'js-yaml'
 import bus from '@utils/eventBus'
 import { codemirror } from 'vue-codemirror'
@@ -341,7 +331,8 @@ export default {
         multi_run: false,
         notify_ctls: [],
         stages: [],
-        params: []
+        params: [],
+        share_storages: []
       },
       originalWorkflow: {},
       curStageIndex: 0,
@@ -355,7 +346,6 @@ export default {
       yaml: '',
       yamlError: '',
       isShowDrawer: false,
-      multi_run: false,
       globalEnv: [],
       scal: '1',
       insertSatgeIndex: 0,
@@ -382,7 +372,8 @@ export default {
     codemirror,
     Env,
     Webhook,
-    Notify
+    Notify,
+    Settings
   },
   computed: {
     modelId () {
@@ -772,7 +763,6 @@ export default {
           }
         })
       })
-      this.multi_run = this.payload.multi_run
       this.originalWorkflow = cloneDeep(this.payload)
       this.$store.dispatch('setWorkflowInfo', cloneDeep(this.payload))
     },
@@ -910,8 +900,10 @@ export default {
     },
     handleDrawerChange () {
       if (this.curDrawer === 'high') {
-        this.$set(this.payload, 'multi_run', this.multi_run)
-        this.isShowDrawer = false
+        this.$refs.settings.validate().then(() => {
+          this.$set(this.payload, 'share_storages', this.$refs.settings.getData())
+          this.isShowDrawer = false
+        })
       }
       if (this.curDrawer === 'env') {
         this.$refs.env.validate().then(() => {

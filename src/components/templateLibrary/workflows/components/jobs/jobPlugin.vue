@@ -22,7 +22,12 @@
           </el-table-column>
           <el-table-column label="值">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.value" v-if="scope.row.type === 'choice'&&scope.row.command !== 'other'" size="small" style="width: 220px;">
+              <el-select
+                v-model="scope.row.value"
+                v-if="scope.row.type === 'choice'&&scope.row.command !== 'other'"
+                size="small"
+                style="width: 220px;"
+              >
                 <el-option v-for="(item,index) in scope.row.choice_option" :key="index" :value="item" :label="item">{{item}}</el-option>
               </el-select>
               <el-input
@@ -85,7 +90,10 @@
             :secondaryProp="`properties`"
             :validObj="validObj"
             @validateFailed="advanced_setting_modified = true"
+            :shareStorage="workflowInfo.share_storages"
             hiddenCache
+            hiddenVars
+            isShowShareStorage
           ></AdvancedConfig>
         </section>
       </div>

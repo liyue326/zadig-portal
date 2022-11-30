@@ -136,7 +136,11 @@ const initBuildConfig = {
     envs: [],
     enable_proxy: false,
     enable_gocov: false,
-    parameters: []
+    parameters: [],
+    share_storage_info: {
+      enabled: false,
+      share_storages: []
+    }
   },
   outputs: [{ name: 'IMAGE' }, { name: 'PKG_FILE' }],
   scripts: '#!/bin/bash\nset -e',

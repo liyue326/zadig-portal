@@ -53,9 +53,8 @@
                 v-model="scope.row.value"
                 placeholder="请选择"
                 filterable
-                size="small"
                 @focus="handleEnvChange(scope.row, scope.row.command)"
-
+                size="small"
               >
                 <el-option v-for="(item,index) in globalEnv" :key="index" :label="item" :value="item">{{item}}</el-option>
               </el-select>
@@ -91,8 +90,10 @@
             :secondaryProp="`properties`"
             :validObj="validObj"
             @validateFailed="advanced_setting_modified = true"
+            :shareStorage="workflowInfo.share_storages"
             hiddenCache
             hiddenVars
+            isShowShareStorage
           ></AdvancedConfig>
         </section>
       </div>

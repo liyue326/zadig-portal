@@ -33,9 +33,11 @@
             class="common-parcel-block"
             :isCreate="isCreate"
             :buildConfig="job.spec"
+            :shareStorage="workflowInfo.share_storages"
             :secondaryProp="`properties`"
             :validObj="validObj"
             fromWorkflow
+            isShowShareStorage
             @validateFailed="advanced_setting_modified = true"
             hiddenCache
             useDockerDaemon

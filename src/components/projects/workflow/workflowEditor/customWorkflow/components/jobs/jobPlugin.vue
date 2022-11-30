@@ -90,8 +90,10 @@
             :secondaryProp="`properties`"
             :validObj="validObj"
             @validateFailed="advanced_setting_modified = true"
+            :shareStorage="workflowInfo.share_storages"
             hiddenCache
             hiddenVars
+            isShowShareStorage
           ></AdvancedConfig>
         </section>
       </div>

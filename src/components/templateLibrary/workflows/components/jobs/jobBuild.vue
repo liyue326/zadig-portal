@@ -28,8 +28,15 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <span class="iconfont iconbianliang1" @click="handleVarBranchChange('var',item,index)"></span>
-              <span class="iconfont iconfenzhi" @click="handleVarBranchChange('branch',item,index)"></span>
+              <el-tooltip class="item" effect="dark" content="变量配置" placement="top">
+                <span class="iconfont iconbianliang1" @click="handleVarBranchChange('var',item,index)"></span>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="分支配置" placement="top">
+                <span class="iconfont iconfenzhi" @click="handleVarBranchChange('branch',item,index)"></span>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="共享存储配置" placement="top">
+                <span class="iconfont iconcunchufuwu" @click="handleVarBranchChange('pv',item,index)"></span>
+              </el-tooltip>
             </el-col>
             <el-col :span="4">
               <el-button type="danger" size="mini" plain @click="delServiceAndBuild(index)">删除</el-button>
@@ -121,6 +128,50 @@
         <el-button type="primary" @click="saveCurSetting('branch',curItem)" size="small">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      :title="`${curItem.service_name}/${curItem.service_module} 共享存储配置`"
+      :visible.sync="isShowPvDialog"
+      :append-to-body="true"
+      width="40%"
+    >
+      <el-form ref="form" label-width="120px" v-if="curItem.share_storage_info">
+        <el-form-item label="开启共享存储">
+          <el-switch
+            v-model="curItem.share_storage_info.enabled"
+            :disabled="!isCanOpenShareStorage"
+            :active-value="true"
+            :inactive-value="false"
+            @change="handleSwitchChange($event,curItem)"
+            active-color="#0066ff"
+          ></el-switch>
+          <el-tooltip v-if="!isCanOpenShareStorage" content="集群无共享存储资源，请前往「系统设置」-「集群管理」配置" placement="top">
+            <i class="el-icon-warning" style="color: red; vertical-align: -2px;"></i>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="选择共享目录" v-if="isCanOpenShareStorage&&curItem.share_storage_info.enabled">
+          <el-select
+            v-model="curItem.share_storage_info.share_storages"
+            placeholder="选择共享目录"
+            filterable
+            multiple
+            value-key="name"
+            size="small"
+          >
+            <el-option v-for="item in workflowInfo.share_storages" :key="item.value" :label="`${item.name}(${item.path})`" :value="item">
+              <span>{{item.name}}</span>
+              <span style="color: #ccc;">({{item.path}})</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isShowPvDialog = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="saveCurSetting('pv',curItem)" size="small">确 定</el-button>
+        <el-tooltip class="item" effect="dark" content="应用到所有使用相同构建的服务组件" placement="top">
+          <el-button type="primary" @click="apply(curItem)" size="small">确认并应用其他组件</el-button>
+        </el-tooltip>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -129,7 +180,8 @@ import { jobType, buildTabList, validateJobName } from '../../config'
 import {
   getAllBranchInfoAPI,
   getRegistryWhenBuildAPI,
-  getWorkflowGlobalVarsAPI
+  getWorkflowGlobalVarsAPI,
+  getClusterStatusAPI
 } from '@api'
 import { differenceWith, cloneDeep } from 'lodash'
 import EnvTypeSelect from '../envTypeSelect.vue'
@@ -170,10 +222,12 @@ export default {
       buildTabList,
       isShowBranchDialog: false,
       isShowVarDialog: false,
+      isShowPvDialog: false,
       curItem: {},
       curIndex: 0,
       dockerList: [],
-      globalEnv: []
+      globalEnv: [],
+      isCanOpenShareStorage: false
     }
   },
   computed: {
@@ -207,6 +261,25 @@ export default {
     this.getGlobalEnv()
   },
   methods: {
+    handleSwitchChange (val, item) {
+      if (!val) {
+        item.share_storage_info.share_storages = []
+      }
+    },
+    apply (curItem) {
+      // 使用相同构建的服务组件都应用当前配置
+      this.serviceAndBuilds.forEach(item => {
+        if (item.build_name === curItem.build_name) {
+          item.share_storage_info = this.curItem.share_storage_info
+        }
+      })
+      this.isShowPvDialog = false
+    },
+    getClusterStatus (type, projectName, name, id) {
+      getClusterStatusAPI(type, projectName, name, id).then(res => {
+        this.isCanOpenShareStorage = res
+      })
+    },
     handleEnvChange (row, command) {
       row.value = ''
       if (command === 'other') {
@@ -297,8 +370,22 @@ export default {
       this.curIndex = index
       if (type === 'var') {
         this.isShowVarDialog = true
-      } else {
+      } else if (type === 'branch') {
         this.isShowBranchDialog = true
+      } else {
+        if (!item.share_storage_info) {
+          this.$set(item, 'share_storage_info', {
+            enabled: false,
+            share_storages: []
+          })
+        }
+        this.getClusterStatus(
+          this.jobType.build,
+          this.projectName,
+          item.build_name,
+          ''
+        )
+        this.isShowPvDialog = true
       }
       this.curItem = cloneDeep(item)
     },
@@ -315,8 +402,10 @@ export default {
       this.$set(this.serviceAndBuilds, this.curIndex, this.curItem)
       if (type === 'var') {
         this.isShowVarDialog = false
-      } else {
+      } else if (type === 'branch') {
         this.isShowBranchDialog = false
+      } else {
+        this.isShowPvDialog = false
       }
     },
     validate () {
