@@ -68,7 +68,7 @@ export default {
       }
       this.updateHelmEnvVarLoading = true
       // Remove temp data
-      if (payload.valuesData.gitRepoConfig.valuesPath) {
+      if (payload.valuesData && payload.valuesData.gitRepoConfig && payload.valuesData.gitRepoConfig.valuesPath) {
         delete payload.valuesData.gitRepoConfig.valuesPath
       }
       updateHelmEnvVarAPI(this.projectName, this.envName, payload)
