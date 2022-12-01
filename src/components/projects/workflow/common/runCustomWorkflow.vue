@@ -969,7 +969,7 @@ export default {
             } else {
               // fromjob
               this.fromJobInfo.pickedTargets.forEach(item => {
-                if (!item.target_tag) {
+                if (item.update_tag && !item.target_tag) {
                   this.$message.error(`请填写 ${item.service_name} 中的目标镜像版本`)
                   throw Error()
                 }
