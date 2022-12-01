@@ -167,9 +167,6 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="isShowPvDialog = false" size="small">取 消</el-button>
         <el-button type="primary" @click="saveCurSetting('pv',curItem)" size="small">确 定</el-button>
-        <el-tooltip class="item" effect="dark" content="应用到所有使用相同构建的服务组件" placement="top">
-          <el-button type="primary" @click="apply(curItem)" size="small">确认并应用其他组件</el-button>
-        </el-tooltip>
       </span>
     </el-dialog>
   </div>
@@ -266,15 +263,6 @@ export default {
       if (!val) {
         item.share_storage_info.share_storages = []
       }
-    },
-    apply (curItem) {
-      // 使用相同构建的服务组件都应用当前配置
-      this.serviceAndBuilds.forEach(item => {
-        if (item.build_name === curItem.build_name) {
-          item.share_storage_info = this.curItem.share_storage_info
-        }
-      })
-      this.isShowPvDialog = false
     },
     getClusterStatus (type, projectName, name, id) {
       getClusterStatusAPI(type, projectName, name, id).then(res => {
