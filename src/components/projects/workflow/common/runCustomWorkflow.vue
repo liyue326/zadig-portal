@@ -1071,7 +1071,7 @@ export default {
     },
     handleContainerChange (val, job) {
       val.forEach(item => {
-        this.getRegistryList([item.service], job.spec.docker_registry_id).then(
+        this.getRegistryList([item.service || item.container_name], job.spec.docker_registry_id).then(
           res => {
             this.$set(item, 'images', res)
             this.$forceUpdate()
