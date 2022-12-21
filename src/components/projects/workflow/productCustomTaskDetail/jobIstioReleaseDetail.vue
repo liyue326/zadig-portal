@@ -2,7 +2,7 @@
   <div class="job-istio-release-detail">
     <header class="mg-b8">
       <el-col :span="6">
-        <span class="type">Istio 灰度发布</span>
+        <span class="type">Istio 发布</span>
         <span>{{jobInfo.name}}</span>
       </el-col>
       <el-col v-if="jobInfo.status!=='running'" :span="2">

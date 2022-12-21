@@ -4,7 +4,7 @@
       <i :class="showSidebar?'el-icon-arrow-right':'el-icon-arrow-left'"></i>
     </a>
     <div class="sidebar-header" :style="{ width: showSidebar ? '100%' : 'auto'}">
-      <router-link to="/v1/status">
+      <router-link to="/v1/dashboard">
         <img v-if="showSidebar&&!showBackPath&&bigLogoUrl" class="logo" :src="bigLogoUrl" />
         <img v-if="showSidebar&&!showBackPath&&!bigLogoUrl" class="logo" src="@assets/icons/logo/logo.svg" />
         <img v-if="!showSidebar&&!showBackPath&&smallLogoUrl" class="logo" :src="smallLogoUrl" />
@@ -85,7 +85,7 @@ export default {
     return {
       showSidebar: true,
       backTitle: '',
-      backUrl: '/v1/status',
+      backUrl: '/v1/dashboard',
       enterpriseInfo: null,
       accountSetting: [
         {
@@ -207,9 +207,9 @@ export default {
           category_name: '产品交付',
           items: [
             {
-              name: '运行状态',
+              name: '仪表盘',
               icon: 'iconfont iconyunhangzhuangtai',
-              url: 'status'
+              url: 'dashboard'
             },
             {
               name: '项目',

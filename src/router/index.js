@@ -47,11 +47,11 @@ const routes = [
         ]
       },
       {
-        path: 'status',
-        component: () => import('@/components/projects/workflow/status/status.vue'),
+        path: 'dashboard',
+        component: () => import('@/components/projects/dashboard.vue'),
         meta: {
           requiresAuth: true,
-          title: '运行状态'
+          title: '仪表盘'
         }
       },
       {

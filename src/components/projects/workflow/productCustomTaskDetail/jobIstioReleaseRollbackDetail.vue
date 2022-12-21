@@ -2,7 +2,7 @@
   <div class="job-istio-rollback-detail">
     <header class="mg-b8">
       <el-col :span="6">
-        <span class="type">Istio 灰度发布回滚</span>
+        <span class="type">Istio 发布回滚</span>
         <span>{{jobInfo.name}}</span>
       </el-col>
       <el-col v-if="jobInfo.status!=='running'" :span="2">

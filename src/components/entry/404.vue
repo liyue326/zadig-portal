@@ -5,11 +5,11 @@
       <div class="stars">
         <div class="custom-navbar">
           <div class="brand-logo">
-            <h3><a href="/v1/status">Zadig</a></h3>
+            <h3><a href="/v1/dashboard">Zadig</a></h3>
           </div>
           <div class="navbar-links">
             <ul>
-              <li><a href="/v1/status"
+              <li><a href="/v1/dashboard"
                    target="_blank">首页</a></li>
               <li><a href="/v1/projects"
                    target="_blank">项目列表</a></li>
