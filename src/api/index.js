@@ -2376,11 +2376,11 @@ export function getDashboardSettingsAPI (payload) {
   return http.get(`/api/aslan/system/dashboard/settings`, payload)
 }
 export function getMyWorkflowAPI (cardId) {
-  return makeEventSource(`/api/aslan/system/dashboard/workflow/mine?card_id=${cardId}`)
+  return http.get(`/api/aslan/system/dashboard/workflow/mine?card_id=${cardId}`)
 }
 export function getRunningWorkflowAPI () {
-  return makeEventSource(`/api/aslan/system/dashboard/workflow/running`)
+  return http.get(`/api/aslan/system/dashboard/workflow/running`)
 }
 export function getMyEnvAPI (name, projectName) {
-  return makeEventSource(`/api/aslan/system/dashboard/environment/${name}?projectName=${projectName}`)
+  return http.get(`/api/aslan/system/dashboard/environment/${name}?projectName=${projectName}`)
 }
