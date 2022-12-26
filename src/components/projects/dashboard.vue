@@ -5,7 +5,11 @@
       <el-button class="header-btn" size="small" type="primary" @click="isShowCardDialog=true">添加卡片</el-button>
     </div>
     <div class="main">
-      <draggable v-model="info.cards" group="people" @start="onStart" @end="onEnd">
+      <section v-if="info.cards.length === 0" class="no-running">
+        <img src="@assets/icons/illustration/runStatus.svg" alt />
+        <p>暂无卡片</p>
+      </section>
+      <draggable v-else v-model="info.cards" group="people" @start="onStart" @end="onEnd">
         <transition-group class="wrap">
           <el-card v-for="(item,index) in info.cards" :key="item.id" class="item">
             <div slot="header" class="clearfix">
@@ -43,31 +47,31 @@
                     <span>{{ $utils.convertTimestamp(scope.row.start_time)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="time" label="执行" v-if="item.type==='my_workflow'">
+                <el-table-column prop="time" label="操作" v-if="item.type==='my_workflow'">
                   <template slot-scope="scope">
-                    <el-button size="small" type="text" @click="goWorkflow(scope.row,true)">Run</el-button>
+                    <el-button size="small" type="text" @click="goWorkflow(scope.row,true)">执行</el-button>
                   </template>
                 </el-table-column>
               </el-table>
               <div v-if="!item.show&&item.type==='my_env'">
                 <div class="env-tip" v-if="item.config">
                   <span>
-                    {{item.config.env_name}}
+                    {{item.config.name}}
                     <span class="desc">({{item.config.project_name}})</span>
                   </span>
                   <span class="desc">
-                    最后一次变更
-                    <span>人 时间</span>
+                    最后一次变更：{{item.config.creator}}
+                    <span>{{ $utils.convertTimestamp(item.config.update_time)}}</span>
                   </span>
                 </div>
-                <el-table :data="item.service_modules" style="width: 100%;">
-                  <el-table-column prop="name" label="服务名称" width="180"></el-table-column>
-                  <el-table-column prop="creator" label="运行状态" width="180">
+                <el-table :data="item.services" style="width: 100%;">
+                  <el-table-column prop="service_name" label="服务名称" width="180"></el-table-column>
+                  <el-table-column prop="status" label="运行状态" width="180">
                     <template slot-scope="scope">
                       <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]">{{ scope.row.status}}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="time" label="镜像信息"></el-table-column>
+                  <el-table-column prop="image" label="镜像信息"></el-table-column>
                 </el-table>
               </div>
               <div v-if="item.show">
@@ -139,6 +143,9 @@ export default {
           service_name: []
         }
       },
+      envTimer: 0,
+      workflowTimer: 0,
+      runningWorkflowTimer: 0,
       cardTypeList: [
         {
           name: '运行中的工作流',
@@ -169,7 +176,8 @@ export default {
       projectList: [],
       envList: [],
       serviceList: [],
-      workflowList: []
+      workflowList: [],
+      intervalTimerList: []
     }
   },
   components: {
@@ -198,6 +206,18 @@ export default {
       this.isShowCardDialog = false
     },
     getSettings () {
+      if (this.runningWorkflowTimer) {
+        window.clearInterval(this.runningWorkflowTimer)
+        this.runningWorkflowTimer = null
+      }
+      if (this.envTimer) {
+        window.clearInterval(this.envTimer)
+        this.envTimer = null
+      }
+      if (this.workflowTimer) {
+        window.clearInterval(this.workflowTimer)
+        this.workflowTimer = null
+      }
       getDashboardSettingsAPI().then(res => {
         this.info = res
         this.info.cards.forEach(item => {
@@ -208,49 +228,46 @@ export default {
             this.getRunningWorkflow(item)
           }
           if (item.type === 'my_workflow') {
-            this.getMyWorkflow(item.workflow_list, item.id)
+            this.getMyWorkflow(item)
           }
           if (item.type === 'my_env') {
-            this.getMyEnv(
-              item.services,
-              item.config.env_name,
-              item.config.project_name
-            )
+            this.getMyEnv(item)
           }
         })
       })
     },
-    // addSettings (payload) {
-    //   addDashboardSettingsAPI(payload).then(res => {
-    //     this.info = res
-    //   })
-    // },
     updateSettings (payload) {
       updateDashboardSettingsAPI(payload).then(res => {
         // this.info = res
         this.getSettings()
       })
     },
-    getMyWorkflow (list, id) {
-      getMyWorkflowAPI(id)
-        .then(res => {
-          list = res
+    getMyWorkflow (item) {
+      this.workflowTimer = window.setInterval(() => {
+        getMyWorkflowAPI(item.id).then(res => {
+          this.$set(item, 'workflow_list', res.cards[0].workflows)
         })
-        .closeWhenDestroy(this)
+      }, 5000)
+      this.intervalTimerList.push(this.workflowTimer)
     },
     getRunningWorkflow (item) {
-      getRunningWorkflowAPI()
-        .then(res => {
+      this.runningWorkflowTimer = window.setInterval(() => {
+        console.log(333)
+        getRunningWorkflowAPI().then(res => {
           this.$set(item, 'workflow_list', res.data)
         })
-        .closeWhenDestroy(this)
+      }, 3000)
+      this.intervalTimerList.push(this.runningWorkflowTimer)
     },
-    getMyEnv (list, name, projectName) {
-      getMyEnvAPI(name, projectName)
-        .then(res => {
-          list = res
+    getMyEnv (item) {
+      this.envTimer = window.setInterval(() => {
+        console.log(item)
+        getMyEnvAPI(item.name, item.project_name).then(res => {
+          this.$set(item, 'config', res)
+          this.$set(item, 'services', res.services)
         })
-        .closeWhenDestroy(this)
+      }, 8000)
+      this.intervalTimerList.push(this.envTimer)
     },
     getProjectList () {
       getProjectsAPI().then(res => {
@@ -322,6 +339,7 @@ export default {
         item.workflow_list = this.curInfo.workflow_list
       } else {
         item.config = this.curInfo.config
+        item.config.name = this.curInfo.config.env_name
       }
       this.updateSettings(this.info)
       this.$set(item, 'show', false)
@@ -331,6 +349,11 @@ export default {
     bus.$emit('set-topbar-title', {
       title: '',
       breadcrumb: [{ title: '', url: '/v1/projects' }]
+    })
+  },
+  beforeDestroy () {
+    this.intervalTimerList.forEach((item) => {
+      clearInterval(item)
     })
   }
 }
@@ -353,6 +376,23 @@ export default {
 
     &-btn {
       margin-left: 16px;
+    }
+  }
+
+  .no-running {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+
+    img {
+      width: 400px;
+      height: 400px;
+    }
+
+    p {
+      color: #606266;
+      font-size: 15px;
     }
   }
 
@@ -391,6 +431,7 @@ export default {
   .card-dialog {
     .card {
       margin: 8px;
+      cursor: pointer;
 
       .type {
         &-title {
