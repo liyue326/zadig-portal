@@ -36,6 +36,7 @@
     "qs": "^6.10.1",
     "smoothscroll-polyfill": "0.4.3",
     "storejs": "^2.0.1",
+    "uuid": "^9.0.0",
     "validator": "^13.7.0",
     "vant": "2.12.49",
     "vue": "2.6.12",

@@ -225,7 +225,7 @@ export default {
         this.redirectByDevice()
       }
     } else {
-      this.checkLogin()
+      // this.checkLogin()
     }
   }
 }

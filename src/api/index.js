@@ -2375,9 +2375,12 @@ export function updateDashboardSettingsAPI (payload) {
 export function getDashboardSettingsAPI (payload) {
   return http.get(`/api/aslan/system/dashboard/settings`, payload)
 }
-export function getMyWorkflowAPI (payload) {
-  return http.get(`/api/aslan/system/dashboard/workflow/mine`, payload)
+export function getMyWorkflowAPI (cardId) {
+  return makeEventSource(`/api/aslan/system/dashboard/workflow/mine?card_id=${cardId}`)
 }
-export function getRunningWorkflowAPI (payload) {
-  return http.get(`/api/aslan/system/dashboard/workflow/running`, payload)
+export function getRunningWorkflowAPI () {
+  return makeEventSource(`/api/aslan/system/dashboard/workflow/running`)
+}
+export function getMyEnvAPI (name, projectName) {
+  return makeEventSource(`/api/aslan/system/dashboard/environment/${name}?projectName=${projectName}`)
 }

@@ -249,6 +249,9 @@ export default {
     clearTimeout(this.timerId)
   },
   mounted () {
+    if (JSON.parse(this.$route.query.formDashboad)) {
+      this.startTask()
+    }
     this.refreshHistoryTask()
     this.getCustomWorkflowDetail()
     bus.$emit('set-topbar-title', {
