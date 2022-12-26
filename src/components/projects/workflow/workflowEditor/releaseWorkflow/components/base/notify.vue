@@ -1,6 +1,6 @@
 <template>
   <div class="notify">
-    <el-button type="primary" size="mini" icon="el-icon-plus" plain @click="editNotify('add')" class="mg-b24">添加</el-button>
+    <el-button type="primary" size="mini" icon="el-icon-plus" plain @click="editNotify('add')" class="mg-b24">{{$t(`global.add`)}}</el-button>
     <div v-if="config.notify_ctls&&config.notify_ctls.length > 0">
       <el-row :gutter="20" class="title">
         <el-col :span="4"></el-col>
@@ -26,11 +26,11 @@
         </el-col>
       </el-row>
     </div>
-    <el-dialog :title="operateType==='add'?'新建通知':'编辑通知'" :visible.sync="isShowDialog" append-to-body :close-on-click-modal="false">
+    <el-dialog :title="operateType==='add'? $t(`workflow.addNotify`):$t(`workflow.editNotify`)" :visible.sync="isShowDialog" append-to-body :close-on-click-modal="false">
       <NotifyOperate ref="notifyOperate" :notify="notify" />
       <div slot="footer">
-        <el-button @click="isShowDialog = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submit" size="small">确 定</el-button>
+        <el-button @click="isShowDialog = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="submit" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
   </div>

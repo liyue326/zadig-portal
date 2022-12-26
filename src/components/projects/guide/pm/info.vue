@@ -1,12 +1,11 @@
 <template>
   <div class="projects-guide-info-container">
     <div class="guide-container">
-      <Step :activeStep="0" envDisabled/>
+      <Step :thirdStepTitle="$t('environments.common.envCreation')" :activeStep="0" envDisabled/>
       <div class="current-step-container">
         <div class="title-container">
-          <span class="first">第一步</span>
-          <span class="second">对项目的流程做初步定义后，后续可在项目中进行调整。当您创建好服务后，我们会为您做如下的智能交付准备。Zadig
-            会自动生成以下资源：</span>
+          <span class="first">{{$t('project.onboardingComp.firstStep')}}</span>
+          <span class="second">{{$t('project.onboardingComp.firstStepTip')}}</span>
         </div>
         <div class="block-list">
           <div class="info-block">
@@ -18,7 +17,7 @@
                              circle></el-button>
                 </div>
                 <div class="integration-card__info">
-                  <div class="card-title">2 套测试环境</div>
+                  <div class="card-title">{{$t('project.onboardingComp.envCountTip')}}</div>
                   <div class="card-desc">dev, qa
                   </div>
                 </div>
@@ -34,7 +33,7 @@
                              circle></el-button>
                 </div>
                 <div class="integration-card__info">
-                  <div class="card-title">3 条工作流</div>
+                  <div class="card-title">{{$t('project.onboardingComp.workflowCountTip')}}</div>
                   <div class="card-desc">
                     {{projectName}}-workflow-dev ,
                     {{projectName}}-workflow-qa ,
@@ -50,13 +49,13 @@
     <div class="controls__wrap">
       <div class="controls__right">
         <router-link :to="`/v1/projects/create/${projectName}/pm/config`">
-          <el-button size="small" type="primary">下一步</el-button>
+          <el-button size="small" type="primary">{{$t('project.onboardingComp.nextStep')}}</el-button>
         </router-link>
         <el-button size="small" type="primary"
                 @click="exitOnboarding">
           <i v-if="exitLoading"
              class="el-icon-loading"></i>
-          <span>跳过向导</span>
+          <span>{{$t('project.onboardingComp.skipOnboarding')}}</span>
         </el-button>
       </div>
     </div>
@@ -88,7 +87,7 @@ export default {
     }
   },
   created () {
-    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: '项目', url: '/v1/projects' }, { title: this.projectName, isProjectName: true, url: '' }] })
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' }, { title: this.projectName, isProjectName: true, url: '' }] })
   },
   components: {
     Step

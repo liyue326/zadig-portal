@@ -27,7 +27,7 @@
                       effect="plain"
                       :type="$utils.taskElTagType(notification.content.status)"
                       close-transition
-                    >{{ wordTranslation(notification.content.status,'pipeline','task')}}</el-tag>
+                    >{{notification.content.status?$t(`workflowTaskStatus.${notification.content.status}`):$t(`workflowTaskStatus.notRunning`) }}</el-tag>
 
                     <router-link
                       :to="`/v1/projects/detail/${notification.content.product_name}/pipelines/${notification.content.type==='single'?notification.content.type:'multi'}/${notification.content.pipeline_name}/${notification.content.task_id}?status=${notification.content.status}`"
@@ -97,7 +97,7 @@
   </span>
 </template>
 <script>
-import { wordTranslate, colorTranslate } from '@utils/wordTranslate'
+import { colorTranslate } from '@utils/wordTranslate'
 import {
   getNotificationAPI,
   deleteNotificationAPI,
@@ -155,9 +155,6 @@ export default {
     },
     colorTranslation (word, category, subitem) {
       return colorTranslate(word, category, subitem)
-    },
-    wordTranslation (word, category, subitem) {
-      return wordTranslate(word, category, subitem)
     },
     markAsRead (item, index) {
       if (!item.is_read) {

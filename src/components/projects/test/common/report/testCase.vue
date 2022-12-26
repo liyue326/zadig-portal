@@ -5,7 +5,7 @@
                :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
         <div slot="header"
              class="clearfix">
-          <span>测试报告概览</span>
+          <span>{{$t(`testing.taskDetails.report.overview`)}}</span>
         </div>
         <div class="test-summary">
           <FunctionTestSummary :success="testSummary.successes?testSummary.successes:(testSummary.tests - testSummary.failures - testSummary.errors)"
@@ -19,7 +19,7 @@
                :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
         <div slot="header"
              class="clearfix">
-          <span>详细用例</span>
+          <span>{{$t(`testing.taskDetails.report.caseDetails`)}}</span>
         </div>
         <FunctionTestCase :testCases="testCases"/>
       </el-card>
@@ -105,19 +105,19 @@ export default {
           this.testCases.forEach(testCase => {
             const blocks = []
             if (testCase.failure && typeof testCase.failure === 'string') {
-              blocks.push(`失败原因:\n${testCase.failure}`)
+              blocks.push(`${this.$t(`testing.display.failReason`)}\n${testCase.failure}`)
             }
             if (testCase.failure && typeof testCase.failure === 'object') {
-              blocks.push(`失败信息:\n${testCase.failure.message}`)
-              blocks.push(`失败详情:\n${testCase.failure.text}`)
+              blocks.push(`${this.$t(`testing.display.failMessage`)}\n${testCase.failure.message}`)
+              blocks.push(`${this.$t(`testing.display.failDetail`)}\n${testCase.failure.text}`)
             }
             if (testCase.system_out) {
-              blocks.push(`标准输出:\n${testCase.system_out}`)
+              blocks.push(`${this.$t(`testing.display.standardOut`)}\n${testCase.system_out}`)
             }
             if (testCase.error) {
-              blocks.push(`错误信息:\n${testCase.error.message}`)
-              blocks.push(`错误详情:\n${testCase.error.text}`)
-              blocks.push(`错误类型:\n${testCase.error.type}`)
+              blocks.push(`${this.$t(`testing.display.errorMessage`)}\n${testCase.error.message}`)
+              blocks.push(`${this.$t(`testing.display.errorDetail`)}\n${testCase.error.text}`)
+              blocks.push(`${this.$t(`testing.display.errorType`)}\n${testCase.error.type}`)
             }
             testCase.mergedOutput = blocks.join('\n')
           })

@@ -4,10 +4,10 @@
       <el-collapse v-model="activeName">
         <el-collapse-item title="工作流变量" name="env" class="mg-l8" v-if="payload.params && payload.params.length>0&&isShowParams">
           <el-table :data="payload.params.filter(item=>item.isShow)">
-            <el-table-column label="键">
+            <el-table-column :label="$t(`global.key`)">
               <template slot-scope="scope">{{scope.row.name}}</template>
             </el-table-column>
-            <el-table-column label="值">
+            <el-table-column :label="$t(`global.value`)">
               <template slot-scope="scope">
                 <el-select v-model="scope.row.value" v-if="scope.row.type === 'choice'" size="small" style="width: 220px;">
                   <el-option v-for="(item,index) in scope.row.choice_option" :key="index" :value="item" :label="item">{{item}}</el-option>
@@ -45,7 +45,7 @@
               <span class="mg-l8">{{job.name}}</span>
             </template>
             <div v-if="job.type === 'zadig-build'">
-              <el-form-item label="服务组件">
+              <el-form-item :label="$t(`global.serviceModule`)">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -68,7 +68,7 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="镜像仓库" prop="docker_registry_id">
+              <el-form-item :label="$t(`status.imageRepo`)" prop="docker_registry_id">
                 <el-select v-model="job.spec.docker_registry_id" filterable placeholder="请选择镜像" size="small" style="width: 220px;">
                   <el-option v-for="item in dockerList" :key="item.id" :label="`${item.reg_addr}/${item.namespace}`" :value="item.id"></el-option>
                 </el-select>
@@ -78,7 +78,7 @@
               </div>
             </div>
             <div v-if="job.type === 'zadig-deploy'">
-              <el-form-item prop="productName" label="环境" v-if="!(job.spec.env.includes('<+fixed>')||job.spec.env.includes('{{'))">
+              <el-form-item prop="productName" :label="$t(`project.environments`)" v-if="!(job.spec.env.includes('<+fixed>')||job.spec.env.includes('{{'))">
                 <el-select v-model="job.spec.env" size="medium" @change="getRegistryId(job.spec.env)" style="width: 220px;">
                   <el-option
                     v-for="pro of currentProjectEnvs"
@@ -92,7 +92,7 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="服务组件" v-if="job.spec.source === 'runtime'">
+              <el-form-item :label="$t(`global.serviceModule`)" v-if="job.spec.source === 'runtime'">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -138,7 +138,7 @@
               </div>
             </div>
             <div v-if="job.type === 'custom-deploy'">
-              <el-form-item label="选择容器" v-if="job.spec.source === 'runtime'">
+              <el-form-item :label="$t(`workflow.selectContainer`)" v-if="job.spec.source === 'runtime'">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -184,7 +184,7 @@
           </el-collapse-item>
         </div>
       </el-collapse>
-      <el-button @click="runTask" :loading="startTaskLoading" type="primary" size="small" class="mg-t16">{{ startTaskLoading?'启动中':'启动任务' }}</el-button>
+      <el-button @click="runTask" :loading="startTaskLoading" type="primary" size="small" class="mg-t16">{{ startTaskLoading?$t(`workflow.starting`):$t(`workflow.run`) }}</el-button>
     </el-form>
   </div>
 </template>

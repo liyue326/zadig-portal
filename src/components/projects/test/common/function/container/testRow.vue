@@ -11,19 +11,19 @@
     </section>
     <section class="desc">{{ testInfo.desc }}</section>
     <section class="statistics">
-      <div class="gray-desc">用例数量</div>
+      <div class="gray-desc">{{$t(`testing.caseCount`)}}</div>
       <div class="value">{{ testInfo.test_case_num || 'N/A' }}</div>
     </section>
     <section class="statistics">
-      <div class="gray-desc">执行次数</div>
+      <div class="gray-desc">{{$t(`testing.executionCount`)}}</div>
       <div class="value">{{ testInfo.execute_num || 'N/A' }}</div>
     </section>
     <section class="statistics">
-      <div class="gray-desc">平均执行时间</div>
+      <div class="gray-desc">{{$t(`testing.averageExecutionTime`)}}</div>
       <div class="value">{{ testInfo.avg_duration ? $utils.timeFormatEn(testInfo.avg_duration.toFixed(1)) : 'N/A' }}</div>
     </section>
     <section class="statistics">
-      <div class="gray-desc">成功率</div>
+      <div class="gray-desc">{{$t(`testing.successRate`)}}</div>
       <div class="value">
         <span v-if="testInfo.pass_rate">{{ (testInfo.pass_rate * 100).toFixed(2)+'%' }}</span>
         <span v-else>N/A</span>
@@ -31,24 +31,24 @@
     </section>
     <section class="associated-workflows">
       <div class="gray-desc" v-if="projectName">
-        已关联的工作流
+        {{$t(`testing.triggers.workflowTriggers`)}}
         <span
           v-if="checkPermissionSyncMixin({projectName: testInfo.product_name, action: 'edit_test'})"
           @click="addConnection(testInfo.name, testInfo.product_name)"
           class="add-connection el-icon-circle-plus-outline"
         ></span>
-        <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+        <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
           <span class="add-connection el-icon-circle-plus-outline permission-disabled"></span>
         </el-tooltip>
       </div>
       <div class="gray-desc" v-else>
-        已关联的工作流
+        {{$t(`testing.triggers.workflowTriggers`)}}
         <span
           v-if="checkPermissionSyncMixin({type: 'system', action: 'edit_test'})"
           @click="addConnection(testInfo.name, testInfo.product_name)"
           class="add-connection el-icon-circle-plus-outline"
         ></span>
-        <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+        <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
           <span class="add-connection el-icon-circle-plus-outline permission-disabled"></span>
         </el-tooltip>
       </div>
@@ -61,7 +61,7 @@
               @click="deleteConnection(testInfo.name, workflow)"
               class="delete-connection el-icon-remove-outline"
             ></span>
-            <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+            <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
               <span class="delete-connection el-icon-remove-outline permission-disabled"></span>
             </el-tooltip>
           </div>
@@ -76,7 +76,7 @@
               @click="deleteConnection(testInfo.name, workflow)"
               class="delete-connection el-icon-remove-outline"
             ></span>
-            <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+            <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
               <span class="delete-connection el-icon-remove-outline permission-disabled"></span>
             </el-tooltip>
           </div>
@@ -90,14 +90,14 @@
         class="button-exec"
         @click="runTests(testInfo.name, testInfo.product_name)"
       >
-        <span class="iconfont iconzhixing">&nbsp;执行</span>
+        <span class="iconfont iconzhixing">&nbsp;{{$t(`global.execute`)}}</span>
       </el-button>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <el-button
           type="primary"
           class="button-exec permission-disabled"
         >
-          <span class="iconfont iconzhixing">&nbsp;执行</span>
+          <span class="iconfont iconzhixing">&nbsp;{{$t(`global.execute`)}}</span>
         </el-button>
       </el-tooltip>
       <router-link
@@ -106,7 +106,7 @@
       >
         <span class="menu-item iconfont icondeploy"></span>
       </router-link>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <span class="permission-disabled menu-item iconfont icondeploy"></span>
       </el-tooltip>
       <el-dropdown>
@@ -118,7 +118,7 @@
             v-hasPermi="{projectName: testInfo.product_name, action: 'delete_test',isBtn:true}"
             @click.native="removeTest(testInfo)"
           >
-            <span>删除</span>
+            <span>{{$t(`global.delete`)}}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -130,11 +130,11 @@
         class="button-exec"
         @click="runTests(testInfo.name, testInfo.product_name)"
       >
-        <span class="iconfont iconzhixing">&nbsp;执行</span>
+        <span class="iconfont iconzhixing">&nbsp;{{$t(`global.execute`)}}</span>
       </el-button>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <el-button type="primary" class="button-exec permission-disabled">
-          <span class="iconfont iconzhixing">&nbsp;执行</span>
+          <span class="iconfont iconzhixing">&nbsp;{{$t(`global.execute`)}}</span>
         </el-button>
       </el-tooltip>
       <router-link
@@ -143,7 +143,7 @@
       >
         <span class="menu-item iconfont icondeploy"></span>
       </router-link>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <span class="permission-disabled menu-item iconfont icondeploy"></span>
       </el-tooltip>
       <el-dropdown>
@@ -152,7 +152,7 @@
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item v-hasPermi="{type: 'system', action: 'delete_test',isBtn:true}" @click.native="removeTest(testInfo)">
-            <span>删除</span>
+            <span>{{$t(`global.delete`)}}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>

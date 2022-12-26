@@ -1,10 +1,10 @@
 <template>
   <div class="job-deploy">
-    <el-form label-width="90px" :model="job" ref="ruleForm" label-position="left" class="mg-t24 mg-b24 form-item">
-      <el-form-item label="任务名称" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
+    <el-form label-width="100px" :model="job" ref="ruleForm" label-position="left" class="mg-t24 mg-b24 form-item">
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
         <el-input v-model="job.name" size="small" class="fix-width"></el-input>
       </el-form-item>
-      <el-form-item label="环境" :required="job.spec.envType && job.spec.envType !== 'runtime'">
+      <el-form-item :label="$t(`project.environments`)" :required="job.spec.envType && job.spec.envType !== 'runtime'">
         <el-form-item prop="spec.env" v-if="!job.spec.envType ||job.spec.envType === 'runtime'" class="form-item">
           <el-select v-model="job.spec.env" placeholder="请选择" size="small" clearable class="fix-width">
             <el-option v-for="item in envList" :key="item.id" :label="item.name" :value="item.name"></el-option>
@@ -47,7 +47,7 @@
           @change="handleEnvTypeChange($event,'select')"
         />
       </el-form-item>
-      <el-form-item label="服务" :required="job.spec.serviceType && job.spec.serviceType!=='runtime'">
+      <el-form-item :label="$t(`project.services`)" :required="job.spec.serviceType && job.spec.serviceType!=='runtime'">
         <el-form-item prop="spec.service_and_images" v-if="!job.spec.serviceType || job.spec.serviceType === 'runtime'" class="form-item">
           <el-select size="small" v-model="job.spec.service_and_images" multiple filterable clearable value-key="value" class="fix-width">
             <el-option
@@ -77,9 +77,9 @@
           @change="handleEnvTypeChange($event,'select1')"
         />
       </el-form-item>
-      <el-form-item label="服务状态检测" class="status-check">
+      <el-form-item :label="$t(`workflow.serviceStatusCheck`)" class="status-check">
         <span slot="label">
-          服务状态检测
+          {{$t(`workflow.serviceStatusCheck`)}}
           <el-tooltip effect="dark" content="开启后，部署任务会轮询服务运行状态，待服务正常运行，任务状态才为成功。" placement="top">
             <i class="el-icon-question" style="cursor: pointer;"></i>
           </el-tooltip>

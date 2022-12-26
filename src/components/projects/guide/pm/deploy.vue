@@ -1,18 +1,19 @@
 <template>
   <div class="projects-runtime-container">
     <div class="guide-container">
-      <Step :activeStep="2" envDisabled/>
+      <Step :thirdStepTitle="$t('environments.common.envCreation')" :activeStep="2" envDisabled/>
       <div class="current-step-container">
         <div class="title-container">
-          <span class="first">第三步</span>
-          <span class="second">将服务加入环境，并准备对应的交付工作流，后续均可在项目中进行配置</span>
+          <span class="first">{{$t('project.onboardingComp.thirdStep')}}</span>
+          <span class="second">{{$t('project.onboardingComp.cloudHostThirdStepTip')}}</span>
         </div>
         <div class="info-container block-list">
           <div class="title">
-            <h4>环境准备</h4>
+            <h4>{{$t('project.onboardingComp.environmentsPreparation')}}</h4>
             <el-alert v-if="envFailure.length > 0||timeOut" type="warning" show-icon>
               <template v-slot:title>
-                环境正在准备中，可点击 「下一步」 或者 <span class="view-env-btn" @click="viewEnvStatus">查看环境状态</span>
+                <span>{{$t('project.onboardingComp.environmentsPreparationTimeoutTip')}}</span>
+                <span class="view-env-btn" @click="viewEnvStatus">{{$t('project.onboardingComp.toViewEnvironmentStatus')}}</span>
                 <i v-if="exitLoading"
                    class="el-icon-loading"></i>
               </template>
@@ -36,17 +37,16 @@
                        class="integration-details">
                     <template v-if="env.env_name==='dev'">
                       <span class="env-name">
-                        开发环境：{{projectName}}-dev
+                        {{$t('project.onboardingComp.environmentDevPreparationTip',{ projectName:projectName })}}
                       </span>
-                      <span class="desc">，开发日常自测、业务联调</span>
                       <el-link v-if="env.err_message!==''"
                                type="warning">{{env.err_message}}</el-link>
                     </template>
                     <template v-if="env.env_name==='qa'"
                               class="env-item">
-                      <span class="env-name">测试环境：{{projectName}}-qa
+                      <span class="env-name">
+                        {{$t('project.onboardingComp.environmentTestPreparationTip',{ projectName:projectName })}}
                       </span>
-                      <span class="desc">，自动化测试、业务验收</span>
                       <el-link v-if="env.err_message!==''"
                                type="warning">{{env.err_message}}</el-link>
                     </template>
@@ -57,7 +57,7 @@
             </div>
           </div>
           <div class="title">
-            <h4>工作流准备</h4>
+            <h4>{{$t('project.onboardingComp.workflowsPreparation',{ projectName:projectName })}}</h4>
             <el-alert v-if="workflowStatus.err_message"
                       :title="workflowStatus.err_message"
                       type="warning" show-icon>
@@ -77,13 +77,13 @@
                 </div>
                 <div class="integration-card__info">
                   <div class="integration-details">
-                    开发工作流：{{projectName}}-workflow-dev，应用日常升级，用于开发自测和联调
+                    {{$t('project.onboardingComp.workflowDevPreparation',{ projectName:projectName })}}
                   </div>
                   <div class="integration-details">
-                    测试工作流：{{projectName}}-workflow-qa，应用按需升级，用于自动化测试和业务验收
+                    {{$t('project.onboardingComp.workflowTestPreparation',{ projectName:projectName })}}
                   </div>
                   <div class="integration-details">
-                    运维工作流：{{projectName}}-ops-workflow，业务按需发布，用于版本升级和业务上线
+                    {{$t('project.onboardingComp.workflowOpsPreparation',{ projectName:projectName })}}
                   </div>
                 </div>
               </div>
@@ -98,10 +98,10 @@
           <el-button v-if="!getResult"
                   type="primary"
                   size="small"
-                  disabled>下一步</el-button>
+                  disabled>{{$t('project.onboardingComp.nextStep')}}</el-button>
           <el-button v-else-if="getResult"
                   size="small"
-                  type="primary">下一步</el-button>
+                  type="primary">{{$t('project.onboardingComp.nextStep')}}</el-button>
         </router-link>
       </div>
     </div>
@@ -127,8 +127,8 @@ export default {
   methods: {
     viewEnvStatus () {
       this.$confirm('跳出后进入项目将不再进入向导流程', '确认跳出项目初始化向导？', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         this.exitLoading = true
@@ -205,7 +205,7 @@ export default {
         this.generateEnv(this.projectName)
       }, 1000)
     };
-    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: '项目', url: '/v1/projects' }, { title: this.projectName, isProjectName: true, url: '' }] })
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' }, { title: this.projectName, isProjectName: true, url: '' }] })
   },
   beforeDestroy () {
     clearInterval(this.envTimer)

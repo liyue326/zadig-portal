@@ -2,11 +2,11 @@
   <div class="job-test-detail">
     <header class="mg-b8">
       <el-col :span="6">
-        <span class="type">测试</span>
+        <span class="type">{{$t(`workflow.jobType.test`)}}</span>
         <span>{{jobInfo.name}}</span>
       </el-col>
       <el-col :span="2">
-        <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?buildOverallStatusZh:"未运行"}}</a>
+        <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?$t(`workflowTaskStatus.${jobInfo.status}`):$t(`workflowTaskStatus.notRunning`)}}</a>
       </el-col>
       <el-col :span="2">
         <span>{{jobInfo.interval}}</span>
@@ -20,17 +20,17 @@
     <main>
       <section>
         <div class="error-wrapper">
-          <el-alert v-if="jobInfo.error" title="错误信息" :description="jobInfo.error" type="error" close-text="知道了"></el-alert>
+          <el-alert v-if="jobInfo.error" :title="$t(`global.errorMsg`)" :description="jobInfo.error" type="error" :close-text="$t(`global.ok`)"></el-alert>
         </div>
         <el-row class="item" :gutter="0">
           <el-col :span="4">
-            <div class="item-title">项目名称</div>
+            <div class="item-title">{{$t(`workflow.projectName`)}}</div>
           </el-col>
           <el-col :span="8">
             <div class="item-desc">{{jobInfo.spec.project_name}}</div>
           </el-col>
           <el-col :span="4">
-            <div class="item-title">测试名称</div>
+            <div class="item-title">{{$t(`global.testName`)}}</div>
           </el-col>
           <el-col :span="8">
             <div class="item-desc">{{jobInfo.spec.test_name}}</div>
@@ -38,13 +38,13 @@
         </el-row>
         <el-row class="item" :gutter="0" v-for="(build,index) in jobInfo.spec.repos" :key="index">
           <el-col :span="4">
-            <div class="item-title">代码库({{build.source}})</div>
+            <div class="item-title">{{$t(`global.repository`)}}({{build.source}})</div>
           </el-col>
           <el-col :span="8">
             <div class="item-desc">{{build.repo_name}}</div>
           </el-col>
           <el-col :span="4">
-            <div class="item-title">代码信息</div>
+            <div class="item-title">{{$t(`global.gitMessage`)}}</div>
           </el-col>
           <el-col :span="8">
             <RepoJump :build="build" />
@@ -52,7 +52,7 @@
         </el-row>
         <el-row :gutter="0" class="item">
           <el-col :span="4">
-            <div class="item-title">JUnit 测试报告</div>
+            <div class="item-title">JUnit {{$t(`workflow.testReport`)}}</div>
           </el-col>
           <el-col :span="8">
             <span class="item-desc">
@@ -62,11 +62,11 @@
                 :underline="false"
                 target="_blank"
                 :disabled="!jobInfo.spec.junit_report"
-              >查看</el-link>
+              >{{$t(`workflow.view`)}}</el-link>
             </span>
           </el-col>
           <el-col :span="4">
-            <div class="item-title">文件导出</div>
+            <div class="item-title">{{$t(`workflow.fileExport`)}}</div>
           </el-col>
           <el-col :span="8">
             <span class="item-desc">
@@ -77,13 +77,13 @@
                 target="_blank"
                 :disabled="!jobInfo.spec.archive"
                 @click="artifactModalVisible=true"
-              >下载</el-link>
+              >{{$t(`workflow.download`)}}</el-link>
             </span>
           </el-col>
         </el-row>
         <el-row :gutter="0" class="item">
           <el-col :span="4">
-            <div class="item-title">Html 测试报告</div>
+            <div class="item-title">Html {{$t(`workflow.testReport`)}}</div>
           </el-col>
           <el-col :span="8">
             <span class="item-desc">
@@ -94,7 +94,7 @@
                 :type="jobInfo.spec.html_report ? 'primary':'info'"
                 :disabled="!jobInfo.spec.html_report"
                 @click="getTestReport('html')"
-              >查看</el-link>
+              >{{$t(`workflow.view`)}}</el-link>
             </span>
           </el-col>
         </el-row>
@@ -103,7 +103,7 @@
         <XtermLog :id="jobInfo.name" @mouseleave.native="leaveLog" :logs="buildv4AnyLog" :from="jobInfo.name" />
       </section>
     </main>
-    <el-dialog :visible.sync="artifactModalVisible" width="60%" title="Artifact 文件导出" class="downloadArtifact-dialog">
+    <el-dialog :visible.sync="artifactModalVisible" width="60%" :title="$t(`testing.taskDetails.exportArtifact`)" class="downloadArtifact-dialog">
       <ArtifactDownload
         ref="downloadArtifact"
         type="customWorkflow"
@@ -171,7 +171,7 @@ export default {
       return this.$utils.calcOverallBuildStatus(this.jobInfo, {})
     },
     buildOverallStatusZh () {
-      return this.$translate.translateTaskStatus(this.buildOverallStatus)
+      return this.$t(`workflowTaskStatus.${this.buildOverallStatus}`)
     },
     buildOverallColor () {
       return this.$translate.calcTaskStatusColor(this.buildOverallStatus)
@@ -271,7 +271,11 @@ export default {
           if (oldVal && val.name !== oldVal.name) {
             this.firstLoad = false
           }
-          if (val.status && !this.firstLoad) {
+          if (
+            (val.status === 'running' && !this.firstLoad) ||
+            (val.status === 'passed' && !this.firstLoad) ||
+            (val.status === 'failed' && !this.firstLoad)
+          ) {
             this.getLog()
             this.firstLoad = true
           }

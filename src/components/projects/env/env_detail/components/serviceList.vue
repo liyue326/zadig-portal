@@ -1,7 +1,7 @@
 <template>
   <div class="service-list">
     <el-table v-if="containerServiceList.length > 0" :data="containerServiceList">
-      <el-table-column label="服务名" width="280px">
+      <el-table-column :label="$t(`global.serviceName`)" width="280px">
         <template slot-scope="scope">
           <router-link :to="setRoute(scope)">
             <span :class="$utils._getStatusColor(scope.row.status)" class="service-name">
@@ -44,16 +44,13 @@
                   </el-tooltip>
                 </span>
               </el-popover>
-              <el-tooltip  effect="dark" content="更新服务" placement="top">
-                <i v-hasPermi="{projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'},isBtn:true}" @click="updateService(scope.row)" class="iconfont icongengxin operation"></i>
-              </el-tooltip>
             </template>
           </template>
         </template>
       </el-table-column>
-      <el-table-column align="left" label="状态" width="220px">
+      <el-table-column align="left" :label="$t(`global.status`)" width="220px">
         <template slot="header" slot-scope="{}">
-          状态{{`(${runningContainerService}/${containerServiceList.length})`}}
+        {{$t('environments.common.serviceDetail.serviceStatus')}}{{`(${runningContainerService}/${containerServiceList.length})`}}
           <el-tooltip effect="dark" placement="top">
             <div slot="content">实际正常的服务/预期的正常服务数量</div>
             <i class="status-icon el-icon-question"></i>
@@ -63,7 +60,7 @@
           <el-tag size="small" :type="statusIndicator[scope.row.status]">{{scope.row.status}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="left" label="镜像信息" min-width="150px">
+      <el-table-column align="left" :label="$t('environments.common.imageInfo')" min-width="150px">
         <template slot-scope="scope">
           <div v-for="(image,index) in scope.row.images" :key="index">
             <el-tooltip effect="dark" :content="image" placement="top">
@@ -72,7 +69,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="left" width="150px" label="服务入口">
+      <el-table-column align="left" width="150px" :label="$t('global.serviceEntrypoint')">
         <template slot-scope="scope">
           <template v-if="scope.row.ingress && scope.row.ingress.host_info && scope.row.ingress.host_info.length>0">
             <el-tooltip
@@ -90,13 +87,13 @@
           <span v-else>N/A</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="150px">
+      <el-table-column align="center" :label="$t(`global.operation`)" width="150px">
         <template slot-scope="scope">
           <span v-if="envSource !=='external' && envSource !=='helm'" class="operation">
             <el-tooltip
               v-if="checkPermissionSyncMixin({projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'}})"
               effect="dark"
-              content="通过工作流升级服务"
+              :content="$t('environments.common.runWorkflowToUpgradeService')"
               placement="top"
             >
               <i @click="upgradeServiceByWorkflow(projectName,envName,scope.row.service_name,scope.row.type)" class="iconfont iconshengji"></i>
@@ -104,17 +101,17 @@
             <el-tooltip
               v-else
               effect="dark"
-              content="无权限操作"
+              :content="$t('permission.lackPermission')"
               placement="top"
             >
               <i class="iconfont iconshengji permission-disabled"></i>
             </el-tooltip>
           </span>
           <span class="operation">
-            <el-tooltip v-if="checkPermissionSyncMixin({projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'}})" effect="dark" content="重启服务" placement="top">
+            <el-tooltip v-if="checkPermissionSyncMixin({projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'}})" effect="dark" :content="$t('environments.common.serviceDetail.restartService')" placement="top">
               <i @click="restartService(projectName,scope.row.service_name,$route.query.envName)" class="el-icon-refresh"></i>
             </el-tooltip>
-            <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+            <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
               <i class="el-icon-refresh permission-disabled"></i>
             </el-tooltip>
           </span>
@@ -122,30 +119,49 @@
             <el-tooltip
               v-if="checkPermissionSyncMixin({projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'}})"
               effect="dark"
-              content="查看服务配置"
+              :content="$t('environments.common.updateService')"
               placement="top"
             >
-              <router-link :to="setServiceConfigRoute(scope)">
-                <i class="iconfont iconfuwupeizhi"></i>
-              </router-link>
+              <i @click="updateServiceDialog(scope.row)" class="iconfont icongengxin"></i>
             </el-tooltip>
             <el-tooltip
               v-else
               effect="dark"
-              content="无权限操作"
+              :content="$t('permission.lackPermission')"
               placement="top"
             >
-              <span><i class="iconfont iconfuwupeizhi permission-disabled"></i></span>
+              <span><i class="iconfont icongengxin permission-disabled"></i></span>
             </el-tooltip>
           </span>
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog :title="`更新服务 - ${usedServiceInfo.service_name}`" :visible.sync="usedServiceInfo.dialogVisible" width="60%" class="update-service">
+      <div>
+        <div class="primary-title">变量配置</div>
+        <Resize v-show="usedServiceInfo.canEditYaml" @sizeChange="$refs.codemirror.refresh()" :height="'300px'">
+          <CodeMirror ref="codemirror" v-model="usedServiceInfo.variable_yaml" />
+        </Resize>
+        <div v-show="!usedServiceInfo.canEditYaml" style="color: #aaa;">
+          无服务变量
+        </div>
+        <div style="margin-top: 14px;">
+          <el-checkbox v-if="serviceStatus[usedServiceInfo.service_name] && serviceStatus[usedServiceInfo.service_name]['tpl_updatable']" v-model="usedServiceInfo.update_service_tmpl">同时更新服务配置</el-checkbox>
+        </div>
+      </div>
+      <div slot="footer" >
+        <el-button @click="usedServiceInfo.dialogVisible = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="sureUpdateService" size="small">更新</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { serviceTemplateAfterRenderAPI } from '@api'
+import Resize from '@/components/common/resize'
+import CodeMirror from '@/components/projects/common/codemirror.vue'
+import { serviceTemplateAfterRenderAPI, getServiceDefaultVariableAPI } from '@api'
+import { cloneDeep } from 'lodash'
 
 const jsdiff = require('diff')
 
@@ -155,14 +171,21 @@ export default {
     setRoute: Function,
     serviceStatus: Object,
     envSource: String,
-    updateService: Function,
     isPmService: Boolean,
     isProd: Boolean,
     upgradeServiceByWorkflow: Function,
     restartService: Function,
-    setServiceConfigRoute: Function
+    setServiceConfigRoute: Function,
+    updateService: Function
   },
   data () {
+    this.updateServiceInfo = {
+      dialogVisible: false,
+      service_name: '',
+      variable_yaml: '',
+      canEditYaml: false,
+      update_service_tmpl: false
+    }
     return {
       activeDiffTab: 'template',
       combineTemplate: [],
@@ -172,7 +195,8 @@ export default {
         Error: 'danger',
         Unstable: 'warning',
         Unstart: 'info'
-      }
+      },
+      usedServiceInfo: cloneDeep(this.updateServiceInfo)
     }
   },
   computed: {
@@ -209,7 +233,57 @@ export default {
       } else {
         return name
       }
+    },
+    updateServiceDialog (service) {
+      this.usedServiceInfo = cloneDeep(this.updateServiceInfo)
+
+      const { product_name, env_name, service_name } = service
+      this.usedServiceInfo.dialogVisible = true
+      this.usedServiceInfo.service_name = service_name
+      // notice: If the interaction is complicated, it will be unified here in the future
+      getServiceDefaultVariableAPI(product_name, env_name, [service_name]).then(res => {
+        res.forEach(svc => {
+          if (svc.service_name === service_name) {
+            this.usedServiceInfo.variable_yaml = svc.variable_yaml
+            this.usedServiceInfo.canEditYaml = !!svc.variable_yaml
+            this.usedServiceInfo.update_service_tmpl = !!svc.variable_yaml
+          }
+        })
+      })
+    },
+    sureUpdateService () {
+      const { service_name, variable_yaml, update_service_tmpl } = this.usedServiceInfo
+      const payload = {
+        service_name,
+        type: 'k8s',
+        variable_yaml,
+        update_service_tmpl
+      }
+      this.updateService({ service_name, type: 'k8s' }, payload)
+      this.usedServiceInfo.dialogVisible = false
     }
+  },
+  components: {
+    Resize,
+    CodeMirror
   }
 }
 </script>
+
+<style lang="less">
+.update-service {
+  .el-dialog__header {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #e4e4e4;
+  }
+
+  .el-dialog__body {
+    padding: 30px 40px;
+
+    .primary-title {
+      margin-bottom: 14px;
+    }
+  }
+}
+</style>

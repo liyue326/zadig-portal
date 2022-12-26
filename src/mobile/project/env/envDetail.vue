@@ -10,7 +10,7 @@
       </template>
     </van-nav-bar>
     <div class="tabs-container">
-      <van-divider content-position="left">基本信息</van-divider>
+      <van-divider content-position="left">{{$t('global.basicInfo')}}</van-divider>
       <div class="env-info">
         <van-row>
           <van-col v-if="envSource !== 'pm'" span="12">

@@ -3,7 +3,7 @@
            label-width="90px"
            label-position="left">
     <el-form-item prop="productName"
-                  label="环境">
+                  :label="$t(`project.environments`)">
       <el-select v-model="runner.envAndNamespace"
                  size="small"
                  :disabled="specificEnv"
@@ -58,7 +58,7 @@
                  :loading="startTaskLoading"
                  type="primary"
                  size="small">
-        {{ startTaskLoading?'启动中':'启动任务' }}
+        {{ startTaskLoading?$t(`workflow.starting`):$t(`workflow.run`) }}
       </el-button>
 
     </div>

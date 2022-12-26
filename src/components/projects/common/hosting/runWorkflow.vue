@@ -1,12 +1,12 @@
 <template>
   <div class="block-list">
     <el-table v-loading="loading" :data="mapWorkflows" style="width: 100%;">
-      <el-table-column label="工作流名称">
+      <el-table-column :label="$t(`global.workflowName`)">
         <template slot-scope="scope">
           <span style="margin-left: 10px;">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200px" label="包含步骤">
+      <el-table-column width="200px" :label="$t('project.onboardingComp.workflowStages')">
         <template slot-scope="scope">
           <span>
             <span v-for="(stage,index) in scope.row.enabledStages" :key="index" class="stage-tag">
@@ -15,12 +15,12 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column width="400px" label="更新信息（时间/操作人）">
+      <el-table-column width="400px" :label="$t('project.onboardingComp.updateTime')">
         <template slot-scope="scope">
           {{ $utils.convertTimestamp(scope.row.updateTime)}}/ {{scope.row.updateBy}}
         </template>
       </el-table-column>
-      <el-table-column width="120px" label="操作">
+      <el-table-column width="120px" :label="$t(`global.operation`)">
         <template slot-scope="scope">
           <el-button
             type="primary"
@@ -28,13 +28,13 @@
             round
             @click="runCurrentTask(scope.row)"
             plain
-            >点击运行</el-button
+            >{{$t('project.onboardingComp.clickToRun')}}</el-button
           >
         </template>
       </el-table-column>
     </el-table>
         <el-dialog :visible.sync="taskDialogVisible"
-               title="运行 产品-工作流"
+               :title="$t(`workflow.runProductWorkflow`)"
                custom-class="run-workflow"
                width="60%"
                class="dialog">

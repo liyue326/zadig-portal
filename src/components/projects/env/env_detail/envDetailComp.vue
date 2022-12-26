@@ -1,7 +1,7 @@
 <template>
   <div class="env-detail-container" ref="envContainer">
     <PmHostList ref="pmHostList" :currentPmServiceData="currentPmServiceData" @success="refreshServiceList" />
-    <el-dialog title="通过工作流升级服务" :visible.sync="showStartProductBuild" custom-class="run-workflow" width="60%">
+    <el-dialog :title="$t('environments.common.runWorkflowToUpgradeService')" :visible.sync="showStartProductBuild" custom-class="run-workflow" width="60%">
       <RunWorkflow
         v-if="showStartProductBuild"
         :workflows="currentServiceWorkflows"
@@ -16,14 +16,14 @@
             <i v-if="tab.source==='helm'" class="iconfont iconhelmrepo"></i>
             <i v-else-if="tab.source==='spock'" class="el-icon-cloudy"></i>
             {{ $utils.tailCut(tab.name,14) }}
-            <el-tag v-if="tab.source==='external'" effect="light" size="mini" type="primary">托管</el-tag>
-            <el-tag v-if="!_.isNil(tab.share_env_is_base) && tab.share_env_is_base" effect="light" size="mini" type="primary">基准环境</el-tag>
+            <el-tag v-if="tab.source==='external'" effect="light" size="mini" type="primary">{{$t('environments.common.hostingEnv')}}</el-tag>
+            <el-tag v-if="!_.isNil(tab.share_env_is_base) && tab.share_env_is_base" effect="light" size="mini" type="primary">{{$t('environments.common.baseEnv')}}</el-tag>
             <el-tag
               v-if="!tab.share_env_is_base && !_.isNil(tab.share_env_base_env) && tab.share_env_base_env !==''"
               effect="light"
               size="mini"
               type="primary"
-            >子环境</el-tag>
+            >{{$t('environments.common.subEnv')}}</el-tag>
           </span>
         </template>
       </ChromeTabs>
@@ -39,7 +39,7 @@
       </el-alert>
       <el-alert
         v-if="!_.isNil(shareEnvStatus) && !shareEnvStatus.is_ready"
-        :title="`注意：自测模式正在${shareEnvStatus.operation ==='enable'?'开启':'关闭'}，过程中服务会重启，短时间内会影响服务的正常访问，请耐心等待。`"
+        :title="shareEnvStatus.operation ==='enable'?$t('environments.common.enableShareEnvNotReadyTip'):$t('environments.common.disableShareEnvNotReadyTip')"
         :closable="false"
         type="warning"
       ></el-alert>
@@ -49,11 +49,11 @@
       <!--start of basicinfo-->
       <div
         v-loading="envLoading"
-        element-loading-text="正在获取环境基本信息"
+        :element-loading-text="$t('global.loading')"
         element-loading-spinner="el-icon-loading"
         class="common-parcel-block basic-info-content"
       >
-        <el-tooltip v-if="envSource !== 'pm'" effect="dark" content="变更记录" placement="top">
+        <el-tooltip v-if="envSource !== 'pm'" effect="dark" :content="$t('environments.common.envChangeLog')" placement="top">
           <el-button
             type="text"
             v-hasPermi="{projectName: projectName,action:'config_environment',resource:{name:envName,type:'env'}, isBtn:true}"
@@ -64,22 +64,22 @@
         </el-tooltip>
         <el-row :gutter="10">
           <el-col v-if="!pmServiceList.length" :span="12">
-            <div class="grid-title">K8s 集群</div>
-            <div v-if="productInfo.is_local" class="grid-content">本地集群</div>
+            <div class="grid-title">{{$t('environments.common.k8sCluster')}}</div>
+            <div v-if="productInfo.is_local" class="grid-content">{{$t('environments.common.localCluster')}}</div>
             <div v-else class="grid-content">{{productInfo.cluster_name}}</div>
           </el-col>
           <el-col :span="12">
-            <div class="grid-title">更新时间</div>
+            <div class="grid-title">{{$t('environments.common.updateTime')}}</div>
             <div class="grid-content">{{$utils.convertTimestamp(productInfo.update_time)}}</div>
           </el-col>
         </el-row>
         <el-row :gutter="10">
           <el-col :span="12" v-if="!pmServiceList.length">
-            <div class="grid-title">K8s 命名空间</div>
+            <div class="grid-title">{{$t('environments.common.k8sNamespace')}}</div>
             <div class="grid-content">{{ envText }}</div>
           </el-col>
           <el-col :span="12">
-            <div class="grid-title">环境状态</div>
+            <div class="grid-title">{{$t('environments.common.envStatus')}}</div>
             <div class="grid-content">{{getProdStatus(productInfo.status,productStatus.updatable)}}</div>
           </el-col>
         </el-row>
@@ -87,7 +87,7 @@
         <el-row :gutter="10">
           <!-- pm and hosting project don't show registry -->
           <el-col v-if="!isPmService" :span="12">
-            <div class="grid-title">镜像仓库</div>
+            <div class="grid-title">{{$t('status.imageRepo')}}</div>
             <div class="grid-content image-registry">
               <div v-if="editImageRegistry === false">
                 <span>{{imageRegistryDesc}}</span>
@@ -106,17 +106,17 @@
                     :value="registry.id"
                   ></el-option>
                 </el-select>
-                <i class="icon el-icon-circle-close icon-gray" @click="editEnvImageRegistry('cancel')">取消</i>
-                <i class="icon el-icon-circle-check icon-primary" @click="editEnvImageRegistry('update')">保存</i>
+                <i class="icon el-icon-circle-close icon-gray" @click="editEnvImageRegistry('cancel')">{{$t(`global.cancel`)}}</i>
+                <i class="icon el-icon-circle-check icon-primary" @click="editEnvImageRegistry('update')">{{$t(`global.save`)}}</i>
               </div>
             </div>
           </el-col>
           <el-col :span="12">
-            <div class="grid-title">基本操作</div>
+            <div class="grid-title">{{$t('environments.common.envOperation')}}</div>
             <div class="grid-content operation">
               <el-tooltip
                 v-if="checkEnvUpdate(productInfo.status) && productInfo.status!=='Disconnected' && (envSource===''||envSource==='spock'|| envSource==='helm')"
-                content="更新环境中引用的变量"
+                :content="$t('environments.common.updateEnvVariablesTip')"
                 effect="dark"
                 placement="top"
               >
@@ -127,7 +127,7 @@
                   @click="envSource==='helm' ? openUpdateHelmVar() : openUpdateK8sVar()"
                   size="mini"
                   plain
-                >{{ envSource==='helm' ? '更新全局变量' : '更新环境变量' }}</el-button>
+                >{{ $t('environments.common.updateGlobalVariables') }}</el-button>
               </el-tooltip>
               <template v-if="productInfo.share_env_enable && productInfo.share_env_is_base">
                 <router-link
@@ -138,7 +138,7 @@
                     type="primary"
                     size="mini"
                     plain
-                  >创建子环境</el-button>
+                  >{{$t('environments.common.creatingSubEnvironment') }}</el-button>
                 </router-link>
               </template>
               <template v-if="productInfo.status!=='Disconnected' && productInfo.status!=='Creating'">
@@ -148,25 +148,25 @@
                     type="primary"
                     plain
                   >
-                    管理服务
+                    {{$t('environments.common.serviceManagement') }}
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
                   <el-button v-else class="permission-disabled" type="primary" plain>
-                    管理服务
+                    {{$t('environments.common.serviceManagement') }}
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
                   <el-dropdown-menu
                     v-if="checkPermissionSyncMixin({projectName: projectName, action:'config_environment',resource:{name:envName,type:'env'}})"
                     slot="dropdown"
                   >
-                    <el-dropdown-item @click.native="manageServices('add')">添加服务</el-dropdown-item>
-                    <el-dropdown-item @click.native="manageServices('update')">更新服务</el-dropdown-item>
-                    <el-dropdown-item @click.native="manageServices('delete')">删除服务</el-dropdown-item>
+                    <el-dropdown-item @click.native="manageServices('add')">{{$t('environments.common.addService') }}</el-dropdown-item>
+                    <el-dropdown-item @click.native="manageServices('update')">{{$t('environments.common.updateService') }}</el-dropdown-item>
+                    <el-dropdown-item @click.native="manageServices('delete')">{{$t('environments.common.deleteService') }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
                 <el-tooltip
                   v-else-if="showUpdate(productInfo,productStatus) && (!productInfo.is_prod && envSource==='pm')"
-                  content="根据最新环境配置更新，包括服务编排和服务配置的改动"
+                  :content="$t('environments.common.updateEnvTip') "
                   effect="dark"
                   placement="top"
                 >
@@ -176,7 +176,7 @@
                     @click="updateK8sEnv(productInfo)"
                     size="mini"
                     plain
-                  >更新环境</el-button>
+                  >{{$t('environments.common.updateEnv') }}</el-button>
                 </el-tooltip>
               </template>
               <template v-if="envSource==='' || envSource==='spock' || envSource === 'helm'">
@@ -186,11 +186,11 @@
                     type="primary"
                     plain
                   >
-                    环境配置
+                    {{$t('environments.common.envConfig') }}
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
                   <el-button v-else class="permission-disabled" type="primary" plain>
-                    环境配置
+                    {{$t('environments.common.envConfig') }}
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
                   <el-dropdown-menu
@@ -207,7 +207,7 @@
               <template v-if="productInfo.status!=='Disconnected' && productInfo.status!=='Creating'">
                 <el-dropdown v-if="envSource===''||envSource==='spock'||envSource==='helm'" trigger="click">
                   <el-button type="primary" plain>
-                    更多
+                    {{$t('environments.common.moreOperation') }}
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
                   <el-dropdown-menu slot="dropdown">
@@ -215,17 +215,17 @@
                       v-hasPermi="{projectName: projectName, action: 'config_environment',resource:{name:envName,type:'env'}, isBtn:true}"
                       v-if="!productInfo.share_env_enable"
                       @click.native="shareEnv('enable')"
-                    >开启自测模式</el-dropdown-item>
+                    >{{$t('environments.common.enableShareEnv') }}</el-dropdown-item>
                     <el-dropdown-item
                       v-hasPermi="{projectName: projectName, action: 'config_environment',resource:{name:envName,type:'env'}, isBtn:true}"
                       v-if="productInfo.share_env_enable && productInfo.share_env_is_base"
                       @click.native="shareEnv('disable')"
-                    >关闭自测模式</el-dropdown-item>
+                    >{{$t('environments.common.disableShareEnv') }}</el-dropdown-item>
                     <el-dropdown-item
                       v-hasPermi="{projectName: projectName, action: 'delete_environment',resource:{name:envName,type:'env'}, isBtn:true}"
                       v-if="isShowDeleteEnv"
                       @click.native="deleteEnv(productInfo.product_name,productInfo.env_name)"
-                    >删除环境</el-dropdown-item>
+                    >{{$t('environments.common.deleteEnv') }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
                 <el-button
@@ -235,7 +235,7 @@
                   @click="deleteEnv(productInfo.product_name,productInfo.env_name)"
                   size="mini"
                   plain
-                >删除环境</el-button>
+                >{{$t('environments.common.deleteEnv')}}</el-button>
               </template>
               <template v-if="envSource==='external'">
                 <el-button
@@ -244,20 +244,20 @@
                   type="primary"
                   size="mini"
                   plain
-                >配置托管</el-button>
+                >{{$t('environments.common.hostingConfig')}}</el-button>
                 <el-button
                   v-hasPermi="{projectName: projectName, action: 'delete_environment',resource:{name:envName,type:'env'}, isBtn:true}"
                   type="primary"
                   @click="deleteHostingEnv(productInfo.product_name,productInfo.env_name)"
                   size="mini"
                   plain
-                >取消托管</el-button>
+                >{{$t('environments.common.cancelHosting') }}</el-button>
               </template>
             </div>
           </el-col>
         </el-row>
         <div v-if="productInfo.error && productInfo.error!==''">
-          <div class="grid-title">错误信息</div>
+          <div class="grid-title">{{$t('global.errorMsg')}}</div>
           <div class="grid-content error-info">{{productInfo.error}}</div>
         </div>
       </div>
@@ -267,41 +267,41 @@
         class="service-container"
         style="margin-bottom: 16px;"
       >
-        <span class="service-count">环境入口</span>
-        <div v-loading="serviceLoading" element-loading-text="正在获取环境信息" element-loading-spinner="el-icon-loading" class="ingress-container">
+        <span class="service-count">{{$t('environments.common.envEntrypoint')}}</span>
+        <div v-loading="serviceLoading" :element-loading-text="$t('environments.common.getEnvInfoLoading')" element-loading-spinner="el-icon-loading" class="ingress-container">
           <el-table :data="ingressList">
-            <el-table-column prop="name" label="Ingress 名称"></el-table-column>
-            <el-table-column label="地址">
+            <el-table-column prop="name" :label="$t('environments.common.IngressName')"></el-table-column>
+            <el-table-column :label="$t('environments.common.IngressAddress')">
               <template slot-scope="scope">
                 <div v-if="scope.row.host_info && scope.row.host_info.length > 0">
                   <div v-for="host of scope.row.host_info" :key="host.host">
                     <a :href="`http://${host.host}`" class="host-url" target="_blank">{{ host.host }}</a>
                   </div>
                 </div>
-                <div v-else>无</div>
+                <div v-else>{{$t('global.emptyText')}}</div>
               </template>
             </el-table-column>
           </el-table>
         </div>
       </div>
-      <div v-loading="serviceLoading" element-loading-text="正在获取服务信息" element-loading-spinner="el-icon-loading" class="service-container">
+      <div v-loading="serviceLoading" :element-loading-text="$t('environments.common.getServiceInfoLoading')" element-loading-spinner="el-icon-loading" class="service-container">
         <div class="service-title">
           <el-input
             size="mini"
             class="search-input"
             clearable
             v-model="serviceSearch"
-            placeholder="搜索服务"
+            :placeholder="$t('environments.common.searchService')"
             @keyup.enter.native="searchServicesByKeyword"
             @clear="searchServicesByKeyword"
           >
             <i class="el-icon-search el-input__icon" slot="prefix"></i>
           </el-input>
           <span v-show="!serviceLoading" class="service-count middle">
-            服务总数
-            <span class="service-number">{{ envTotal }}</span> 个
+            {{$t('environments.common.serviceCounts')}}
+            <span class="service-number">{{ envTotal }}</span> {{$t('environments.common.serviceCountsUnit')}}
           </span>
-          <el-button icon="el-icon-refresh" type="text" @click="refreshServiceList">刷新</el-button>
+          <el-button icon="el-icon-refresh" type="text" @click="refreshServiceList">{{$t(`global.refresh`)}}</el-button>
         </div>
         <div class="env-service-list-content">
           <ChartList
@@ -329,7 +329,7 @@
           />
         </div>
         <el-table v-if="pmServiceList.length > 0" class="pm-service-container" :data="pmServiceList">
-          <el-table-column label="服务名" width="250px">
+          <el-table-column :label="$t(`global.serviceName`)" width="250px">
             <template slot-scope="scope">
               <router-link :to="setPmRoute(scope)">
                 <span class="service-name">
@@ -349,7 +349,7 @@
               </template>
             </template>
           </el-table-column>
-          <el-table-column align="left" label="状态" width="130px">
+          <el-table-column align="left" :label="$t(`global.status`)" width="130px">
             <template slot="header">
               状态
               <el-tooltip effect="dark" placement="top">
@@ -394,14 +394,14 @@
                   class="add-host el-icon-edit-outline"
                   @click="editHost(scope.row)"
                 ></span>
-                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
                   <span class="add-host el-icon-edit-outline permission-disabled"></span>
                 </el-tooltip>
               </div>
             </template>
           </el-table-column>
 
-          <el-table-column align="center" label="操作" width="150px">
+          <el-table-column align="center" :label="$t(`global.operation`)" width="150px">
             <template slot-scope="scope">
               <span class="operation">
                 <el-tooltip
@@ -415,7 +415,7 @@
                     class="iconfont iconshengji"
                   ></i>
                 </el-tooltip>
-                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
                   <i class="iconfont iconshengji permission-disabled"></i>
                 </el-tooltip>
               </span>
@@ -428,7 +428,7 @@
                 >
                   <i @click="openPmServiceLog(envName,scope.row.service_name)" class="iconfont iconiconlog"></i>
                 </el-tooltip>
-                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
                   <i class="iconfont iconiconlog permission-disabled"></i>
                 </el-tooltip>
               </span>
@@ -443,7 +443,7 @@
                     <i class="iconfont iconfuwupeizhi"></i>
                   </router-link>
                 </el-tooltip>
-                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
                   <span>
                     <i class="iconfont iconfuwupeizhi permission-disabled"></i>
                   </span>
@@ -459,12 +459,13 @@
       </div>
     </div>
     <UpdateHelmVarDialog :fetchAllData="fetchAllData" ref="updateHelmVarDialog" :projectName="projectName" :envName="envName" />
-    <UpdateK8sVarDialog :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateK8sVarDialog" />
+    <UpdateK8sVarDialog :fetchAllData="fetchAllData" ref="updateK8sVarDialog" />
     <PmServiceLog ref="pmServiceLog" />
     <ManageK8sServicesDialog
       v-if="envSource === '' || envSource === 'spock'"
       :fetchAllData="fetchAllData"
       :productInfo="productInfo"
+      :allServiceNames="allServiceNames"
       ref="manageK8sServicesRef"
     />
     <ManageHelmServicesDialog
@@ -493,8 +494,8 @@
         </el-form>
       </div>
       <div slot="footer">
-        <el-button @click="envDeleteInfo.deleteDialogVisible = false" size="small">取 消</el-button>
-        <el-button type="danger" @click="identifyDeleteEnv()" size="small">确 定</el-button>
+        <el-button @click="envDeleteInfo.deleteDialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="danger" @click="identifyDeleteEnv()" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -508,7 +509,7 @@ import {
   productServicesAPI,
   listProductAPI,
   updateServiceAPI,
-  updateK8sEnvAPI,
+  updatePmEnvAPI,
   restartPmServiceAPI,
   restartServiceOriginAPI,
   deleteProjectEnvAPI,
@@ -630,7 +631,8 @@ export default {
             trigger: 'change'
           }
         ]
-      }
+      },
+      allServiceNames: []
     }
   },
   computed: {
@@ -844,6 +846,7 @@ export default {
             this.isPmService = false
             this.isExternal = false
           }
+          this.allServiceNames = _.flatten(res.services)
         })
         .catch(err => {
           if (err === 'CANCEL') {
@@ -1127,8 +1130,8 @@ export default {
           : ''
       }</p>`
       this.$confirm(content, '更新', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         dangerouslyUseHTMLString: true,
         type: 'warning'
       }).then(() => {
@@ -1137,7 +1140,7 @@ export default {
         const envType = this.isProd ? 'prod' : ''
         const payload = { vars: envInfo.vars }
         const force = false
-        updateK8sEnvAPI(projectName, envName, payload, envType, force)
+        updatePmEnvAPI(projectName, envName, payload, envType, force)
           .then(response => {
             this.fetchAllData()
             this.$message({
@@ -1162,8 +1165,8 @@ export default {
         `您的更新操作将覆盖环境中${message.name}服务变更，确认继续?`,
         '提示',
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }
       ).then(() => {
@@ -1172,7 +1175,7 @@ export default {
         const envType = this.isProd ? 'prod' : ''
         const payload = { vars: envInfo.vars }
         const force = true
-        updateK8sEnvAPI(projectName, envName, payload, envType, force).then(
+        updatePmEnvAPI(projectName, envName, payload, envType, force).then(
           response => {
             this.fetchAllData()
             this.$message({
@@ -1216,8 +1219,8 @@ export default {
         '请输入环境名称以确认',
         `确定要取消托管 ${project_name} 项目的 ${env_name} 环境?`,
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           confirmButtonClass: 'el-button el-button--danger',
           inputValidator: input => {
             if (input === env_name) {
@@ -1273,7 +1276,7 @@ export default {
         }请先修改协作模式！`,
         isDelete ? '删除环境' : '取消托管',
         {
-          confirmButtonText: '确定',
+          confirmButtonText: this.$t(`global.confirm`),
           type: 'warning'
         }
       )
@@ -1335,8 +1338,8 @@ export default {
     },
     restartService (projectName, serviceName, envName) {
       this.$confirm('确定重启服务吗?', '重启', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       })
         .then(() => {
@@ -1414,14 +1417,14 @@ export default {
     setPmServiceConfigRoute (scope) {
       return `/v1/projects/detail/${scope.row.product_name}/services?serviceName=${scope.row.service_name}`
     },
-    updateService (service) {
+    updateService (service, payload) {
       this.$message.info('开始更新服务')
       updateServiceAPI(
         this.projectName,
         service.service_name,
         service.type,
         this.envName,
-        this.serviceStatus[service.service_name].raw
+        payload || this.serviceStatus[service.service_name].raw
       ).then(res => {
         this.$message.success('更新成功请等待服务升级')
         this.fetchAllData()

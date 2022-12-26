@@ -4,7 +4,7 @@
                :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
         <div slot="header"
              class="block-title">
-          最新一次测试报告
+          {{$t(`testing.summary.latest`)}}
         </div>
         <div class="text item">
           <el-row>
@@ -12,7 +12,7 @@
               <div>
                 <el-row :gutter="0">
                   <el-col :span="6">
-                    <div class="item-title">总测试用例</div>
+                    <div class="item-title">{{$t(`testing.summary.caseCount`)}}</div>
                   </el-col>
                   <el-col :span="5">
                     <div class="item-desc">{{latestTestSummary.tests }}
@@ -20,7 +20,7 @@
                   </el-col>
 
                   <el-col :span="6">
-                    <div class="item-title">成功用例</div>
+                    <div class="item-title">{{$t(`testing.summary.successCount`)}}</div>
                   </el-col>
                   <el-col :span="5">
                     <div class="">
@@ -32,13 +32,13 @@
 
                 <el-row :gutter="0">
                   <el-col :span="6">
-                    <div class="item-title">失败用例</div>
+                    <div class="item-title">{{$t(`testing.summary.failCount`)}}</div>
                   </el-col>
                   <el-col :span="5">
                     <div class="item-desc">{{latestTestSummary.failures}}</div>
                   </el-col>
                   <el-col :span="6">
-                    <div class="item-title">错误用例</div>
+                    <div class="item-title">{{$t(`testing.summary.errorCount`)}}</div>
                   </el-col>
                   <el-col :span="5">
                     <div class="item-desc">{{latestTestSummary.errors}}</div>
@@ -46,7 +46,7 @@
                 </el-row>
                 <el-row :gutter="0">
                   <el-col :span="6">
-                    <div class="item-title">未执行用例</div>
+                    <div class="item-title">{{$t(`testing.summary.unstartCount`)}}</div>
                   </el-col>
 
                   <el-col :span="5">
@@ -54,7 +54,7 @@
                   </el-col>
 
                   <el-col :span="6">
-                    <div class=" item-title">测试用时</div>
+                    <div class=" item-title">{{$t(`testing.summary.timeConsumption`)}}</div>
                   </el-col>
                   <el-col :span="5">
                     <div class=" item-desc">
@@ -71,14 +71,14 @@
                  type="primary"
                  size="small"
                  @click="showTestCase = !showTestCase"
-                 plain>查看用例</el-button>
+                 plain>{{$t(`testing.summary.checkCases`)}}</el-button>
       <el-collapse-transition>
         <el-card v-show="showTestCase"
                  class="box-card task-process"
                  :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
           <div slot="header"
                class="clearfix">
-            <span class="block-title">详细用例（可滚动查看）</span>
+            <span class="block-title">{{$t(`testing.summary.caseDetails`)}}</span>
           </div>
           <function-test-case :testCases="testCases"></function-test-case>
         </el-card>
@@ -87,7 +87,7 @@
                :body-style="{ padding: '0px', margin: '15px 0 30px 0' }">
         <div slot="header"
              class="block-title">
-          历史任务
+          {{$t(`testing.history.title`)}}
         </div>
         <TaskList :taskList="workflowTasks"
                    :total="total"
@@ -124,24 +124,6 @@ export default {
           time: 0
         }
       ],
-      testResultLabels: [
-        {
-          text: '失败',
-          value: 'failure'
-        },
-        {
-          text: '成功',
-          value: 'succeeded'
-        },
-        {
-          text: '未执行',
-          value: 'skipped'
-        },
-        {
-          text: '错误',
-          value: 'error'
-        }
-      ],
       workflow: {},
       workflowTasks: [],
       total: 0,
@@ -168,6 +150,26 @@ export default {
     },
     serviceName () {
       return this.$route.params.test_name.slice(0, -4)
+    },
+    testResultLabels () {
+      return [
+        {
+          text: this.$t(`testing.status.fail`),
+          value: 'failure'
+        },
+        {
+          text: this.$t(`testing.status.success`),
+          value: 'succeeded'
+        },
+        {
+          text: this.$t(`testing.status.unstart`),
+          value: 'skipped'
+        },
+        {
+          text: this.$t(`testing.status.error`),
+          value: 'error'
+        }
+      ]
     }
   },
   methods: {
@@ -178,19 +180,19 @@ export default {
         this.testCases.forEach(testCase => {
           const blocks = []
           if (testCase.failure && typeof testCase.failure === 'string') {
-            blocks.push(`失败原因:\n${testCase.failure}`)
+            blocks.push(`${this.$t(`testing.display.failReason`)}\n${testCase.failure}`)
           }
           if (testCase.failure && typeof testCase.failure === 'object') {
-            blocks.push(`失败信息:\n${testCase.failure.message}`)
-            blocks.push(`失败详情:\n${testCase.failure.text}`)
+            blocks.push(`${this.$t(`testing.display.failMessage`)}\n${testCase.failure.message}`)
+            blocks.push(`${this.$t(`testing.display.failDetail`)}\n${testCase.failure.text}`)
           }
           if (testCase.system_out) {
-            blocks.push(`标准输出:\n${testCase.system_out}`)
+            blocks.push(`${this.$t(`testing.display.standardOut`)}\n${testCase.system_out}`)
           }
           if (testCase.error) {
-            blocks.push(`错误信息:\n${testCase.error.message}`)
-            blocks.push(`错误详情:\n${testCase.error.text}`)
-            blocks.push(`错误类型:\n${testCase.error.type}`)
+            blocks.push(`${this.$t(`testing.display.errorMessage`)}\n${testCase.error.message}`)
+            blocks.push(`${this.$t(`testing.display.errorDetail`)}\n${testCase.error.text}`)
+            blocks.push(`${this.$t(`testing.display.errorType`)}\n${testCase.error.type}`)
           }
           testCase.mergedOutput = blocks.join('\n')
         })

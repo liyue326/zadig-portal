@@ -2,12 +2,12 @@
   <div class="host-step-container">
     <div class="step-detail">
       <div class="guide-title">
-        <h4>项目初始化向导</h4>
+        <h4>{{$t('project.onboardingComp.projectOnboarding')}}</h4>
       </div>
       <OnboardingSteps :active="activeStep" class="steps-container" align-center simple finish-status="success">
-        <OnboardingStep title="配置环境托管" description />
-        <OnboardingStep title="配置服务构建" description />
-        <OnboardingStep title="运行工作流" description />
+        <OnboardingStep :title="$t('project.onboardingComp.configureEnvHosting')" description />
+        <OnboardingStep :title="$t('project.onboardingComp.configureServiceBuild')" description />
+        <OnboardingStep :title="$t('project.onboardingComp.runWorkflow')" description />
       </OnboardingSteps>
     </div>
     <div class="title-container">
@@ -20,20 +20,20 @@
 import OnboardingSteps from '@/common/steps/src/steps.vue'
 import OnboardingStep from '@/common/steps/src/step.vue'
 export default {
-  data () {
-    return {
-      stepMap: [
+  computed: {
+    stepMap () {
+      return [
         {
-          title: '第一步',
-          description: '托管已有 K8s 集群资源，选择服务在 Zadig 中进行管理'
+          title: this.$t('project.onboardingComp.firstStep'),
+          description: this.$t('project.onboardingComp.hostingFirstStepTip')
         },
         {
-          title: '第二步',
-          description: '添加构建并配置相关脚本，后续可在工作流中自动更新服务'
+          title: this.$t('project.onboardingComp.secondStep'),
+          description: this.$t('project.onboardingComp.hostingSecondStepTip')
         },
         {
-          title: '第三步',
-          description: '运行工作流触发服务的自动化交付'
+          title: this.$t('project.onboardingComp.thirdStep'),
+          description: this.$t('project.onboardingComp.hostingThirdStepTip')
         }
       ]
     }

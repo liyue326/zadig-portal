@@ -10,42 +10,42 @@
         label-position="left"
         inline-message
       >
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="scannerConfig.name" placeholder="请输入代码扫描名称" autofocus size="small" :disabled="isEdit" auto-complete="off"></el-input>
+        <el-form-item :label="$t(`global.name`)" prop="name">
+          <el-input v-model="scannerConfig.name" :placeholder="$t(`scanning.prompt.inputScanningName`)" autofocus size="small" :disabled="isEdit" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="描述信息">
-          <el-input v-model="scannerConfig.description" placeholder="请输入描述信息" autofocus size="small" auto-complete="off"></el-input>
+        <el-form-item :label="$t(`scanning.details.description`)">
+          <el-input v-model="scannerConfig.description" :placeholder="$t(`scanning.prompt.inputDescription`)" autofocus size="small" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="扫描工具">
-          <el-select v-model="scannerConfig.scanner_type" placeholder="选择扫描工具" size="small" @change="initDefaultImage">
+        <el-form-item :label="$t(`scanning.details.scanner`)">
+          <el-select v-model="scannerConfig.scanner_type" :placeholder="$t(`scanning.prompt.chooseScanner`)" size="small" @change="initDefaultImage">
             <el-option label="SonarQube" value="sonarQube"></el-option>
-            <el-option label="其他" value="other"></el-option>
+            <el-option :label="$t(`scanning.details.scannerTypeOther`)" value="other"></el-option>
           </el-select>
         </el-form-item>
 
-        <el-form-item label="扫描环境" prop="image_id">
-          <el-select v-model="scannerConfig.image_id" placeholder="选择扫描环境" size="small">
+        <el-form-item :label="$t(`scanning.details.image`)" prop="image_id">
+          <el-select v-model="scannerConfig.image_id" :placeholder="$t(`scanning.prompt.chooseImage`)" size="small">
             <el-option v-for="(sys,index) in systems" :key="index" :label="sys.label" :value="sys.id">{{sys.label}}</el-option>
             <el-option disabled value="NEWCUSTOM">
               <router-link to="/v1/system/imgs" class="env-link">
                 <i class="el-icon-circle-plus-outline" style="margin-right: 3px;"></i>
-                新建扫描环境
+                {{$t(`scanning.prompt.createImage`)}}
               </router-link>
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="scannerConfig.installs.length===0" label="依赖的软件包">
-          <el-button @click="addFirstApp()" type="primary" size="mini" plain>新增</el-button>
+        <el-form-item v-if="scannerConfig.installs.length===0" :label="$t(`scanning.details.packages`)">
+          <el-button @click="addFirstApp()" type="primary" size="mini" plain>{{$t(`global.create`)}}</el-button>
         </el-form-item>
         <el-form-item
           v-else
           v-for="(app,appIndex) in scannerConfig.installs"
           :key="appIndex"
           :prop="`installs.${appIndex}.name`"
-          :rules="{required: false, message: '不能为空', trigger: 'blur'}"
-          :label="appIndex === 0 ? `依赖的软件包` : ''"
+          :rules="{required: false, message: $t(`scanning.prompt.packageCannotBeEmpty`), trigger: 'blur'}"
+          :label="appIndex === 0 ? $t(`scanning.details.packages`) : ''"
         >
-          <el-select v-model="scannerConfig.installs[appIndex]" placeholder="请选择" size="small" value-key="id" filterable>
+          <el-select v-model="scannerConfig.installs[appIndex]" :placeholder="$t(`global.pleaseSelect`)" size="small" value-key="id" filterable>
             <el-option
               v-for="(app, index) in scannerConfig.installs[appIndex].name ? [scannerConfig.installs[appIndex]].concat(remainingApps) : remainingApps"
               :key="index"
@@ -54,12 +54,12 @@
             ></el-option>
           </el-select>
           <span>
-            <el-button v-if="scannerConfig.installs.length >= 1" @click="deleteApp(appIndex)" type="danger" size="mini" plain>删除</el-button>
-            <el-button v-if="appIndex===scannerConfig.installs.length-1" @click="addApp(appIndex)" type="primary" size="mini" plain>新增</el-button>
+            <el-button v-if="scannerConfig.installs.length >= 1" @click="deleteApp(appIndex)" type="danger" size="mini" plain>{{$t(`global.delete`)}}</el-button>
+            <el-button v-if="appIndex===scannerConfig.installs.length-1" @click="addApp(appIndex)" type="primary" size="mini" plain>{{$t(`global.create`)}}</el-button>
           </span>
         </el-form-item>
-        <el-form-item label="Sonar 地址" v-if="scannerConfig.scanner_type === 'sonarQube'" prop="sonar_id">
-          <el-select v-model="scannerConfig.sonar_id" placeholder="选择 Sonar 地址" size="small">
+        <el-form-item :label="$t(`scanning.details.sonarAddress`)" v-if="scannerConfig.scanner_type === 'sonarQube'" prop="sonar_id">
+          <el-select v-model="scannerConfig.sonar_id" :placeholder="$t(`scanning.prompt.selectSonarAddress`)" size="small">
             <el-option v-for="(item, index) in sonarList" :key="index" :label="item.server_address" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -79,7 +79,7 @@
 
       <section v-if="scannerConfig.scanner_type === 'sonarQube'">
         <div class="primary-title not-first-child">
-          <span>前置脚本</span>
+          <span>{{$t(`scanning.details.preScanScript`)}}</span>
         </div>
         <div class="deploy-script">
           <Resize :resize="'both'">
@@ -87,8 +87,8 @@
           </Resize>
         </div>
         <div class="primary-title not-first-child">
-          <span>参数配置</span>
-          <el-tooltip effect="dark" content="sonar 地址和 token 在执行时自动注入" placement="right">
+          <span>{{$t(`scanning.details.parameters`)}}</span>
+          <el-tooltip effect="dark" :content="$t(`scanning.prompt.sonarParameterPopup`)" placement="right">
             <i class="el-icon-warning"></i>
           </el-tooltip>
         </div>
@@ -98,8 +98,8 @@
           </Resize>
         </div>
         <div class="primary-title not-first-child" v-if="hasPlutus">
-          <span>质量门禁检查</span>
-          <el-tooltip effect="dark" content="开启质量门禁检查后，如果门禁未通过，任务状态置为失败" placement="top" class="mg-r8">
+          <span>{{$t(`scanning.details.qualityGate`)}}</span>
+          <el-tooltip effect="dark" :content="$t(`scanning.prompt.qualityGatePopup`)" placement="top" class="mg-r8">
             <i class="el-icon-warning"></i>
           </el-tooltip>
           <el-switch v-model="scannerConfig.check_quality_gate"></el-switch>
@@ -107,7 +107,7 @@
       </section>
 
       <section v-else-if="scannerConfig.scanner_type === 'other'">
-        <div class="primary-title not-first-child">扫描脚本</div>
+        <div class="primary-title not-first-child">{{$t(`scanning.details.scanningScript`)}}</div>
         <div class="deploy-script">
           <Resize :resize="'both'">
             <Editor v-model="scannerConfig.script" />
@@ -124,7 +124,7 @@
           plain
           @click="scannerConfig.advanced_setting_modified = !scannerConfig.advanced_setting_modified"
         >
-          高级配置
+          {{$t(`scanning.advancedSettings.title`)}}
           <i :class="[scannerConfig.advanced_setting_modified ? 'el-icon-arrow-up' : 'el-icon-arrow-down']" style="margin-left: 8px;"></i>
         </el-button>
       </div>
@@ -141,14 +141,14 @@
 
     <footer class="create-footer">
       <router-link :to="`/v1/projects/detail/${projectName}/scanner`">
-        <el-button style="margin-right: 15px;" type="primary" :disabled="saveLoading" plain>取消</el-button>
+        <el-button style="margin-right: 15px;" type="primary" :disabled="saveLoading" plain>{{$t(`global.cancel`)}}</el-button>
       </router-link>
       <el-button
         v-hasPermi="{projectName: projectName, action: isEdit?'edit_scan':'create_scan',isBtn:true}"
         @click="saveScanner"
         type="primary"
         :loading="saveLoading"
-      >{{ isEdit ? '确认修改' : '立即新建' }}</el-button>
+      >{{ isEdit ? $t(`scanning.prompt.editConfirmation`) : $t(`scanning.prompt.createNow`) }}</el-button>
     </footer>
   </div>
 </template>
@@ -174,42 +174,16 @@ import bus from '@utils/eventBus'
 
 import { cloneDeep, differenceBy } from 'lodash'
 
-const validateName = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入代码扫描名称'))
-  } else {
-    if (!/^[a-z0-9-]+$/.test(value)) {
-      callback(new Error('名称只支持小写字母和数字，特殊字符只支持中划线'))
-    } else {
-      callback()
-    }
-  }
-}
-
 export default {
   data () {
     return {
       loading: false,
-      createRules: {
-        name: [
-          {
-            type: 'string',
-            required: true,
-            validator: validateName,
-            trigger: ['blur', 'change']
-          }
-        ],
-        image_id: {
-          required: true,
-          message: '扫描环境不能为空',
-          trigger: ['blur', 'change']
-        },
-        sonar_id: {
-          required: true,
-          message: 'Sonar 地址不能为空',
-          trigger: ['blur', 'change']
-        }
-      },
+      validObj: new ValidateSubmit(),
+      saveLoading: false,
+      allCodeHosts: [],
+      systems: [],
+      sonarList: [],
+      defaultSonarImageId: '',
       scannerConfig: {
         name: '',
         project_name: '',
@@ -221,7 +195,7 @@ export default {
         installs: [],
         pre_script: '#!/bin/bash',
         check_quality_gate: false,
-        parameter: '# Sonar 参数\n', // sonar parameters
+        parameter: '# Sonar Parameter\n', // sonar parameters
         script: '#!/bin/bash\nset -e', // for other type
         advanced_settings: {
           timeout: 60,
@@ -247,13 +221,7 @@ export default {
         },
         outputs: [],
         advanced_setting_modified: false
-      },
-      validObj: new ValidateSubmit(),
-      saveLoading: false,
-      allCodeHosts: [],
-      systems: [],
-      sonarList: [],
-      defaultSonarImageId: ''
+      }
     }
   },
   computed: {
@@ -268,6 +236,39 @@ export default {
     },
     remainingApps () {
       return differenceBy(this.allApps, this.scannerConfig.installs, 'id')
+    },
+    createRules () {
+      const validateName = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t(`scanning.prompt.inputScanningName`)))
+        } else {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            callback(new Error(this.$t(`scanning.prompt.scanningNamingConvention`)))
+          } else {
+            callback()
+          }
+        }
+      }
+      return {
+        name: [
+          {
+            type: 'string',
+            required: true,
+            validator: validateName,
+            trigger: ['blur', 'change']
+          }
+        ],
+        image_id: {
+          required: true,
+          message: this.$t(`scanning.prompt.imageCannotBeEmpty`),
+          trigger: ['blur', 'change']
+        },
+        sonar_id: {
+          required: true,
+          message: this.$t(`scanning.prompt.sonarAddressCannotBeEmpty`),
+          trigger: ['blur', 'change']
+        }
+      }
     },
     ...mapState({
       hasPlutus: state => state.checkPlutus.hasPlutus
@@ -336,7 +337,7 @@ export default {
         this.saveLoading = false
         if (res) {
           this.$message.success(
-            `${this.isEdit ? '更新' : '新建'} ${payload.name} 成功！`
+            `${this.isEdit ? this.$t('scanning.prompt.updated', { name: payload.name }) : this.$t('scanning.prompt.created', { name: payload.name })}`
           )
           this.$router.push(`/v1/projects/detail/${this.projectName}/scanner`)
         }
@@ -382,18 +383,18 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: `/v1/projects` },
+        { title: this.$t(`subTopbarMenu.projects`), url: `/v1/projects` },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}`
         },
         {
-          title: '代码扫描',
+          title: this.$t(`subTopbarMenu.scannings`),
           url: `/v1/projects/detail/${this.projectName}/scanner`
         },
         {
-          title: this.isEdit ? this.$route.params.scanner_name : '添加',
+          title: this.isEdit ? this.$route.params.scanner_name : this.$t(`global.create`),
           url: ''
         }
       ]

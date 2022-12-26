@@ -1,6 +1,6 @@
 <template>
   <div class="setting-auditlog-container">
-    <el-dialog :title="`API 请求：${currentLog.time}`"
+    <el-dialog :title="$t('sysSetting.auditLog.APIPayloadDialogTitle',{ time:currentLog.time })"
                :visible.sync="payloadDialogVisiable"
                width="500px">
 
@@ -8,13 +8,13 @@
         <vue-json-pretty v-if="currentLog.request_body"
                          :data="currentLog.request_body">
         </vue-json-pretty>
-        <p v-if="currentLog.request_body ===''">暂无请求 Payload 信息</p>
+        <p v-if="currentLog.request_body ===''">{{$t('sysSetting.auditLog.noPayload')}}</p>
       </div>
       <span slot="footer"
             class="dialog-footer">
         <el-button type="primary"
                    size="small"
-                   @click="payloadDialogVisiable = false">确 定</el-button>
+                   @click="payloadDialogVisiable = false">{{$t(`global.confirm`)}}</el-button>
       </span>
     </el-dialog>
     <div class="section">
@@ -22,17 +22,17 @@
         <div class="type">
           <el-select v-model="searchType"
                      size="small"
-                     placeholder="请选择查询类型">
-            <el-option label="用户名"
+                     :placeholder="$t(`sysSetting.auditLog.selectType`)">
+            <el-option :label="$t(`sysSetting.auditLog.username`)"
                        value="username">
             </el-option>
-            <el-option label="项目"
+            <el-option :label="$t(`sysSetting.auditLog.project`)"
                        value="product_name">
             </el-option>
-            <el-option label="功能"
+            <el-option :label="$t(`sysSetting.auditLog.function`)"
                        value="function">
             </el-option>
-            <el-option label="状态码"
+            <el-option :label="$t(`sysSetting.auditLog.statusCode`)"
                        value="status">
             </el-option>
           </el-select>
@@ -44,55 +44,55 @@
                     size="small"
                     v-model="keyword"
                     @keyup.enter.native="getAuditLogBySearch"
-                    placeholder="请输入关键字"></el-input>
+                    :placeholder="$t(`sysSetting.auditLog.inputKeyword`)"></el-input>
         </div>
 
         <el-button plain
                    size="small"
                    @click="getAuditLogBySearch"
-                   type="primary">查询</el-button>
+                   type="primary">{{$t(`sysSetting.auditLog.search`)}}</el-button>
       </div>
       <div class="storage-list">
         <template>
           <el-table :data="results"
                     v-loading="loading"
-                    element-loading-text="拼命加载中"
+                    :element-loading-text="$t('global.loading')"
                     element-loading-spinner="el-icon-loading"
                     style="width: 100%;">
             <el-table-column width="160px"
-                             label="时间">
+                             :label="$t(`sysSetting.auditLog.time`)">
               <template slot-scope="scope">
                 {{$utils.convertTimestamp(scope.row.created_at,'yyyy-mm-dd-ss')}}
               </template>
             </el-table-column>
-            <el-table-column label="用户名">
+            <el-table-column :label="$t(`sysSetting.auditLog.username`)">
               <template slot-scope="scope">
                 {{scope.row.username}}
               </template>
             </el-table-column>
             <el-table-column width="100px"
-                             label="操作">
+                             :label="$t(`global.operation`)">
               <template slot-scope="scope">
                 {{scope.row.method}}
               </template>
             </el-table-column>
-            <el-table-column label="项目">
+            <el-table-column :label="$t(`sysSetting.auditLog.project`)">
               <template slot-scope="scope">
                 {{scope.row.product_name}}
               </template>
             </el-table-column>
-            <el-table-column label="功能">
+            <el-table-column :label="$t(`sysSetting.auditLog.function`)">
               <template slot-scope="scope">
                 {{scope.row.function}}
               </template>
             </el-table-column>
-            <el-table-column label="详情">
+            <el-table-column :label="$t(`sysSetting.auditLog.detail`)">
               <template slot-scope="scope">
                 {{scope.row.name}}
               </template>
             </el-table-column>
             <el-table-column width="100px"
-                             label="状态码">
+                             :label="$t(`sysSetting.auditLog.statusCode`)">
               <template slot-scope="scope">
                 <el-tag effect="dark"
                         :type="getStatusColor(scope.row.status)"
@@ -102,7 +102,7 @@
               </template>
             </el-table-column>
             <el-table-column width="100px"
-                             label="API 请求">
+                             :label="$t(`sysSetting.auditLog.APIPayload`)">
               <template slot-scope="scope">
                 <el-button @click="viewRequestPayload(scope.row)"
                            icon="el-icon-document"
@@ -171,7 +171,7 @@ export default {
         this.results = res.data
         if (type !== 'init') {
           this.$message({
-            message: '查询完毕',
+            message: this.$t('sysSetting.auditLog.searchCompleted'),
             type: 'success'
           })
         }
@@ -208,14 +208,11 @@ export default {
       this.getAuditLog('init', this.logPageSize, this.currentPageList)
     }
   },
-  computed: {
-
-  },
   components: {
     VueJsonPretty
   },
   created () {
-    bus.$emit(`set-topbar-title`, { title: '操作日志', breadcrumb: [] })
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t(`sidebarMenu.auditLog`), url: '' }] })
     this.getAuditLog('init', this.logPageSize, this.currentPageList)
   }
 }
@@ -238,7 +235,7 @@ export default {
 
       .type {
         display: inline-block;
-        width: 120px;
+        width: 140px;
       }
 
       .keyword {

@@ -11,7 +11,7 @@
           :href="`https://docs.koderover.com/zadig/settings/vm-management/`"
           :underline="false"
           target="_blank"
-        >帮助文档</el-link>
+        >{{$t(`global.helpDoc`)}}</el-link>
       </template>
     </el-alert>
     <el-form ref="host" :rules="rules" label-width="120px" label-position="left" :model="host" class="host-form">
@@ -101,7 +101,7 @@
               type="text"
               icon="el-icon-plus"
               @click="actionHttpHeaders('add')"
-            >添加</el-button>
+            >{{$t(`global.add`)}}</el-button>
             <div v-for="(header, index) in host.probe.http_probe.http_headers" :key="index">
               <el-input v-model="header.name" size="small" placeholder="Header Name"></el-input>
               <el-input v-model="header.value" size="small" placeholder="Header Value"></el-input>

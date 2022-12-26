@@ -10,7 +10,7 @@
           :href="`https://docs.koderover.com/zadig/settings/vm-management/`"
           :underline="false"
           target="_blank"
-        >帮助文档</el-link>
+        >{{$t(`global.helpDoc`)}}</el-link>
       </template>
     </el-alert>
     <el-form ref="importHosts" :rules="rules" label-width="100px" label-position="left" :model="host" class="host-form">

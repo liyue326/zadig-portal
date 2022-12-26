@@ -5,7 +5,7 @@
              :body-style="{padding: '8px 20px', margin: '5px 0 0 0' }">
       <div slot="header"
            class="clearfix subtask-header">
-        <span>构建</span>
+        <span>{{$t(`status.build`)}}</span>
         <div v-if="buildv2.status==='running'"
              class="loader">
           <div class="ball-scale-multiple">
@@ -17,29 +17,29 @@
       </div>
       <div class="error-wrapper">
         <el-alert v-if="buildv2.error"
-                  title="错误信息"
+                  :title="$t(`global.errorMsg`)"
                   :description="buildv2.error"
                   type="error"
-                  close-text="知道了">
+                  :close-text="$t(`global.ok`)">
         </el-alert>
       </div>
       <div class="text item">
         <el-row :gutter="0">
           <el-col :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconzhuangtai"></i> 构建状态
+              <i class="iconfont iconzhuangtai"></i> {{$t(`status.buildStatus`)}}
             </div>
           </el-col>
           <el-col :span="6">
             <div class="grid-content item-desc">
               <a :class="buildOverallColor"
-                 href="#buildv2-log">{{buildv2.status?buildOverallStatusZh:"未运行"}}</a>
+                 href="#buildv2-log">{{buildv2.status?$t(`workflowTaskStatus.${buildv2.status}`):$t(`workflowTaskStatus.notRunning`)}}</a>
             </div>
           </el-col>
           <el-col v-if="buildv2.status!=='running'"
                   :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconshijian"></i> 持续时间
+              <i class="iconfont iconshijian"></i> {{$t(`workflow.duration`)}}
             </div>
           </el-col>
           <el-col v-if="buildv2.status!=='running'"
@@ -54,7 +54,7 @@
                   :key="index">
             <el-col :span="6">
               <div class="grid-content item-title">
-                <i class="iconfont icondaima"></i> 代码库({{build.source}})
+                <i class="iconfont icondaima"></i> {{$t(`global.repository`)}}({{build.source}})
               </div>
             </el-col>
             <el-col :span="6">
@@ -63,7 +63,7 @@
             </el-col>
             <el-col :span="6">
               <div class="grid-content item-title">
-                <i class="iconfont iconinfo"></i> 代码信息
+                <i class="iconfont iconinfo"></i> {{$t(`global.gitMessage`)}}
               </div>
             </el-col>
             <el-col :span="6">
@@ -75,7 +75,7 @@
                 :gutter="0">
           <el-col :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconvery-service"></i> 服务名称
+              <i class="iconfont iconvery-service"></i> {{$t(`global.serviceName`)}}
             </div>
           </el-col>
           <el-col :span="6">
@@ -84,7 +84,7 @@
           <el-col v-if="serviceType!=='pm'"
                   :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconSliceCopy"></i> 镜像信息
+              <i class="iconfont iconSliceCopy"></i> {{$t(`status.imgInfo`)}}
                 <el-tooltip effect="dark"
                             placement="top">
                   <div slot="content">构建镜像标签生成规则 ：<br />选择 Tag 进行构建 ： 构建时间戳 -
@@ -182,7 +182,7 @@ export default {
       return this.$utils.calcOverallBuildStatus(this.buildv2, this.docker_build)
     },
     buildOverallStatusZh () {
-      return this.$translate.translateTaskStatus(this.buildOverallStatus)
+      return this.$t(`workflowTaskStatus.${this.buildOverallStatus}`)
     },
     buildOverallColor () {
       return this.$translate.calcTaskStatusColor(this.buildOverallStatus)

@@ -6,30 +6,30 @@
               class="header">
         <el-col :span="2">
           <div class="build-item">
-            序号
+            {{$t(`global.number`)}}
           </div>
         </el-col>
         <el-col :span="6">
           <div class="build-item service">
-            服务
+            {{$t(`status.service`)}}
           </div>
         </el-col>
 
         <el-col :span="6">
           <div class="build-item build">
-            构建名称
+            {{$t(`workflow.buildName`)}}
           </div>
         </el-col>
 
         <el-col :span="6">
           <div class="build-item deploy">
-            部署
+            {{$t(`status.deploy`)}}
           </div>
         </el-col>
 
         <el-col :span="4">
           <div class="build-item view">
-            是否显示
+            {{$t(`global.whetherToDisplay`)}}
             <el-tooltip effect="dark" content="执行工作流任务时是否在服务列表中显示，供用户选择。" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>

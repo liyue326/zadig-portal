@@ -1,7 +1,7 @@
 <template>
   <div class="import-from-template-container">
     <el-dialog
-      :title="currentUpdatedServiceName?'更新服务':'新建服务 - 使用模板新建'"
+      :title="currentUpdatedServiceName?$t('services.common.updateService'):'新建服务 - 使用模板新建'"
       :close-on-click-modal="false"
       append-to-body
       center
@@ -12,13 +12,13 @@
       @update:visible="$emit('update:dialogImportFromYamlVisible', $event)"
     >
       <el-form :model="importYaml" @submit.native.prevent label-position="left" ref="importYamlForm">
-        <el-form-item label="服务名称" prop="serviceName" :rules="{ required: true, message: '服务名称不能为空', trigger: ['change','blur'] }">
+        <el-form-item :label="$t(`global.serviceName`)" prop="serviceName" :rules="{ required: true, message: '服务名称不能为空', trigger: ['change','blur'] }">
           <el-input
             style="width: 400px;"
             v-model.trim="importYaml.serviceName"
             size="small"
             :disabled="currentUpdatedServiceName!==''?true:false"
-            placeholder="请输入服务名称"
+            :placeholder="$t('services.common.inputServiceName')"
             clearable
           ></el-input>
         </el-form-item>
@@ -46,7 +46,7 @@
         </el-form-item>
         <el-form-item prop="auto_sync">
           <span style="margin-right: 16px;">
-            <span>自动同步</span>
+            <span>{{$t('global.autoSync')}}</span>
             <el-tooltip content="开启后，对模板库操作应用到服务时，该服务配置将自动基于模板内容同步。" placement="top">
               <i class="pointer el-icon-question"></i>
             </el-tooltip>
@@ -62,7 +62,7 @@
             @click="getTemplatePreview"
           >
             {{
-            previewYamlFile ? '关闭预览' : '预览'
+            previewYamlFile ? '关闭预览' : $t('global.preview')
             }}
           </el-button>
         </el-form-item>
@@ -71,14 +71,14 @@
         <codemirror v-model="renderedYaml" :options="importTemplateEditorOption" />
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button plain native-type="submit" @click="$emit('update:dialogImportFromYamlVisible', false)" size="small">取消</el-button>
+        <el-button plain native-type="submit" @click="$emit('update:dialogImportFromYamlVisible', false)" size="small">{{$t(`global.cancel`)}}</el-button>
         <el-button
           type="primary"
           native-type="submit"
           size="small"
           class="start-create"
           @click="loadServiceFromKubernetesTemplate"
-        >{{currentUpdatedServiceName?'更新':'新建'}}</el-button>
+        >{{currentUpdatedServiceName?'更新':$t('global.add')}}</el-button>
       </div>
     </el-dialog>
   </div>

@@ -3,7 +3,7 @@
            label-width="100px"
            label-position="left">
     <el-form-item prop="productName"
-                  label="环境">
+                  :label="$t(`project.environments`)">
       <el-select :value="runner.product_tmpl_name&&runner.namespace ? `${runner.product_tmpl_name} / ${runner.namespace}` : ''"
                  @change="precreate"
                  size="small"
@@ -20,7 +20,7 @@
 
     <div v-if="workflowMeta.build_stage.enabled"
          v-loading="precreateLoading">
-      <el-form-item label="服务">
+      <el-form-item :label="$t(`project.services`)">
         <el-select v-model="pickedTargets"
                    filterable
                    multiple

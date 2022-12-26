@@ -5,25 +5,25 @@
         <span>{{`${serviceName}`}}</span>
       </template>
     </van-nav-bar>
-    <van-divider content-position="left">基本信息</van-divider>
+    <van-divider content-position="left">{{$t('global.basicInfo')}}</van-divider>
     <div class="service-info">
       <van-row>
         <van-col span="12">
           <div class="mobile-block">
-            <h2 class="mobile-block-title">外网访问</h2>
+            <h2 class="mobile-block-title">{{$t('environments.common.serviceDetail.ingressHosts')}}</h2>
             <div class="mobile-block-desc">
               <template v-if="allHosts.length > 0">
                 <div v-for="host of allHosts" :key="host.host">
                   <a :href="`http://${host.host}`" class="host" target="_blank">{{ host.host }}</a>
                 </div>
               </template>
-              <div v-else>无</div>
+              <div v-else>{{$t('global.emptyText')}}</div>
             </div>
           </div>
         </van-col>
         <van-col span="12">
           <div class="mobile-block">
-            <h2 class="mobile-block-title">内网访问</h2>
+            <h2 class="mobile-block-title">{{$t('environments.common.serviceDetail.serviceEndpoints')}}</h2>
             <div class="mobile-block-desc">
               <template v-if="allEndpoints.length > 0">
                 <div v-for="(ep,index) in allEndpoints" :key="index">
@@ -55,13 +55,13 @@
                   </el-popover>
                 </div>
               </template>
-              <div v-else>无</div>
+              <div v-else>{{$t('global.emptyText')}}</div>
             </div>
           </div>
         </van-col>
       </van-row>
     </div>
-    <van-divider content-position="left">服务实例</van-divider>
+    <van-divider content-position="left">{{$t('environments.common.serviceDetail.serviceInstance')}}</van-divider>
     <div class="container-info">
       <van-collapse v-model="activeContainers">
         <van-collapse-item v-for="(item,index) in currentService.scales" :key="index" :name="index">
@@ -88,31 +88,31 @@
                 <div v-if="activePod[index].name" class="pod-info">
                   <van-row :class="['pod-row', activePod[index].__color]" ref="pod-row">
                     <van-col :span="24">
-                      <span class="title">实例名称：</span>
+                      <span class="title">{{$t('environments.common.serviceDetail.instanceName')}}:</span>
                       <span class="content">{{ activePod[index].name }}</span>
                     </van-col>
                   </van-row>
                   <van-row>
                     <van-col :span="24">
-                      <span class="title">运行时长：</span>
+                      <span class="title">{{$t('environments.common.serviceDetail.serviceAge')}} :</span>
                       <span class="content">{{ activePod[index].age }}</span>
                     </van-col>
                   </van-row>
                   <van-row>
                     <van-col :span="24">
-                      <span class="title">实例 IP：</span>
+                      <span class="title">{{$t('environments.common.serviceDetail.instanceIp')}}:</span>
                       <span class="content">{{ activePod[index].ip }}</span>
                     </van-col>
                   </van-row>
                   <van-row>
                     <van-col :span="24">
-                      <span class="title">节点信息：</span>
+                      <span class="title">{{$t('environments.common.serviceDetail.nodeInfo')}} :</span>
                       <span class="content">{{ activePod[index].host_ip }}( {{activePod[index].node_name}} )</span>
                     </van-col>
                   </van-row>
                   <van-row>
                     <van-col :span="24">
-                      <span class="title">健康探测：</span>
+                      <span class="title">{{$t('environments.common.serviceDetail.healthDetection')}} :</span>
                       <span
                         class="content"
                         :style="{ color: activePod[index].containers_ready ? '#4a4a4a' : 'red' }"
@@ -132,19 +132,19 @@
                     :class="['container-row', container.__color]"
                   >
                     <div>
-                      <span class="title">容器名称：</span>
+                      <span class="title">{{$t('environments.common.serviceDetail.containerName')}} :</span>
                       <span class="content">{{ container.name }}</span>
                     </div>
                     <div>
-                      <span class="title">当前镜像：</span>
+                      <span class="title">{{$t('environments.common.serviceDetail.podImage')}} :</span>
                       <span class="content">{{ container.imageShort }}</span>
                     </div>
                     <div v-if="container.message">
-                      <span class="title">错误信息：</span>
+                      <span class="title">{{$t('global.errorMsg')}} : </span>
                       <span class="content">{{ container.message }}</span>
                     </div>
                     <div>
-                      <span class="title">状态：</span>
+                      <span class="title">{{$t('global.status')}} :</span>
                       <span class="content">{{ container.status }}</span>
                       <el-tooltip effect="dark" content="未通过健康探测" placement="top">
                         <i
@@ -155,14 +155,14 @@
                       </el-tooltip>
                     </div>
                     <div v-if="container.startedAtReadable">
-                      <span class="title">启动时间：</span>
+                      <span class="title">{{$t('environments.common.serviceDetail.startTime')}} :</span>
                       <span class="content">{{ container.startedAtReadable }}</span>
                     </div>
-                    <van-button plain size="mini" type="info" @click="openLog(activePod[index].name,container.name)">实时日志</van-button>
+                    <van-button plain size="mini" type="info" @click="openLog(activePod[index].name,container.name)">{{$t('environments.common.serviceDetail.realTimeLog')}} </van-button>
                   </van-row>
                   <van-row type="flex" justify="end">
                     <van-col :span="24" class="op-buttons">
-                      <van-button plain size="small" @click="showPodEvents(activePod[index])" type="info">查看事件</van-button>
+                      <van-button plain size="small" @click="showPodEvents(activePod[index])" type="info">{{$t('environments.common.serviceDetail.viewEvents')}} </van-button>
                     </van-col>
                   </van-row>
                 </div>

@@ -60,7 +60,7 @@
             </el-row>
           </div>
         </el-form>
-        <el-button type="text" size="small" icon="el-icon-circle-plus-outline" @click="addMatchRule">添加</el-button>
+        <el-button type="text" size="small" icon="el-icon-circle-plus-outline" @click="addMatchRule">{{$t(`global.add`)}}</el-button>
       </div>
       <div class="example-rule">
         <div class="er-title">示例：</div>
@@ -83,7 +83,7 @@
       </div>
     </div>
     <div class="mr-footer">
-      <el-button type="primary" :loading="addLoading" size="small" @click="updateMatchRules">保存</el-button>
+      <el-button type="primary" :loading="addLoading" size="small" @click="updateMatchRules">{{$t(`global.save`)}}</el-button>
       <span class="tootip">保存规则且重新匹配服务组件</span>
     </div>
   </el-drawer>

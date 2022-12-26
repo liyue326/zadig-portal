@@ -1,23 +1,23 @@
 <template>
   <div>
     <div>
-      <h1 class="title">用户注册</h1>
-      <h2 class="subtitle">请输入新用户信息</h2>
-      <el-form :model="signUpForm" ref="signUpForm" :rules="rules" label-position="left" label-width="80px">
-        <el-form-item label="用户名" prop="account">
-          <el-input v-model="signUpForm.account" placeholder="请输入用户名"></el-input>
+      <h1 class="title">{{$t(`signUp.signUp`)}}</h1>
+      <h2 class="subtitle">{{$t(`signUp.inputUserInfo`)}}</h2>
+      <el-form :model="signUpForm" ref="signUpForm" :rules="rules" label-position="left" label-width="90px">
+        <el-form-item :label="$t(`signUp.username`)" prop="account">
+          <el-input v-model="signUpForm.account" :placeholder="$t(`signUp.inputUsername`)"></el-input>
         </el-form-item>
-        <el-form-item label="昵称" prop="name">
-          <el-input v-model="signUpForm.name" placeholder="请输入昵称"></el-input>
+        <el-form-item :label="$t(`signUp.nickname`)" prop="name">
+          <el-input v-model="signUpForm.name" :placeholder="$t(`signUp.inputNickname`)"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input type="email" v-model.trim="signUpForm.email" placeholder="请输入邮箱"></el-input>
+        <el-form-item :label="$t(`signUp.mail`)" prop="email">
+          <el-input type="email" v-model.trim="signUpForm.email" :placeholder="$t(`signUp.inputMail`)"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="signUpForm.password" placeholder="请输入密码"></el-input>
+        <el-form-item :label="$t(`signUp.password`)" prop="password">
+          <el-input v-model="signUpForm.password" :placeholder="$t(`signUp.inputPass`)"></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="submit" @click="submit" class="btn-md btn-theme btn-block login-btn">注册</el-button>
+      <el-button type="submit" @click="submit" class="btn-md btn-theme btn-block login-btn">{{$t(`signUp.signUp`)}}</el-button>
     </div>
   </div>
 </template>
@@ -37,13 +37,17 @@ export default {
         password: '',
         email: '',
         phone: ''
-      },
-      rules: {
+      }
+    }
+  },
+  computed: {
+    rules () {
+      return {
         account: [
           {
             type: 'string',
             required: true,
-            message: '请输入用户名',
+            message: this.$t(`signUp.inputUsername`),
             trigger: 'blur'
           }
         ],
@@ -51,12 +55,12 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请输入邮箱',
+            message: this.$t(`signUp.inputMail`),
             trigger: 'blur'
           },
           {
             type: 'email',
-            message: '请输入正确的邮箱地址',
+            message: this.$t(`signUp.inputMailCheck`),
             trigger: ['blur', 'change']
           }
         ],
@@ -64,7 +68,7 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请输入昵称',
+            message: this.$t(`signUp.inputNickname`),
             trigger: 'blur'
           }
         ],
@@ -72,7 +76,7 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请输入密码',
+            message: this.$t(`signUp.inputPass`),
             trigger: 'blur'
           }
         ]
@@ -88,7 +92,7 @@ export default {
             console.log(error)
           )
           if (res) {
-            this.$message.success('用户注册成功')
+            this.$message.success(this.$t(`signUp.signUpSuccess`))
             this.openLogin()
           }
         }

@@ -10,7 +10,7 @@
                    type="primary"
                    :href="`https://docs.koderover.com/zadig/settings/system-settings/#任务配置`"
                    :underline="false"
-                   target="_blank">帮助文档</el-link>
+                   target="_blank">{{$t(`global.helpDoc`)}}</el-link>
         </template>
       </el-alert>
     </template>
@@ -44,7 +44,7 @@
       <section class="save-concurrency-setting">
         <el-button @click="updateConcurrencySettings(workflowConcurrency, buildConcurrency)"
                    size="small"
-                   type="primary">保存</el-button>
+                   type="primary">{{$t(`global.save`)}}</el-button>
       </section>
       <br/>
       <section>
@@ -85,7 +85,7 @@
       <section class="operation">
         <el-button @click="setCapacity('WorkflowTaskRetention',selectType,WorkflowTaskRetention[selectType])"
                    size="small"
-                   type="primary">保存</el-button>
+                   type="primary">{{$t(`global.save`)}}</el-button>
       </section>
     </div>
   </div>
@@ -138,8 +138,8 @@ export default {
         const type = this.selectType
         const countStr = (type === 'max_days' ? `最新 ${this.WorkflowTaskRetention.max_days} 天` : `最近 ${this.WorkflowTaskRetention.max_items} 个`)
         this.$confirm(`只保留${countStr}任务产生的数据（包括构建日志、构建产生的 Tar 包、测试日志和测试报告），其他历史任务数据将被永久删除<br><span style="color:#ff1949;font-size:13px">注意：确定后，立即生效</span>`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           dangerouslyUseHTMLString: true,
           type: 'warning'
         }).then(() => {

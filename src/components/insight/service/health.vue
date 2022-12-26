@@ -12,6 +12,7 @@ import 'echarts/lib/component/legend'
 import 'echarts/lib/chart/pie'
 import { getServiceHealthAPI } from '@api'
 export default {
+  // TODO: HELP WITH THIS
   data () {
     return {
       option: {
@@ -43,7 +44,7 @@ export default {
         },
         series: [
           {
-            name: '任务状态',
+            name: this.$t('dataStatistics.insight.taskStatus'),
             type: 'pie',
             radius: ['50%', '70%'],
             avoidLabelOverlap: false,
@@ -83,8 +84,8 @@ export default {
               }
             },
             data: [
-              { value: 0, name: '失败' },
-              { value: 0, name: '成功' }
+              { value: 0, name: this.$t('workflowTaskStatus.failed') },
+              { value: 0, name: this.$t('workflowTaskStatus.passed') }
             ]
           }
         ]
@@ -97,10 +98,15 @@ export default {
       const endTime = Math.floor(this.selectedDuration[1] / 1000)
       const selectedProjects = this.selectedProjects
       getServiceHealthAPI({ startDate: startTime, endDate: endTime, projectNames: selectedProjects }).then((res) => {
-        this.option.series[0].data = [{
-          value: res.totalFailure, name: '失败'
-        }, { value: res.totalSuccess, name: '成功' }
-        ]
+        this.option.series[0].data =
+        [{
+          value: res.totalFailure,
+          name: this.$t('workflowTaskStatus.failed')
+        },
+        {
+          value: res.totalSuccess,
+          name: this.$t('workflowTaskStatus.passed')
+        }]
       })
     }
   },

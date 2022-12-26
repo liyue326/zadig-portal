@@ -6,12 +6,12 @@
     </div>
     <el-form label-position="left" label-width="140px" size="small">
       <el-collapse v-model="activeName">
-        <el-collapse-item title="工作流变量" name="env" class="mg-l8" v-if="payload.params && payload.params.length>0&&isShowParams">
+        <el-collapse-item :title="$t(`workflow.workflowVars`)" name="env" class="mg-l8" v-if="payload.params && payload.params.length>0&&isShowParams">
           <el-table :data="payload.params.filter(item=>item.isShow)">
-            <el-table-column label="键">
+            <el-table-column :label="$t(`global.key`)">
               <template slot-scope="scope">{{scope.row.name}}</template>
             </el-table-column>
-            <el-table-column label="值">
+            <el-table-column :label="$t(`global.value`)">
               <template slot-scope="scope">
                 <el-select v-model="scope.row.value" v-if="scope.row.type === 'choice'" size="small" style="width: 220px;">
                   <el-option v-for="(item,index) in scope.row.choice_option" :key="index" :value="item" :label="item">{{item}}</el-option>
@@ -49,7 +49,7 @@
               <span class="mg-l8">{{job.name}}</span>
             </template>
             <div v-if="job.type === 'zadig-build'">
-              <el-form-item label="服务组件">
+              <el-form-item :label="$t(`global.serviceModule`)">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -72,7 +72,7 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="镜像仓库" prop="docker_registry_id">
+              <el-form-item :label="$t(`status.imageRepo`)" prop="docker_registry_id">
                 <el-select v-model="job.spec.docker_registry_id" filterable placeholder="请选择镜像" size="small" style="width: 220px;">
                   <el-option v-for="item in dockerList" :key="item.id" :label="`${item.reg_addr}/${item.namespace}`" :value="item.id"></el-option>
                 </el-select>
@@ -82,7 +82,7 @@
               </div>
             </div>
             <div v-if="job.type === 'zadig-deploy'">
-              <el-form-item prop="productName" label="环境" v-if="!(job.spec.env.includes('<+fixed>')||job.spec.env.includes('{{'))">
+              <el-form-item prop="productName" :label="$t(`project.environments`)" v-if="!(job.spec.env.includes('<+fixed>')||job.spec.env.includes('{{'))">
                 <el-select v-model="job.spec.env" size="medium" @change="getRegistryId(job.spec.env)" style="width: 220px;">
                   <el-option
                     v-for="pro of currentProjectEnvs"
@@ -94,7 +94,7 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="服务组件" v-if="job.spec.source === 'runtime'">
+              <el-form-item :label="$t(`global.serviceModule`)" v-if="job.spec.source === 'runtime'">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -140,7 +140,7 @@
               </div>
             </div>
             <div v-if="job.type === 'custom-deploy'">
-              <el-form-item label="选择容器" v-if="job.spec.source === 'runtime'">
+              <el-form-item :label="$t(`workflow.selectContainer`)" v-if="job.spec.source === 'runtime'">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -200,7 +200,7 @@
               </el-table>
             </div>
             <div v-if="job.type === 'k8s-resource-patch'">
-              <el-form-item label="资源名称">
+              <el-form-item :label="$t(`workflow.resourceName`)">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -220,12 +220,12 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="更新内容">
+              <el-form-item :label="$t(`workflow.updateContent`)">
                 <div v-for="(item,index) in job.pickedTargets" :key="index">
                   <span>{{item.resource_name}}</span>
                   <el-table :data="item.params">
-                    <el-table-column label="键" prop="name"></el-table-column>
-                    <el-table-column label="值">
+                    <el-table-column :label="$t(`global.key`)" prop="name"></el-table-column>
+                    <el-table-column :label="$t(`global.value`)">
                       <template slot-scope="scope">
                         <el-select v-model="scope.row.value" v-if="scope.row.type === 'choice'" size="small" style="width: 220px;">
                           <el-option v-for="(item,index) in scope.row.choice_option" :key="index" :value="item" :label="item">{{item}}</el-option>
@@ -254,8 +254,8 @@
               </el-form-item>
             </div>
             <div v-if="job.type === 'k8s-gray-release'">
-              <el-form-item label="灰度百分比">{{job.spec.gray_scale}}</el-form-item>
-              <el-form-item label="选择容器" v-if="!job.spec.from_job">
+              <el-form-item :label="$t(`workflow.grayPercentage`)">{{job.spec.gray_scale}}</el-form-item>
+              <el-form-item :label="$t(`workflow.selectContainer`)" v-if="!job.spec.from_job">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -335,7 +335,7 @@
                 </el-form-item>
               </div>
             </div>
-            <div class="font-gray" v-if="job.type === 'k8s-canary-release'">无需输入变量</div>
+            <div class="font-gray" v-if="job.type === 'k8s-canary-release'">{{$t(`workflow.noNeedToEnterVariables`)}}</div>
             <div v-if="job.type === 'k8s-blue-green-deploy'">
               <el-form-item label="K8s service 名称">
                 <el-select
@@ -374,7 +374,7 @@
                 </el-form-item>
               </div>
             </div>
-            <div class="font-gray" v-if="job.type === 'k8s-blue-green-release'">无需输入变量</div>
+            <div class="font-gray" v-if="job.type === 'k8s-blue-green-release'">{{$t(`workflow.noNeedToEnterVariables`)}}</div>
             <div v-if="job.type === 'freestyle'">
               <CustomWorkflowCommonRows :job="job" />
             </div>
@@ -393,7 +393,7 @@
             </div>
             <div v-if="job.type==='zadig-distribute-image'">
               <div v-if="job.spec.source === 'runtime'">
-                <el-form-item label="服务组件">
+                <el-form-item :label="$t(`global.serviceModule`)">
                   <el-select
                     v-model="job.pickedTargets"
                     filterable
@@ -417,7 +417,7 @@
                   </el-select>
                 </el-form-item>
                 <el-table :data="job.pickedTargets">
-                  <el-table-column label="服务" min-width="15%">
+                  <el-table-column :label="$t(`project.services`)" min-width="15%">
                     <template slot-scope="scope">{{`${scope.row.service_module}(${scope.row.service_name})`}}</template>
                   </el-table-column>
                   <el-table-column label="原始镜像版本" min-width="25%">
@@ -448,7 +448,7 @@
               </div>
               <div v-else>
                 <el-table :data="fromJobInfo.pickedTargets">
-                  <el-table-column label="服务" min-width="20%">
+                  <el-table-column :label="$t(`project.services`)" min-width="20%">
                     <template slot-scope="scope">{{`${scope.row.service_module}(${scope.row.service_name})`}}</template>
                   </el-table-column>
                   <el-table-column label="原始镜像版本" min-width="20%">
@@ -478,7 +478,7 @@
                 <span>新版本副本数百分比:{{job.spec.replica_percentage}}%</span>
                 <span style="margin-left: 10px;">新版本流量百分比:{{job.spec.weight}}%</span>
               </div>
-              <el-form-item label="选择容器" v-if="!job.spec.from_job">
+              <el-form-item :label="$t(`workflow.selectContainer`)" v-if="!job.spec.from_job">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -521,7 +521,7 @@
               </div>
             </div>
             <div v-if="job.type === 'istio-rollback'">
-              <el-form-item label="选择容器">
+              <el-form-item :label="$t(`workflow.selectContainer`)">
                 <el-select
                   v-model="job.pickedTargets"
                   filterable
@@ -544,7 +544,7 @@
               <template v-if="job.pickedTargets.length > 0">
                 <span style="color: #606266;">回滚版本信息</span>
                 <el-table :data="job.pickedTargets">
-                  <el-table-column label="容器名称" prop="value">
+                  <el-table-column :label="$t(`workflow.containerName`)" prop="value">
                     <template slot-scope="scope">
                       <span>{{`${scope.row.workload_name}/${scope.row.container_name}`}}</span>
                     </template>
@@ -557,17 +557,10 @@
           </el-collapse-item>
         </div>
       </el-collapse>
-      <el-button
-        @click="runTask"
-        :disabled="hasPlutus && notReady"
-        :loading="startTaskLoading"
-        type="primary"
-        size="small"
-        class="mg-t16"
-      >{{ startTaskLoading?'启动中':'启动任务' }}</el-button>
+      <el-button @click="runTask" :loading="startTaskLoading" type="primary" size="small" class="mg-t16">{{ startTaskLoading?$t(`workflow.starting`):$t(`workflow.run`) }}</el-button>
     </el-form>
     <el-dialog
-      title="修改手机号码"
+      :title="$t(`profile.changePhone`)"
       :close-on-click-modal="false"
       :append-to-body="true"
       custom-class="edit-form-dialog"
@@ -575,7 +568,7 @@
     >
       <el-form :model="userInfo" @submit.native.prevent ref="mailForm">
         <el-form-item
-          label="新手机号码"
+          :label="$t(`profile.newPhone`)"
           label-width="100px"
           prop="phone"
           size="small"
@@ -589,8 +582,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" native-type="submit" size="small" @click="updateUser" class="start-create">确定</el-button>
-        <el-button plain native-type="submit" size="small" @click="dialogMailEditFormVisible=false">取消</el-button>
+        <el-button type="primary" native-type="submit" size="small" @click="updateUser" class="start-create">{{$t(`global.confirm`)}}</el-button>
+        <el-button plain native-type="submit" size="small" @click="dialogMailEditFormVisible=false">{{$t(`global.cancel`)}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -1174,7 +1167,7 @@ export default {
               this.fromJobInfo.pickedTargets.forEach(item => {
                 if (item.update_tag && !item.target_tag) {
                   this.$message.error(
-                    `请填写 ${item.service_name} 中的目标镜像版本`
+                    this.$t(`workflow.inputTargetImage`, { serviceName: item.service_name })
                   )
                   throw Error()
                 }

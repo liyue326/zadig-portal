@@ -1,56 +1,56 @@
 <template>
   <div class="users-overview-container">
     <!--start of add user dialog-->
-    <el-dialog title="新建用户" custom-class="create-user-dialog" :close-on-click-modal="false" :visible.sync="dialogAddUserVisible">
+    <el-dialog :title="$t('sysSetting.users.addUser')" custom-class="create-user-dialog" :close-on-click-modal="false" :visible.sync="dialogAddUserVisible">
       <el-form
         :model="addUser"
         @submit.native.prevent
         :rules="addUserRule"
         ref="addUserForm"
         label-position="left"
-        label-width="80px"
+        label-width="100px"
         class="primary-form"
       >
-        <el-form-item label="用户名" prop="account">
+        <el-form-item :label="$t('sysSetting.users.username')" prop="account">
           <el-input size="small" v-model="addUser.account"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item :label="$t('sysSetting.users.password')" prop="password">
           <el-input size="small" v-model="addUser.password"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item :label="$t('sysSetting.users.mail')" prop="email">
           <el-input size="small" v-model="addUser.email"></el-input>
         </el-form-item>
-        <el-form-item label="昵称" prop="name">
+        <el-form-item :label="$t('sysSetting.users.nickname')" prop="name">
           <el-input size="small" v-model="addUser.name"></el-input>
         </el-form-item>
-        <el-form-item label="手机" prop="phone">
+        <el-form-item :label="$t('sysSetting.users.phone')" prop="phone">
           <el-input size="small" v-model="addUser.phone"></el-input>
         </el-form-item>
-        <el-form-item label="角色" prop="isAdmin">
-          <el-select size="small" v-model="addUser.isAdmin" multiple placeholder="请选择角色">
+        <el-form-item :label="$t('sysSetting.users.role')" prop="isAdmin">
+          <el-select size="small" v-model="addUser.isAdmin" multiple :placeholder="$t('sysSetting.users.selectRole')">
             <el-option :label="item.name" :value="item.name"  v-for="item in roleList" :key="item.desc">
           </el-option>
         </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" native-type="submit" size="small" @click="addUserOperation" class="start-create">确定</el-button>
-        <el-button plain native-type="submit" size="small" @click="dialogAddUserVisible = false">取消</el-button>
+        <el-button type="primary" native-type="submit" size="small" @click="addUserOperation" class="start-create">{{$t(`global.confirm`)}}</el-button>
+        <el-button plain native-type="submit" size="small" @click="dialogAddUserVisible = false">{{$t(`global.cancel`)}}</el-button>
       </div>
     </el-dialog>
     <!--end of add user dialog-->
     <div class="search-user">
       <el-row :gutter="10">
-        <el-col :span="6">
+        <el-col :span="10">
           <div class="search-member">
-            <span class="text-title">搜索成员:</span>
+            <span class="text-title">{{$t('sysSetting.users.searchUser')}}</span>
             <el-button v-if="!searchInputVisible" size="small" @click="searchInputVisible=true" plain type="primary" icon="el-icon-search"></el-button>
             <transition name="fade">
               <el-input
                 v-if="searchInputVisible"
                 size="small"
                 v-model.lazy="searchUser"
-                placeholder="请输入昵称"
+                :placeholder="$t('sysSetting.users.inputNickname')"
                 autofocus
                 clearable
                 prefix-icon="el-icon-search"
@@ -58,12 +58,12 @@
             </transition>
           </div>
         </el-col>
-        <el-col :span="3">
-          <el-button @click="dialogAddUserVisible=true" size="small" plain type="primary">新建用户</el-button>
+        <el-col :span="6">
+          <el-button @click="dialogAddUserVisible=true" size="small" plain type="primary">{{$t('sysSetting.users.addUser')}}</el-button>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="6">
           <div style="width: 100%; line-height: 32px;">
-            <span class="text-title">用户注册:</span>
+            <span class="text-title">{{$t('sysSetting.users.userRegistration')}}</span>
             <el-switch v-model="registrationStatus"
                        @change="changeRegistration"
                        active-color="#0066ff">
@@ -74,12 +74,12 @@
     </div>
     <div
       v-loading="loading"
-      element-loading-text="加载中..."
+      :element-loading-text="$t(`global.loading`)"
       element-loading-spinner="iconfont iconfont-loading icongeren"
       class="users-container"
     >
       <el-table :data="users" style="width: 100%;">
-        <el-table-column label="用户">
+        <el-table-column :label="$t('sysSetting.users.users')">
           <template slot-scope="scope">
             <div class="name-listing-details">
               <!-- Logo -->
@@ -90,7 +90,7 @@
               <div class="name-listing-description">
                 <h3 class="name-listing-title">
                   {{ scope.row.name ? `${scope.row.name}(${scope.row.account})`: scope.row.account }}
-                  <el-tag size="mini" v-if="scope.row.admin"  effect="plain">{{ '管理员' }}</el-tag>
+                  <el-tag size="mini" v-if="scope.row.admin"  effect="plain">{{$t('sysSetting.users.admin')}}</el-tag>
                 </h3>
                 <!-- Name Listing Footer -->
                 <div class="name-listing-footer">
@@ -109,13 +109,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="last_login_time" label="登录信息">
+        <el-table-column prop="last_login_time" :label="$t('sysSetting.users.loginInfo')">
           <template slot-scope="scope">
             <span v-if="scope.row.last_login_time">{{$utils.convertTimestamp(scope.row.last_login_time)}}</span>
-            <span v-else>{{'尚未登录'}}</span>
+            <span v-else>{{$t('sysSetting.users.notLoggedIn')}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="来源">
+        <el-table-column :label="$t('sysSetting.users.source')">
           <template slot-scope="scope">
             <span v-if="scope.row.identity_type" class="origin">
               <i class="iconfont type" :class="'icon'+scope.row.identity_type"></i>
@@ -123,10 +123,10 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="280">
+        <el-table-column :label="$t(`global.operation`)" width="280">
           <template slot-scope="scope">
-            <el-button @click="editUserInfo(scope.row)" type="primary" size="mini" plain>编辑</el-button>
-            <el-button @click="deleteUser(scope.row)" type="danger" size="mini" plain>删除</el-button>
+            <el-button @click="editUserInfo(scope.row)" type="primary" size="mini" plain>{{$t(`global.edit`)}}</el-button>
+            <el-button @click="deleteUser(scope.row)" type="danger" size="mini" plain>{{$t(`global.delete`)}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -159,7 +159,6 @@ import {
   changeRegistrationAPI,
   getRoleListAPI
 } from '@api'
-import bus from '@utils/eventBus'
 import EditUserRole from './editUserInfo.vue'
 export default {
   components: {
@@ -188,18 +187,25 @@ export default {
       searchInputVisible: true,
       registrationStatus: false,
       loading: true,
-      identityTypeMap: {
+      roleList: []
+    }
+  },
+  computed: {
+    identityTypeMap () {
+      return {
         github: 'GitHub',
-        system: '系统创建',
+        system: this.$t('sysSetting.users.identityTypeSystem'),
         ldap: 'OpenLDAP',
         oauth: 'OAuth'
-      },
-      addUserRule: {
+      }
+    },
+    addUserRule () {
+      return {
         account: [
           {
             type: 'string',
             required: true,
-            message: '请输入用户名',
+            message: this.$t('sysSetting.users.inputUsername'),
             trigger: 'blur'
           }
         ],
@@ -207,12 +213,12 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请输入登录邮箱',
+            message: this.$t('sysSetting.users.inputMail'),
             trigger: 'blur'
           },
           {
             type: 'email',
-            message: '请输入正确的邮箱地址',
+            message: this.$t('sysSetting.users.checkMail'),
             trigger: ['blur', 'change']
           }
         ],
@@ -220,7 +226,7 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请输入昵称',
+            message: this.$t('sysSetting.users.inputNickname'),
             trigger: 'blur'
           }
         ],
@@ -228,12 +234,11 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请输入密码',
+            message: this.$t('sysSetting.users.inputPassword'),
             trigger: 'blur'
           }
         ]
-      },
-      roleList: []
+      }
     }
   },
   methods: {
@@ -267,13 +272,11 @@ export default {
     },
     deleteUser (row) {
       this.$confirm(
-        `确定删除 ${this.identityTypeMap[row.identity_type]} 用户 ${
-          row.name ? row.name : row.account
-        }`,
-        '提示',
+        this.$t('sysSetting.users.deleteUserTip', { type: this.identityTypeMap[row.identity_type], name: row.name ? row.name : row.account }),
+        this.$t('sysSetting.users.tip'),
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }
       )
@@ -281,7 +284,7 @@ export default {
           deleteUserAPI(row.uid).then(res => {
             this.$message({
               type: 'success',
-              message: '用户删除成功'
+              message: this.$t('sysSetting.users.userHasBeenDeleted')
             })
             this.getUsers(
               this.userPageSize,
@@ -294,7 +297,7 @@ export default {
           console.log(error)
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: this.$t('sysSetting.users.cancelDelete')
           })
         })
     },
@@ -327,7 +330,7 @@ export default {
             )
             this.$message({
               type: 'success',
-              message: '新建用户成功'
+              message: this.$t('sysSetting.users.addImageSuccess')
             })
           })
         } else {
@@ -349,7 +352,7 @@ export default {
         this.checkRegistration()
         this.$message({
           type: 'success',
-          message: '更改成功'
+          message: this.$t('sysSetting.users.changeUserRegistrationStatusSuccess')
         })
       })
     },
@@ -368,8 +371,7 @@ export default {
       }
       const res = await getRoleListAPI(payload).catch(error => {
         console.log(error)
-      }
-      )
+      })
 
       if (res) {
         this.roleList = res
@@ -387,8 +389,6 @@ export default {
     }
   },
   created () {
-    bus.$emit('set-topbar-title', { title: '用户管理', breadcrumb: [] })
-
     this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
     this.checkRegistration()
   }
@@ -468,7 +468,7 @@ export default {
     margin-bottom: 15px;
 
     .text-title {
-      margin-right: 15px;
+      margin-right: 5px;
       color: rgba(0, 0, 0, 0.65);
     }
 

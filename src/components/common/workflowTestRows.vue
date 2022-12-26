@@ -8,7 +8,7 @@
                        label="测试"
                        width="100px"></el-table-column>
 
-      <el-table-column label="代码库">
+      <el-table-column :label="$t(`global.repository`)">
         <template slot-scope="scope">
           <el-row v-for="build of scope.row.builds"
                   class="build-row"
@@ -29,20 +29,20 @@
                             allow-create
                             clearable
                             size="small"
-                            placeholder="请选择分支">
+                            :placeholder="$t(`repository.prompt.chooseBranch`)">
                   <el-option v-for="branch of build.branchNames"
                               :key="branch"
                               :label="branch"
                               :value="branch"></el-option>
                 </el-select>
                 <el-tooltip v-else
-                            content="请求分支失败，请手动输入分支"
+                            :content="$t(`repository.prompt.getBranchErrorInputBranch`)"
                             placement="top"
                             popper-class="gray-popper">
                   <el-input v-model="build.branch"
                             class="short-input"
                             size="small"
-                            placeholder="请填写分支"></el-input>
+                            :placeholder="$t(`repository.prompt.inputBranch`)"></el-input>
                 </el-tooltip>
               </el-col>
 
@@ -52,7 +52,7 @@
                             v-model="build.prs"
                             multiple
                             size="small"
-                            placeholder="请选择 PR"
+                            :placeholder="$t(`repository.prompt.choosePR`)"
                             filterable
                             clearable>
 
@@ -61,10 +61,10 @@
                               placement="left"
                               popper-class="gray-popper">
 
-                    <div slot="content">{{`创建人: ${$utils.tailCut(item.authorUsername,10)}`}}
-                      <br />{{`时间: ${$utils.convertTimestamp(item.createdAt)}`}}
-                      <br />{{`源分支: ${item.sourceBranch}`}}
-                      <br />{{`目标分支: ${item.targetBranch}`}}
+                    <div slot="content">{{`${$t('repository.info.creatorTemplate')}${$utils.tailCut(item.authorUsername,10)}`}}
+                      <br />{{`${$t('repository.info.creationTimeTemplate')}${$utils.convertTimestamp(item.createdAt)}`}}
+                      <br />{{`${$t('repository.info.sourceBranchTemplate')}${item.sourceBranch}`}}
+                      <br />{{`${$t('repository.info.targetBranchTemplate')}${item.targetBranch}`}}
                     </div>
                     <el-option :label="`#${item[build.prNumberPropName]} ${item.title}`"
                                 :value="item[build.prNumberPropName]">
@@ -72,13 +72,13 @@
                   </el-tooltip>
                 </el-select>
                 <el-tooltip v-else
-                            content="PR 不存在，支持手动输入 PR 号，多个 PR 用 , 分隔"
+                            :content="$t(`repository.prompt.prDoesNotExist`)"
                             placement="top"
                             popper-class="gray-popper">
                   <el-input v-model="build.prs"
                             class="short-input"
                             size="small"
-                            placeholder="请填写 PR 号"></el-input>
+                            :placeholder="$t(`repository.prompt.inputPR`)"></el-input>
                 </el-tooltip>
               </el-col>
               <el-col :span="1">
@@ -97,7 +97,7 @@
       <el-table-column width="250px">
       </el-table-column>
       <el-table-column width="100px"
-                       label="变量">
+                       :label="$t(`global.var`)">
         <template slot-scope="scope">
           <el-popover placement="left"
                       width="450"

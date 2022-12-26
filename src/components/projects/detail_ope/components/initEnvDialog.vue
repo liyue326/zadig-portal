@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="`设置 ${currentEnv} 环境变量`" :visible.sync="dialogVisible" width="850px">
     <div>
-      <VarList :variables="variables" v-if="deployType === 'k8s'" class="var-list-container"></VarList>
+      <K8sEnvTemplate v-if="deployType === 'k8s'" :currentInfo="currentInfo" class="var-list-container" />
       <HelmEnvTemplate
         v-else-if="deployType === 'helm'"
         class="chart-value"
@@ -13,13 +13,13 @@
       ></HelmEnvTemplate>
     </div>
     <div slot="footer">
-      <el-button size="small" type="primary" @click="getEnvInfo">确 定</el-button>
+      <el-button size="small" type="primary" @click="getEnvInfo">{{$t(`global.confirm`)}}</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import VarList from '@/components/projects/env/k8sPmEnv/varList.vue'
+import K8sEnvTemplate from './k8sEnvTemplate.vue'
 import HelmEnvTemplate from '@/components/projects/env/env_detail/components/updateHelmEnvTemp.vue'
 import { cloneDeep } from 'lodash'
 
@@ -32,7 +32,6 @@ export default {
   },
   data () {
     return {
-      variables: [],
       chartNames: [],
       currentEnvObj: undefined
     }
@@ -57,14 +56,11 @@ export default {
   watch: {
     currentEnv: async function (nVal, oVal) {
       if (!nVal) {
-        this.variables = []
         this.chartNames = []
         this.currentEnvObj = undefined
         return
       }
-      if (this.deployType === 'k8s') {
-        this.variables = cloneDeep(this.currentInfo.vars)
-      } else {
+      if (this.deployType === 'helm') {
         // for service charts
         this.chartNames = cloneDeep(this.currentInfo.chartValues || []).map(chart => {
           return {
@@ -75,7 +71,7 @@ export default {
         })
         // for environment
         const valuesData = this.currentInfo.valuesData
-        const currentEnvObj = { yamlSource: 'customEdit', envValue: this.currentInfo.defaultValues, gitRepoConfig: null, variableSet: null }
+        const currentEnvObj = { yamlSource: 'customEdit', envValue: this.currentInfo.default_values, gitRepoConfig: null, variableSet: null }
         if (valuesData) {
           currentEnvObj.yamlSource = valuesData.yamlSource
           if (valuesData.yamlSource === 'repo') {
@@ -93,15 +89,13 @@ export default {
   },
   methods: {
     getEnvInfo () {
-      if (this.deployType === 'k8s') {
-        this.currentInfo.vars = cloneDeep(this.variables)
-      } else {
+      if (this.deployType === 'helm') {
         const {
           envInfo,
           chartInfo
         } = this.$refs.helmEnvTemplateRef.getAllInfo()
         const defaultEnv = envInfo.DEFAULT
-        this.currentInfo.defaultValues = defaultEnv.envValue || ''
+        this.currentInfo.default_values = defaultEnv.envValue || ''
         this.currentInfo.valuesData = defaultEnv.valuesData || null
         this.currentInfo.chartValues = chartInfo
       }
@@ -109,7 +103,7 @@ export default {
     }
   },
   components: {
-    VarList,
+    K8sEnvTemplate,
     HelmEnvTemplate
   }
 }

@@ -8,15 +8,15 @@
     <el-dropdown-menu slot="dropdown">
       <el-dropdown-item command="runtime" v-if="isRuntime">
         <span class="iconfont iconshuru"></span>
-        运行时输入
+        {{$t(`workflow.runtimeInput`)}}
       </el-dropdown-item>
       <el-dropdown-item command="fixed" v-if="isFixed">
         <span class="iconfont icongudingzhi"></span>
-        固定值
+        {{$t(`workflow.fixedvalue`)}}
       </el-dropdown-item>
       <el-dropdown-item command="other" v-if="isOther">
         <span class="iconfont iconhanshu"></span>
-          全局变量/其他任务输出
+        {{$t(`workflow.globalVariableOrotherTaskOutput`)}}
       </el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>

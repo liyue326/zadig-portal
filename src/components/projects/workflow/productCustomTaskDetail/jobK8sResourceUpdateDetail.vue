@@ -8,7 +8,7 @@
         </el-tooltip>
       </el-col>
       <el-col :span="2">
-        <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?buildOverallStatusZh:"未运行"}}</a>
+        <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?$t(`workflowTaskStatus.${jobInfo.status}`):$t(`workflowTaskStatus.notRunning`)}}</a>
       </el-col>
       <el-col :span="2">
         <span>{{$utils.timeFormat(jobInfo.end_time - jobInfo.start_time)}}</span>
@@ -21,7 +21,7 @@
     </header>
     <main>
       <div class="error-wrapper mg-t8 mg-b8">
-        <el-alert v-if="jobInfo.error" title="错误信息" :description="jobInfo.error" type="error" close-text="知道了"></el-alert>
+        <el-alert v-if="jobInfo.error" :title="$t(`global.errorMsg`)" :description="jobInfo.error" type="error" :close-text="$t(`global.ok`)"></el-alert>
       </div>
       <div class="mg-b16 text-weight">更新内容</div>
       <div v-for="(item,index) in jobInfo.spec.patch_items" :key="index" style="width: 60%;" class="mg-t16 mg-b48">
@@ -30,11 +30,11 @@
           <span @click="showDetail(item)" style="color: #c0c4cc; cursor: pointer;">详情</span>
         </div>
         <div class="error-wrapper mg-t8 mg-b8">
-          <el-alert v-if="item.error" title="错误信息" :description="item.error" type="error" close-text="知道了"></el-alert>
+          <el-alert v-if="item.error" :title="$t(`global.errorMsg`)" :description="item.error" type="error" :close-text="$t(`global.ok`)"></el-alert>
         </div>
         <el-table :data="item.params">
-          <el-table-column label="键" prop="name"></el-table-column>
-          <el-table-column label="值" prop="value"></el-table-column>
+          <el-table-column :label="$t(`global.key`)" prop="name"></el-table-column>
+          <el-table-column :label="$t(`global.value`)" prop="value"></el-table-column>
         </el-table>
       </div>
     </main>
@@ -51,7 +51,7 @@
         :options="curItem.patch_strategy==='json' ? editorJsonOptions:editorOptions"
       ></codemirror>
       <div slot="footer">
-        <el-button @click="isShowDetail = false" size="small">确定</el-button>
+        <el-button @click="isShowDetail = false" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -94,7 +94,7 @@ export default {
       return this.$utils.calcOverallBuildStatus(this.jobInfo, {})
     },
     buildOverallStatusZh () {
-      return this.$translate.translateTaskStatus(this.buildOverallStatus)
+      return this.$t(`workflowTaskStatus.${this.buildOverallStatus}`)
     },
     buildOverallColor () {
       return this.$translate.calcTaskStatusColor(this.buildOverallStatus)

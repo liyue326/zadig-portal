@@ -1,133 +1,118 @@
 <template>
-  <el-dialog title :visible.sync="dialogVisible" width="740px" custom-class="manage-k8s-service-dialog" :close-on-click-modal="false">
+  <el-dialog
+    title
+    :visible.sync="dialogVisible"
+    width="740px"
+    custom-class="manage-k8s-service-dialog"
+    :before-close="closeDialog"
+    :close-on-click-modal="false"
+  >
     <div slot="title">{{ productInfo.env_name }} 环境 - {{ opeDesc }}服务</div>
     <div class="manage-services-container">
       <el-form ref="serviceFormRef" class="primary-form" :model="updateServices" label-width="100px" label-position="left">
         <el-form-item
-          label="服务选择"
+          :label="$t(`workflow.selectService`)"
           props="service_names"
           :rules="{ required: true, type: 'array', message: '请选择服务名称', trigger: ['blur', 'change']}"
         >
           <el-select v-model="updateServices.service_names" placeholder="请选择服务" size="small" filterable multiple clearable collapse-tags>
-            <el-option v-for="service in currentAllInfo.services" :key="service" :label="service" :value="service"></el-option>
+            <el-option v-for="service in currentServices" :key="service" :label="service" :value="service"></el-option>
           </el-select>
-          <el-button type="primary" size="mini" plain @click="updateServices.service_names = currentAllInfo.services">全选</el-button>
+          <el-button type="primary" size="mini" plain @click="updateServices.service_names = currentServices">全选</el-button>
         </el-form-item>
       </el-form>
-      <template v-if="hasPlutus && opeType === 'add'">
-        <div class="header">服务名称</div>
-        <CheckResource :checkResource="checkResource" :currentResourceCheck="currentResourceCheck" @checkRes="svcResources = $event" />
-      </template>
       <template v-if="opeType !== 'delete'">
-        <div v-show="opeType === 'update' || currentVars.length">
-          <div class="header">变量配置</div>
-          <div class="var-title">
-            所选服务有使用环境变量，请确认对应变量值
-            <VariablePreviewEditor
-              :services="previewServices"
-              :projectName="productInfo.product_name"
-              :envName="productInfo.env_name"
-              :variables="currentVars"
-            />
-          </div>
-          <el-table :data="currentVars" style="width: 100%;">
-            <el-table-column prop="key" label="键"></el-table-column>
-            <el-table-column label="值">
-              <template slot-scope="{ row }">
-                <VariableEditor :varKey="row.key" :value.sync="row.value" />
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
+        <div class="header">服务列表</div>
+        <CheckResource
+          v-if="hasPlutus && opeType==='add'"
+          :checkResource="checkResource"
+          :currentResourceCheck="currentResourceCheck"
+          :expandKeys="expandKeys"
+          @checkRes="svcResources = $event"
+          showExpand
+        />
+        <el-table v-else :data="currentResourceCheck" style="width: 100%;" row-key="service_name" :expand-row-keys="expandKeys">
+          <el-table-column prop="service_name" :label="$t(`global.serviceName`)"></el-table-column>
+          <el-table-column type="expand" width="100px" label="变量配置">
+            <template slot-scope="{ row }">
+              <div v-if="row.canEditYaml">
+                <div class="primary-title">变量配置</div>
+                <Resize @sizeChange="$refs[`codemirror-${row.service_name}`].refresh()" :height="'200px'">
+                  <CodeMirror :ref="`codemirror-${row.service_name}`" v-model="row.variable_yaml" />
+                </Resize>
+              </div >
+              <div v-else style="font-size: 12px; text-align: center;">无变量配置</div>
+            </template>
+          </el-table-column>
+        </el-table>
       </template>
     </div>
     <div slot="footer">
-      <el-button @click="closeDialog" size="small" :disabled="loading">取 消</el-button>
-      <el-button type="primary" size="small" @click="updateEnvironment" :loading="loading">确 定</el-button>
+      <el-button @click="closeDialog()" size="small" :disabled="loading">{{$t(`global.cancel`)}}</el-button>
+      <el-button type="primary" size="small" @click="updateEnvironment" :loading="loading">{{$t(`global.confirm`)}}</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import Resize from '@/components/common/resize'
+import CodeMirror from '@/components/projects/common/codemirror.vue'
 import CheckResource from '@/components/projects/serviceMgr/common/checkResource.vue'
 import {
   autoUpgradeEnvAPI,
   deleteEnvServicesAPI,
-  getSingleProjectAPI
+  getServiceDefaultVariableAPI
 } from '@api'
-import { cloneDeep, flatten, difference, intersection } from 'lodash'
+import { cloneDeep, flatten, difference } from 'lodash'
 import { mapState } from 'vuex'
 
 export default {
   props: {
     fetchAllData: Function,
-    productInfo: Object // add: vars/services
+    productInfo: Object, // add: vars/services
+    allServiceNames: Array
   },
   data () {
     return {
       opeType: '',
       dialogVisible: false,
-      allProductInfo: {
-        // all services and variables
-        services: [],
-        vars: []
-      },
-      currentAllInfo: {
-        // currently available services and variables
-        services: [],
-        vars: []
-      },
+      currentServices: [],
+      serviceVariables: {},
       updateServices: {
         // env_names: [], // use this parameter when adding or updating services
         service_names: [] // not use
-        // services: [{service_name: '', deploy_strategy: ''}] // use
-        // vars: []  // use this parameter when adding or updating services
+        // services: [{service_name: '', variable_yaml: '', deploy_strategy: ''}] // use
       },
       loading: false,
       svcResources: {},
-      checkResource: null
+      checkResource: null,
+      expandKeys: []
     }
   },
   computed: {
     projectName () {
       return this.$route.params.project_name
     },
-    currentVars () {
-      const services = this.updateServices.service_names
-      return this.currentAllInfo.vars.filter(
-        item => intersection(item.services, services).length
-      )
-    },
     currentResourceCheck () {
       const res = []
+      const expandKeys = []
       this.updateServices.service_names.forEach(name => {
-        res.push(
-          this.svcResources[name] || { service_name: name, deploy_strategy: '' }
-        )
+        const curSvc = this.svcResources[name] || this.serviceVariables[name]
+        if (curSvc.canEditYaml) {
+          expandKeys.push(curSvc.service_name)
+        }
+        res.push(curSvc)
       })
+      this.expandKeys = expandKeys
       return res
     },
     opeDesc () {
       const typeEnum = {
-        add: '添加',
-        update: '更新',
-        delete: '删除'
+        add: this.$t('global.add'),
+        update: this.$t('global.update'),
+        delete: this.$t('global.delete')
       }
       return typeEnum[this.opeType] || ''
-    },
-    isBaseEnv () {
-      return this.productInfo.share_env_is_base
-    },
-    baseEnvName () {
-      return this.productInfo.share_env_base_env
-    },
-    envType () {
-      return this.productInfo.share_env_enable ? 'share' : 'general'
-    },
-    previewServices () {
-      return this.updateServices.service_names.map(item => {
-        return { service_name: item }
-      })
     },
     ...mapState({
       hasPlutus: state => state.checkPlutus.hasPlutus
@@ -185,11 +170,11 @@ export default {
             services: this.currentResourceCheck.map(resource => {
               return {
                 service_name: resource.service_name,
+                variable_yaml: resource.variable_yaml,
                 deploy_strategy: isAdd ? resource.deploy_strategy : 'deploy'
               }
             }),
-            env_name: this.productInfo.env_name,
-            vars: this.currentVars
+            env_name: this.productInfo.env_name
           }
         ]
         autoUpgradeEnvAPI(this.projectName, payload, false)
@@ -222,8 +207,8 @@ export default {
         `您的更新操作将覆盖环境中 ${key} 的 ${value} 服务变更，确认继续?`,
         '提示',
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }
       ).then(() => {
@@ -238,70 +223,62 @@ export default {
         })
       })
     },
-    closeDialog () {
+    closeDialog (done) {
       this.dialogVisible = false
+      this.serviceVariables = {}
       this.updateServices.service_names = []
+      done && done()
     },
     async openDialog (type) {
-      const projectName = this.projectName
-      const isBaseEnv = this.isBaseEnv
-      const baseEnvName = this.baseEnvName
-      const envType = this.envType
-      const res = await getSingleProjectAPI(
-        projectName,
-        envType,
-        isBaseEnv,
-        baseEnvName
-      )
-      if (res) {
-        this.allProductInfo = {
-          services: flatten(res.services),
-          vars: res.vars || []
-        }
-      }
       this.dialogVisible = true
       this.opeType = type
-
       const productServices = flatten(this.productInfo.services)
+      this.currentServices =
+        type === 'add'
+          ? difference(this.allServiceNames, productServices)
+          : productServices
 
-      let vars = []
-      let services = []
-      switch (this.opeType) {
-        case 'add':
-          vars = cloneDeep(this.allProductInfo.vars) || []
-          services = difference(this.allProductInfo.services, productServices)
-          break
-        case 'update':
-        case 'delete':
-          vars = cloneDeep(this.productInfo.vars) || []
-          services = productServices
-          break
-      }
-      this.currentAllInfo = { vars, services }
-    }
-  },
-  watch: {
-    productInfo: {
-      handler (val, oVal) {
-        if (this.hasPlutus && val.env_name) {
-          this.svcResources = {}
-          this.checkResource = {
-            env_name: this.productInfo.env_name,
-            namespace: this.productInfo.namespace,
-            cluster_id: this.productInfo.cluster_id,
-            vars: this.productInfo.vars.map(va => ({
-              alias: va.alias,
-              key: va.key,
-              value: va.value
-            }))
-          }
+      const serviceVariables = {}
+      this.currentServices.forEach(svc => {
+        serviceVariables[svc] = {
+          service_name: svc,
+          deploy_strategy: '',
+          variable_yaml: '',
+          canEditYaml: false
         }
-      },
-      immediate: true
+      })
+      this.serviceVariables = serviceVariables
+      const res = await getServiceDefaultVariableAPI(
+        this.projectName,
+        this.productInfo.env_name,
+        this.currentServices
+      ).catch(err => console.log(err))
+      if (res) {
+        res.forEach(svc => {
+          serviceVariables[svc.service_name] = {
+            service_name: svc.service_name,
+            deploy_strategy: '',
+            variable_yaml: svc.variable_yaml,
+            canEditYaml: !!svc.variable_yaml
+          }
+        })
+        this.serviceVariables = serviceVariables
+      }
+      this.checkSvcResource()
+    },
+    checkSvcResource () {
+      this.checkResource = {
+        env_name: this.productInfo.env_name,
+        namespace: this.productInfo.namespace,
+        cluster_id: this.productInfo.cluster_id,
+        services: Object.values(this.serviceVariables)
+      }
     }
   },
   components: {
-    CheckResource
+    CheckResource,
+    Resize,
+    CodeMirror
   }
 }
 </script>
@@ -342,6 +319,10 @@ export default {
       .el-radio__label {
         padding-left: 4px;
       }
+    }
+
+    .primary-title {
+      margin-bottom: 14px;
     }
   }
 }

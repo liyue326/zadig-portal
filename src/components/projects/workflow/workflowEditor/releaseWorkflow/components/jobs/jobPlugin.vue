@@ -1,26 +1,27 @@
 <template>
   <section class="job-plugin">
-    <el-form label-position="left" label-width="90px" :model="job" ref="ruleForm" class="mg-t24 mg-b24">
-      <el-form-item label="任务名称" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
+    <el-form label-position="left" label-width="100px" :model="job" ref="ruleForm" class="mg-t24 mg-b24">
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
       <section class="common-parcel-block">
-        <span class="title">变量</span>
+        <span class="title">{{$t(`global.var`)}}</span>
+
         <el-table :data="job.spec.plugin.inputs" class="mg-t8">
-          <el-table-column label="键">
+          <el-table-column :label="$t(`global.key`)">
             <template slot-scope="scope">
               <el-tooltip class="item" effect="dark" :content="scope.row.description" placement="top-start">
                 <span>{{scope.row.name}}</span>
               </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column label="类型">
+          <el-table-column :label="$t(`global.type`)">
             <template slot-scope="scope">
-              <span>{{scope.row.type === 'string' ? '字符串':scope.row.type==='text'?'多行文本':'枚举'}}</span>
+              <span>{{scope.row.type === 'string' ? $t(`global.string`):scope.row.type==='text'?$t(`global.multilineText`):$t(`global.enumerate`)}}</span>
               <i v-show="scope.row.type  === 'choice'" class="el-icon-edit edit-icon" @click="updateParams(scope.row)"></i>
             </template>
           </el-table-column>
-          <el-table-column label="值">
+          <el-table-column :label="$t(`global.value`)">
             <template slot-scope="scope">
               <el-select
                 v-model="scope.row.value"
@@ -69,7 +70,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column label="敏感信息">
+          <el-table-column :label="$t(`workflow.sensitiveInformation`)">
             <template slot-scope="scope">
               <el-checkbox v-model="scope.row.is_credential" :disabled="scope.row.type === 'text'||scope.row.type === 'choice'"></el-checkbox>
             </template>
@@ -80,7 +81,7 @@
         <section>
           <div style="margin-bottom: 8px;">
             <el-button type="primary" size="small" plain @click="advanced_setting_modified = !advanced_setting_modified">
-              高级配置
+              {{$t(`project.createProjectComp.advancedConfigurations`)}}
               <i :class="[advanced_setting_modified ? 'el-icon-arrow-up' : 'el-icon-arrow-down']" style="margin-left: 8px;"></i>
             </el-button>
           </div>
@@ -101,7 +102,7 @@
       </div>
     </el-form>
     <el-dialog :visible.sync="dialogVisible" title="枚举" width="600px" :close-on-click-modal="false" :show-close="false" append-to-body>
-      <el-form ref="form" :model="currentVars" label-position="left" label-width="90px">
+      <el-form ref="form" :model="currentVars" label-position="left" label-width="100px">
         <el-form-item label="变量名称">
           <el-input v-model="currentVars.name" disabled size="small"></el-input>
         </el-form-item>
@@ -110,8 +111,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveVariable" size="small">确 定</el-button>
+        <el-button @click="dialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveVariable" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
   </section>

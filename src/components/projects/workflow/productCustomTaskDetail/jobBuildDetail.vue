@@ -2,11 +2,11 @@
   <div class="job-build-detail">
     <header class="mg-b8">
       <el-col :span="6">
-        <span class="type">构建</span>
+        <span class="type">{{$t(`workflow.jobType.build`)}}</span>
         <span>{{jobInfo.name}}</span>
       </el-col>
       <el-col :span="2">
-        <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?buildOverallStatusZh:"未运行"}}</a>
+        <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?$t(`workflowTaskStatus.${jobInfo.status}`):$t(`workflowTaskStatus.notRunning`)}}</a>
       </el-col>
       <el-col :span="2">
         <span>{{jobInfo.interval}}</span>
@@ -20,17 +20,17 @@
     <main>
       <section>
         <div class="error-wrapper">
-          <el-alert v-if="jobInfo.error" title="错误信息" :description="jobInfo.error" type="error" close-text="知道了"></el-alert>
+          <el-alert v-if="jobInfo.error" :title="$t(`global.errorMsg`)" :description="jobInfo.error" type="error" :close-text="$t(`global.ok`)"></el-alert>
         </div>
         <el-row class="item" :gutter="0" v-for="(build,index) in jobInfo.spec.repos" :key="index">
           <el-col :span="4">
-            <div class="item-title">代码库({{build.source}})</div>
+            <div class="item-title">{{$t(`global.repository`)}}({{build.source}})</div>
           </el-col>
           <el-col :span="8">
             <div class="item-desc">{{build.repo_name}}</div>
           </el-col>
           <el-col :span="4">
-            <div class="item-title">代码信息</div>
+            <div class="item-title">{{$t(`global.gitMessage`)}}</div>
           </el-col>
           <el-col :span="8">
             <RepoJump :build="build" />
@@ -38,14 +38,14 @@
         </el-row>
         <el-row :gutter="0" class="item">
           <el-col :span="4">
-            <div class="item-title">服务名称</div>
+            <div class="item-title">{{$t(`global.serviceName`)}}</div>
           </el-col>
           <el-col :span="8">
             <span class="item-desc">{{jobInfo.spec.service_name}}({{jobInfo.spec.service_module}})</span>
           </el-col>
           <el-col :span="4">
             <div class="item-title">
-              镜像名称
+              {{$t(`workflow.imageName`)}}
             </div>
           </el-col>
           <el-col :span="8">
@@ -114,7 +114,7 @@ export default {
       return this.$utils.calcOverallBuildStatus(this.jobInfo, {})
     },
     buildOverallStatusZh () {
-      return this.$translate.translateTaskStatus(this.buildOverallStatus)
+      return this.$t(`workflowTaskStatus.${this.buildOverallStatus}`)
     },
     buildOverallColor () {
       return this.$translate.calcTaskStatusColor(this.buildOverallStatus)
@@ -202,7 +202,11 @@ export default {
           if (oldVal && val.name !== oldVal.name) {
             this.firstLoad = false
           }
-          if (val.status && !this.firstLoad) {
+          if (
+            (val.status === 'running' && !this.firstLoad) ||
+            (val.status === 'passed' && !this.firstLoad) ||
+            (val.status === 'failed' && !this.firstLoad)
+          ) {
             this.getLog()
             this.firstLoad = true
           }

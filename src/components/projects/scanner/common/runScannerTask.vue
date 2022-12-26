@@ -1,14 +1,14 @@
 <template>
   <div class="run-code-scanner-container">
-    <el-dialog :title="`代码扫描 ${scannerInfo.name}`" :visible="dialogVisible" @close="cancelTask" custom-class="scanner-dialog" width="60%">
+    <el-dialog :title="$t('scanning.titleWithScanName', {name: scannerInfo.name})" :visible="dialogVisible" @close="cancelTask" custom-class="scanner-dialog" width="60%">
       <el-table :data="scannerInfoDetail.repos" v-loading="loading">
-        <el-table-column prop="repo_name" label="代码库" width="180"></el-table-column>
+        <el-table-column prop="repo_name" :label="$t(`global.repository`)" width="180"></el-table-column>
         <el-table-column>
           <template slot-scope="{ row }" v-if="row.repo_name">
             <el-row>
               <template v-if="!row.use_default">
                 <el-col :span="7">
-                  <el-input v-if="row.source==='other'" v-model="row.branchOrTag.name" placeholder="请输入分支或标签" size="small"></el-input>
+                  <el-input v-if="row.source==='other'" v-model="row.branchOrTag.name" :placeholder="$t(`repository.prompt.inputBranchOrTag`)" size="small"></el-input>
                   <el-select
                     v-else
                     v-model="row.branchOrTag"
@@ -19,12 +19,12 @@
                     clearable
                     value-key="id"
                     size="small"
-                    placeholder="请选择分支或标签"
+                    :placeholder="$t(`repository.prompt.chooseBranchOrTag`)"
                     @change="changeBranchOrTag(row)"
                   >
                     <el-option-group v-for="group in row.branchAndTagList" :key="group.label" :label="group.label">
                       <el-option v-for="(item, index) in group.options" :key="index" :label="item.name" :value="item">
-                        <span v-if="item.id.startsWith('addTag')||item.id.startsWith('addBranch')">{{`使用 "${item.name}"`}}</span>
+                        <span v-if="item.id.startsWith('addTag')||item.id.startsWith('addBranch')">{{`${$t('repository.prompt.usePRorTagTemplate')}"${item.name}"`}}</span>
                         <span v-else>{{item.name}}</span>
                       </el-option>
                     </el-option-group>
@@ -37,7 +37,7 @@
                     v-model="row.prs"
                     multiple
                     size="small"
-                    placeholder="请选择 PR"
+                    :placeholder="$t(`repository.prompt.choosePR`)"
                     filterable
                     clearable
                   >
@@ -48,23 +48,23 @@
                       popper-class="gray-popper"
                     >
                       <div slot="content">
-                        {{`创建人: ${$utils.tailCut(item.authorUsername,10)}`}}
+                        {{`${$t('repository.info.creatorTemplate')}${$utils.tailCut(item.authorUsername,10)}`}}
                         <br />
-                        {{`时间: ${$utils.convertTimestamp(item.createdAt)}`}}
+                        {{`${$t('repository.info.creationTimeTemplate')}${$utils.convertTimestamp(item.createdAt)}`}}
                         <br />
-                        {{`源分支: ${item.sourceBranch}`}}
+                        {{`${$t('repository.info.sourceBranchTemplate')}${item.sourceBranch}`}}
                         <br />
-                        {{`目标分支: ${item.targetBranch}`}}
+                        {{`${$t('repository.info.targetBranchTemplate')}${item.targetBranch}`}}
                       </div>
                       <el-option :label="`#${item[row.prNumberPropName]} ${item.title}`" :value="item[row.prNumberPropName]"></el-option>
                     </el-tooltip>
                   </el-select>
-                  <el-tooltip v-else content="PR 不存在，支持手动输入 PR 号，多个 PR 用 , 分隔" placement="top" popper-class="gray-popper">
+                  <el-tooltip v-else :content="$t(`repository.prompt.prDoesNotExist`)" placement="top" popper-class="gray-popper">
                     <el-input
                       v-model="row.prs"
                       class="short-input"
                       size="small"
-                      placeholder="请填写 PR 号"
+                      :placeholder="$t(`repository.prompt.inputPR`)"
                       :disabled="row.branchOrTag && row.branchOrTag.type === 'tag'"
                     ></el-input>
                   </el-tooltip>
@@ -87,7 +87,7 @@
           :loading="startTaskLoading"
           :disabled="scannerInfoDetail.repos.length === 0"
           type="primary"
-        >启动任务</el-button>
+        >{{$t(`workflow.run`)}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -169,7 +169,7 @@ export default {
         this.$emit('update:dialogVisible', false)
         this.$message({
           type: 'success',
-          message: '任务创建成功'
+          message: this.$t(`scanning.taskCreationSuccess`)
         })
         this.$router.push(
           `/v1/projects/detail/${projectName}/scanner/detail/${scannerName}/task/${taskId}?status=running&id=${scannerId}`

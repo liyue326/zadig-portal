@@ -10,7 +10,7 @@
     <div>
       <span class="download">
         <a :href="downloadUrl" download>
-          <el-button size="small" type="primary" :disabled="fileList.file_names.length===0" plain>下载</el-button>
+          <el-button size="small" type="primary" :disabled="fileList.file_names.length===0" plain>{{$t('global.download')}}</el-button>
         </a>
       </span>
     </div>

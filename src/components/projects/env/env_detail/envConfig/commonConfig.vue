@@ -7,7 +7,7 @@
       plain
       @click="operateConfig('add')"
       style="margin-bottom: 12px;"
-    >添加</el-button>
+    >{{$t(`global.add`)}}</el-button>
     <div v-loading="configLoading">
       <ETable :tableData="currentInfos.tableData" :tableColumns="currentInfos.tableColumns" :id="currentInfos.id" />
     </div>
@@ -32,126 +32,7 @@ export default {
   },
   data () {
     return {
-      configLoading: false,
-      configInfos: {
-        Ingress: {
-          id: 'ingress_name',
-          getAPI: getIngressObjectAPI,
-          tableData: [],
-          tableColumns: [
-            {
-              prop: 'ingress_name',
-              label: '名称'
-            },
-            {
-              prop: 'host_info',
-              label: 'HOSTS'
-            },
-            {
-              prop: 'address',
-              label: '地址'
-            },
-            // {
-            //   prop: 'ports',
-            //   label: '端口'
-            // },
-            {
-              width: '210',
-              render: this.operation
-            }
-          ]
-        },
-        ConfigMap: {
-          id: 'cm_name',
-          getAPI: getConfigMapObjectAPI,
-          tableData: [],
-          tableColumns: [
-            {
-              prop: 'cm_name',
-              label: '名称'
-            },
-            {
-              prop: 'services',
-              label: '关联服务',
-              render: scope => {
-                return <span>{scope.row.services.join(', ')}</span>
-              }
-            },
-            {
-              width: '210',
-              render: this.operation
-            }
-          ]
-        },
-        Secret: {
-          id: 'secret_name',
-          getAPI: getSecretObjectAPI,
-          tableData: [],
-          tableColumns: [
-            {
-              prop: 'secret_name',
-              label: '名称'
-            },
-            {
-              prop: 'secret_type',
-              label: '类型'
-            },
-            {
-              prop: 'services',
-              label: '关联服务',
-              render: scope => {
-                return <span>{scope.row.services.join(', ')}</span>
-              }
-            },
-            {
-              width: '210',
-              render: this.operation
-            }
-          ]
-        },
-        PVC: {
-          id: 'pvc_name',
-          getAPI: getPvcObjectAPI,
-          tableData: [],
-          tableColumns: [
-            {
-              prop: 'pvc_name',
-              label: '名称'
-            },
-            {
-              prop: 'status',
-              label: '状态'
-            },
-            {
-              prop: 'volume',
-              label: '挂载点'
-            },
-            {
-              prop: 'capacity',
-              label: '容量'
-            },
-            {
-              prop: 'access_modes',
-              label: '访问模式'
-            },
-            {
-              prop: 'storageclass',
-              label: 'STORAGECLASS'
-            },
-            {
-              prop: 'services',
-              label: '关联服务',
-              render: scope => {
-                return <span>{scope.row.services.join(', ')}</span>
-              }
-            },
-            {
-              width: '210',
-              render: this.operation
-            }
-          ]
-        }
-      }
+      configLoading: false
     }
   },
   computed: {
@@ -187,6 +68,127 @@ export default {
         project => project.name === this.projectName
       )
       return current ? current.deployType === 'helm' : false
+    },
+    configInfos () {
+      return {
+        Ingress: {
+          id: 'ingress_name',
+          getAPI: getIngressObjectAPI,
+          tableData: [],
+          tableColumns: [
+            {
+              prop: 'ingress_name',
+              label: this.$t('global.name')
+            },
+            {
+              prop: 'host_info',
+              label: 'HOSTS'
+            },
+            {
+              prop: 'address',
+              label: this.$t('environments.config.address')
+            },
+            {
+              label: this.$t('global.operation'),
+              width: '250',
+              render: this.operation
+            }
+          ]
+        },
+        ConfigMap: {
+          id: 'cm_name',
+          getAPI: getConfigMapObjectAPI,
+          tableData: [],
+          tableColumns: [
+            {
+              prop: 'cm_name',
+              label: this.$t('global.name')
+            },
+            {
+              prop: 'services',
+              label: this.$t('environments.config.linkedServices'),
+              render: scope => {
+                return <span>{scope.row.services.join(', ')}</span>
+              }
+            },
+            {
+              label: this.$t('global.operation'),
+              width: '250',
+              render: this.operation
+            }
+          ]
+        },
+        Secret: {
+          id: 'secret_name',
+          getAPI: getSecretObjectAPI,
+          tableData: [],
+          tableColumns: [
+            {
+              prop: 'secret_name',
+              label: this.$t('global.name')
+            },
+            {
+              prop: 'secret_type',
+              label: this.$t('global.type')
+            },
+            {
+              prop: 'services',
+              label: this.$t('environments.config.linkedServices'),
+              render: scope => {
+                return <span>{scope.row.services.join(', ')}</span>
+              }
+            },
+            {
+              label: this.$t('global.operation'),
+              width: '250',
+              render: this.operation
+            }
+          ]
+        },
+        PVC: {
+          id: 'pvc_name',
+          getAPI: getPvcObjectAPI,
+          tableData: [],
+          tableColumns: [
+            {
+              prop: 'pvc_name',
+              label: this.$t('global.type')
+            },
+            {
+              prop: 'status',
+              label: this.$t('global.status')
+            },
+            {
+              prop: 'volume',
+              label: this.$t('environments.config.volume')
+            },
+            {
+              prop: 'capacity',
+              label: this.$t('environments.config.capacity')
+            },
+            {
+              prop: 'access_modes',
+              label: this.$t('environments.config.accessModes')
+            },
+            {
+              prop: 'storageclass',
+              label: 'Storage Class'
+            },
+            {
+              prop: 'services',
+              label: this.$t('environments.config.linkedServices'),
+              render: scope => {
+                return <span>{scope.row.services.join(', ')}</span>
+              }
+            },
+            {
+              label: this.$t('global.operation'),
+              width: '250',
+              render: this.operation
+            }
+          ]
+        }
+      }
     }
   },
   watch: {
@@ -213,7 +215,7 @@ export default {
               this.operateConfig('view', scope.row, scope.$index)
             }}
           >
-            查看
+            { this.$t('global.view') }
           </el-button>
           <el-button
             type="text"
@@ -229,7 +231,7 @@ export default {
             }}
             disabled={scope.row.immutable}
           >
-            编辑
+            { this.$t('global.edit') }
           </el-button>
           <el-button
             type="text"
@@ -244,7 +246,7 @@ export default {
               this.operateConfig('history', scope.row, scope.$index)
             }}
           >
-            历史版本
+            {this.$t('environments.config.versionHistory')}
           </el-button>
           <el-button
             type="text"
@@ -259,7 +261,7 @@ export default {
               this.deleteConfig(scope.row)
             }}
           >
-            删除
+            { this.$t('global.delete') }
           </el-button>
         </div>
       )
@@ -346,11 +348,11 @@ export default {
     async deleteConfig (row) {
       const objectName = row[this.currentInfos.id]
       this.$confirm(
-        `确定要删除 ${this.envName} 环境中 ${objectName} 配置?`,
-        '删除',
+        this.$t('environments.config.deleteConfigurationConfirm', { envName: this.envName, name: objectName }),
+        this.$t('global.delete'),
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }
       ).then(async () => {
@@ -364,7 +366,7 @@ export default {
           console.log(err)
         )
         if (res) {
-          this.$message.success(`删除 ${objectName} 成功！`)
+          this.$message.success(this.$t('environments.config.deleteConfigurationSuccess', { name: objectName }))
           this.getConfigByType(this.currentType)
         }
       })
@@ -379,7 +381,7 @@ export default {
       }
       return addConfigObjectAPI(this.projectName, payload)
         .then(res => {
-          this.$message.success(`添加配置成功！`)
+          this.$message.success(this.$t('environments.config.addConfigurationSuccess'))
           this.getConfigByType(this.currentType)
         })
         .catch(err => {
@@ -409,7 +411,7 @@ export default {
       }
       return updateConfigObjectAPI(this.projectName, fromRollback, payload)
         .then(res => {
-          this.$message.success(`更新配置成功！`)
+          this.$message.success(this.$t('environments.config.updateConfigurationSuccess'))
           this.getConfigByType(this.currentType)
         })
         .catch(err => {

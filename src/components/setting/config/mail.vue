@@ -80,11 +80,11 @@
                    native-type="submit"
                    size="small"
                    @click="updateMailConfig()"
-                   class="start-create">确定</el-button>
+                   class="start-create">{{$t(`global.confirm`)}}</el-button>
         <el-button plain
                    native-type="submit"
                    size="small"
-                   @click="handleMailCancel()">取消</el-button>
+                   @click="handleMailCancel()">{{$t(`global.cancel`)}}</el-button>
       </div>
     </el-dialog>
     <!--end of edit mail dialog-->
@@ -168,11 +168,11 @@
                    native-type="submit"
                    size="small"
                    @click="createMailConfig()"
-                   class="start-create">确定</el-button>
+                   class="start-create">{{$t(`global.confirm`)}}</el-button>
         <el-button plain
                    native-type="submit"
                    size="small"
-                   @click="handleMailCancel()">取消</el-button>
+                   @click="handleMailCancel()">{{$t(`global.cancel`)}}</el-button>
       </div>
     </el-dialog>
     <!--end of add mail dialog-->
@@ -182,7 +182,7 @@
                 type="primary"
                 :href="`https://docs.koderover.com/zadig/settings/system-settings/#%E9%82%AE%E4%BB%B6%E9%85%8D%E7%BD%AE`"
                 :underline="false"
-                target="_blank">帮助文档</el-link>
+                target="_blank">{{$t(`global.helpDoc`)}}</el-link>
             </template>
           </el-alert>
           <div v-if="mailHosts.length === 0" class="sync-container">
@@ -190,7 +190,7 @@
                        size="small"
                        type="primary"
                        plain
-                       @click="handleMailAdd">添加</el-button>
+                       @click="handleMailAdd">{{$t(`global.add`)}}</el-button>
           </div>
           <div class="mail-container">
           <el-table :data="mailHosts"
@@ -215,17 +215,17 @@
                 {{scope.row.isTLS?'是':'否'}}
               </template>
             </el-table-column>
-            <el-table-column label="操作"
+            <el-table-column :label="$t(`global.operation`)"
                              width="160">
               <template>
                 <el-button type="primary"
                            size="mini"
                            plain
-                           @click="handleMailEdit">编辑</el-button>
+                           @click="handleMailEdit">{{$t(`global.edit`)}}</el-button>
                 <el-button type="danger"
                            size="mini"
                            @click="handleMailDelete"
-                           plain>删除</el-button>
+                           plain>{{$t(`global.delete`)}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -327,8 +327,8 @@ export default {
     },
     handleMailDelete () {
       this.$confirm('确定要删除这个邮件配置吗？', '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         Promise.all([deleteEmailHostAPI(), deleteEmailServiceAPI()]).then(

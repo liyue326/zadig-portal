@@ -30,8 +30,8 @@
         <span v-if="parseErr" class="error-msg">{{parseErr}}</span>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button size="small" @click="showMultiImport = false">取 消</el-button>
-        <el-button size="small" type="primary" @click="parseMultiImport">确 定</el-button>
+        <el-button size="small" @click="showMultiImport = false">{{$t(`global.cancel`)}}</el-button>
+        <el-button size="small" type="primary" @click="parseMultiImport">{{$t(`global.confirm`)}}</el-button>
       </span>
     </el-dialog>
     <template v-if="targets.length > 0">
@@ -204,7 +204,7 @@
                       v-if="!showAdvancedSetting[repoIndex]"
                       @click="$set(showAdvancedSetting,repoIndex,true)"
                     >
-                      展开
+                      {{$t('global.expand')}}
                       <i class="el-icon-arrow-down" />
                     </el-button>
                     <el-button
@@ -215,7 +215,7 @@
                       v-if="showAdvancedSetting[repoIndex]"
                       @click="$set(showAdvancedSetting,repoIndex,false)"
                     >
-                      收起
+                      {{$t('global.collapse')}}
                       <i class="el-icon-arrow-up" />
                     </el-button>
                   </div>
@@ -303,7 +303,7 @@
                 <el-select v-if="env.type==='choice'" v-model="env.value" placeholder="默认值" size="small">
                   <el-option v-for="option in env.choice_option" :key="option" :label="option" :value="option"></el-option>
                 </el-select>
-                <el-input v-else placeholder="值" v-model="env.value" size="small"></el-input>
+                <el-input v-else :placeholder="$t(`global.value`)" v-model="env.value" size="small"></el-input>
               </el-col>
               <el-col :span="mini ? 6 : 4" v-show="env.type!=='choice'" style="line-height: 32px;">
                 <el-checkbox v-model="env.is_credential">

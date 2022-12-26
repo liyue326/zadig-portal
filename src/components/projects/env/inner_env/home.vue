@@ -1,7 +1,7 @@
 <template>
   <div class="project-home"
        v-loading="loading"
-       element-loading-text="加载中..."
+       :element-loading-text="$t(`global.loading`)"
        element-loading-spinner="iconfont iconfont-loading iconrongqi">
     <div v-if="loading"
          class="no-show">
@@ -44,7 +44,7 @@ export default {
     }
   },
   beforeRouteUpdate (to, from, next) {
-    if (!this.jumpPath || to.meta.title === '创建环境') {
+    if (!this.jumpPath || to.meta.createEnv) {
       next()
     } else if (!to.params.service_name && !to.query.envName && !to.params.env_name) {
       next({ path: this.jumpPath })

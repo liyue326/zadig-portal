@@ -1,8 +1,8 @@
 <template>
   <div class="chart-aside">
     <div class="aside-bar">
-      <div class="bar-title" :class="{selected:selected === 'var' }" @click="selected = 'var'">变量列表</div>
-      <div class="bar-title" :class="{selected:selected === 'reference' }" @click="selected = 'reference'">引用列表</div>
+      <div class="bar-title" :class="{selected:selected === 'var' }" @click="selected = 'var'">{{$t(`templates.helmChart.variablesList`)}}</div>
+      <div class="bar-title" :class="{selected:selected === 'reference' }" @click="selected = 'reference'">{{$t(`templates.helmChart.referenceList`)}}</div>
     </div>
     <div class="aside-content">
       <ReferenceList v-if="selected === 'reference'"/>
@@ -51,7 +51,9 @@ export default {
     .bar-title {
       margin: 0 0 1px 1px;
       padding: 20px 17px;
+      text-transform: uppercase;
       transition: all 0.5s;
+      writing-mode: vertical-rl;
 
       &.selected,
       &:hover {

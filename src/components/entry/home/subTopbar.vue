@@ -10,7 +10,7 @@
           >
             <li class="nav-item">
               <i class="icon iconfont icongongzuoliucheng"></i>
-              <span class="name">工作流</span>
+              <span class="name">{{$t('subTopbarMenu.workflows')}}</span>
             </li>
           </router-link>
           <router-link
@@ -20,7 +20,7 @@
           >
             <li class="nav-item">
               <i class="icon iconfont iconvery-environ"></i>
-              <span class="name">环境</span>
+              <span class="name">{{$t('subTopbarMenu.environments')}}</span>
             </li>
           </router-link>
 
@@ -31,7 +31,7 @@
           >
             <li class="nav-item">
               <i class="icon iconfont iconvery-service"></i>
-              <span class="name">服务</span>
+              <span class="name">{{$t('subTopbarMenu.services')}}</span>
             </li>
           </router-link>
           <router-link
@@ -41,7 +41,7 @@
           >
             <li class="nav-item">
               <i class="icon iconfont iconvery-build"></i>
-              <span class="name">构建</span>
+              <span class="name">{{$t('subTopbarMenu.builds')}}</span>
             </li>
           </router-link>
           <router-link
@@ -51,7 +51,7 @@
           >
             <li class="nav-item">
               <i class="icon iconfont iconvery-testing"></i>
-              <span class="name">测试</span>
+              <span class="name">{{$t('subTopbarMenu.tests')}}</span>
             </li>
           </router-link>
           <router-link
@@ -61,7 +61,7 @@
           >
             <li class="nav-item">
               <i class="icon iconfont iconvery-scanner"></i>
-              <span class="name">代码扫描</span>
+              <span class="name">{{$t('subTopbarMenu.scannings')}}</span>
             </li>
           </router-link>
           <router-link
@@ -72,7 +72,7 @@
           >
             <li class="nav-item">
               <i class="icon iconfont iconvery-versionmana"></i>
-              <span class="name">版本管理</span>
+              <span class="name">{{$t('subTopbarMenu.versions')}}</span>
             </li>
           </router-link>
         </ul>
@@ -85,7 +85,7 @@
           @click="bindComp(comp,'workflow')"
           icon="el-icon-plus"
           plain
-        >新建工作流</el-button>
+        >{{$t('subTopbarMenu.createWorkflow')}}</el-button>
       </template>
       <template v-if="$route.path === `/v1/projects/detail/${projectName}/envs/detail`">
         <el-button
@@ -93,7 +93,7 @@
           @click="bindComp(comp,'env')"
           icon="el-icon-plus"
           plain
-        >创建环境</el-button>
+        >{{$t('subTopbarMenu.createEnvironment')}}</el-button>
       </template>
       <template v-if="$route.path === `/v1/projects/detail/${projectName}/builds`">
         <el-button
@@ -101,7 +101,7 @@
           @click="bindComp(comp,'build')"
           icon="el-icon-plus"
           plain
-        >新建构建</el-button>
+        >{{$t('subTopbarMenu.createBuild')}}</el-button>
       </template>
       <template v-if="$route.path === `/v1/projects/detail/${projectName}/test`">
         <el-button
@@ -109,7 +109,7 @@
           @click="bindComp(comp,'test')"
           icon="el-icon-plus"
           plain
-        >新建测试</el-button>
+        >{{$t('subTopbarMenu.createTest')}}</el-button>
       </template>
       <template v-if="$route.path === `/v1/projects/detail/${projectName}/scanner`">
         <el-button
@@ -117,7 +117,7 @@
           @click="bindComp(comp,'scanner')"
           icon="el-icon-plus"
           plain
-        >新建代码扫描</el-button>
+        >{{$t('subTopbarMenu.createScanner')}}</el-button>
       </template>
       <template v-if="$route.path === `/v1/projects/detail/${projectName}/version` && deployType === 'helm'">
         <el-button
@@ -125,36 +125,36 @@
           @click="bindComp(comp,'version')"
           icon="el-icon-plus"
           plain
-        >创建版本</el-button>
+        >{{$t('subTopbarMenu.createVersion')}}</el-button>
       </template>
       <template v-if="comp && comp.isProjectAdmin && $route.path === `/v1/projects/detail/${projectName}/detail`">
-        <el-button v-if="hasPlutus && deployType === 'external'" type="text" @click="convertType">切换项目类型</el-button>
+        <el-button v-if="hasPlutus && deployType === 'external'" type="text" @click="convertType">{{$t('subTopbarMenu.changeProjectType')}}</el-button>
         <el-dropdown
           placement="bottom"
           trigger="click"
         >
           <button type="button" class="display-btn el-button">
             <i class="iconfont iconvery-options el-icon--left"></i>
-            &nbsp;&nbsp;配置&nbsp;&nbsp;
+            &nbsp;&nbsp;{{$t('subTopbarMenu.projectConfig')}}&nbsp;&nbsp;
             <i class="el-icon-caret-bottom el-icon--right"></i>
           </button>
           <el-dropdown-menu slot="dropdown" class="project-config">
-            <el-dropdown-item icon="el-icon-edit-outline" @click.native="$router.push(`/v1/projects/edit/${projectName}`)">修改</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-edit-outline" @click.native="$router.push(`/v1/projects/edit/${projectName}`)">{{$t('subTopbarMenu.editProject')}}</el-dropdown-item>
             <el-dropdown-item v-if="deployType === 'cloud_host'" @click.native="$router.push(`/v1/projects/detail/${projectName}/host`)">
-              <i class="iconfont iconwuliji"></i>主机管理
+              <i class="iconfont iconwuliji"></i>{{$t('subTopbarMenu.hostManagement')}}
             </el-dropdown-item>
-            <el-dropdown-item icon="el-icon-lock" @click.native="$router.push(`/v1/projects/detail/${projectName}/rbac`)">权限</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-lock" @click.native="$router.push(`/v1/projects/detail/${projectName}/rbac`)">{{$t('subTopbarMenu.projectPermission')}}</el-dropdown-item>
             <el-dropdown-item
               v-if="deployType !== 'cloud_host'"
               icon="item-icon iconfont iconvery-collaboratiom"
               @click.native="$router.push(`/v1/projects/detail/${projectName}/policy`)"
-            >协作模式</el-dropdown-item>
+            >{{$t('subTopbarMenu.projectCollaborationMode')}}</el-dropdown-item>
             <el-dropdown-item
               v-if="deployType === 'helm'"
               icon="item-icon iconfont iconchakanbianliang"
               @click.native="$router.push(`/v1/projects/detail/${projectName}/group`)"
-            >变量组</el-dropdown-item>
-            <el-dropdown-item icon="el-icon-delete" @click.native="comp.deleteProject">删除</el-dropdown-item>
+            >{{$t('subTopbarMenu.varsGroup')}}</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-delete" @click.native="comp.deleteProject">{{$t(`global.delete`)}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </template>
@@ -192,23 +192,23 @@ export default {
   methods: {
     convertType () {
       const content = `
-      <div style="line-height: 2.5;">
-        <div>从「托管项目」切换为「K8s YAML 项目」，项目内资源确认：</div>
-        <p>1. 现有项目资源不会变化，将新增服务管理能力</p>
-        <p>2. 托管项目中的所有服务将被纳入到服务管理，环境中关联的 workload 将作为服务配置</p>
-        <p>3. 切换操作不可逆，请谨慎操作</p>
+      <div>
+        <div style="font-weight: 500;color: #303133;">${this.$t('subTopbarMenu.changeProjectTypeFirstTip')}</div>
+        <p>${this.$t('subTopbarMenu.changeProjectTypeSecondTip')}</p>
+        <p>${this.$t('subTopbarMenu.changeProjectTypeThirdTip')}</p>
+        <p>${this.$t('subTopbarMenu.changeProjectTypeFourthTip')}</p>
       </div>
       `
-      this.$confirm(content, '确认切换项目类型？', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      this.$confirm(content, this.$t('subTopbarMenu.changeProjectTypeConfirm'), {
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         dangerouslyUseHTMLString: true
       })
         .then(() => {
           updateProjectTypeAPI(this.projectName).then(() => {
             this.$message({
               type: 'success',
-              message: '切换项目类型成功!'
+              message: this.$t('subTopbarMenu.changeProjectTypeSuccess')
             })
             this.$router.push(`/v1/projects`)
           })
@@ -216,7 +216,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: '取消切换项目类型'
+            message: this.$t('subTopbarMenu.cancelChangeProjectType')
           })
         })
     },
@@ -333,7 +333,6 @@ export default {
   margin-top: 2px;
 
   .el-dropdown-menu__item {
-    width: 80px;
     margin: 0 10px;
     padding: 0 10px;
     font-weight: 300;

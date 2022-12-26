@@ -1,12 +1,12 @@
 <template>
   <div>
-    <el-alert type="info" :closable="false" description="项目成员管理，主要用于定义项目成员的角色"></el-alert>
+    <el-alert type="info" :closable="false" :description="$t('project.rbac.membersManagementTip')"></el-alert>
     <div class="btn-container">
-      <el-button plain size="small" type="primary" @click="$refs.addRoleBind.addUserFormVisible = true">添加成员</el-button>
+      <el-button plain size="small" type="primary" @click="$refs.addRoleBind.addUserFormVisible = true">{{$t('project.rbac.addMember')}}</el-button>
     </div>
 
     <el-table v-loading="loading" row-key="id" :data="members" style="width: 100%;" class="users-container">
-      <el-table-column label="项目成员">
+      <el-table-column :label="$t('project.rbac.projectMember')">
         <template slot-scope="scope">
           <div class="name-listing-details">
             <!-- Logo -->
@@ -15,7 +15,7 @@
             </div>
             <!-- Details -->
             <div class="name-listing-description">
-              <h3 v-if="scope.row.uid === '*'" class="name-listing-title">所有用户</h3>
+              <h3 v-if="scope.row.uid === '*'" class="name-listing-title">{{$t('project.rbac.projectMember')}}</h3>
               <h3
                 v-else
                 class="name-listing-title"
@@ -41,18 +41,18 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="角色">
+      <el-table-column :label="$t('project.rbac.role')">
         <template slot-scope="{ row }">
           <div v-if="row.uid === '*'">
             {{ row.role }}
-            <span v-if="row.type === 'system'">(系统内置)</span>
+            <span v-if="row.type === 'system'">{{$t('project.rbac.systemBuiltIn')}}</span>
           </div>
           <div v-else>
             <div class="role-content" v-show="!row.editRole">
               <div :class="{'role-content-left': row.roles.length}">
                 <div v-for="(role, index) in row.roles" :key="index">
                   <span>{{ role.role }}</span>
-                  <span v-if="role.type === 'system'">(系统内置)</span>
+                  <span v-if="role.type === 'system'">{{$t('project.rbac.systemBuiltIn')}}</span>
                 </div>
               </div>
               <div>
@@ -61,13 +61,13 @@
             </div>
             <div class="role-content" v-show="row.editRole">
               <div class="role-content-left">
-                <el-select v-model="row.updatedRoles" placeholder="选择角色" size="small" multiple>
+                <el-select v-model="row.updatedRoles" :placeholder="$t('project.rbac.selectRole')" size="small" multiple>
                   <el-option
                     v-for="(item, index) in rolesFiltered"
                     :key="index"
                     :label="item.name"
                     :value="item.name"
-                  >{{item.name}} {{item.isPublic ? '(系统内置)': ''}}</el-option>
+                  >{{item.name}} {{item.isPublic ?$t('project.rbac.systemBuiltIn'): ''}}</el-option>
                 </el-select>
               </div>
               <div>
@@ -81,34 +81,34 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="策略">
+      <el-table-column :label="$t('project.rbac.policy')">
         <template slot-scope="{ row }">
           <div v-if="row.uid === '*'" :class="{'show-gray': row.hasSystemPolicy}">
             {{ row.policy || '-' }}
-            <span v-if="row.hasSystemPolicy">(系统创建)</span>
+            <span v-if="row.hasSystemPolicy">{{$t('project.rbac.systemBuiltIn')}}</span>
           </div>
           <div v-else>
             <div v-if="!row.policies.length">-</div>
             <div v-for="(policy, index) in row.policies" :key="index" :class="{'show-gray': policy.type === 'system'}">
               <span>{{ policy.policy }}</span>
-              <span v-if="policy.type === 'system'">(系统创建)</span>
+              <span v-if="policy.type === 'system'">{{$t('project.rbac.systemBuiltIn')}}</span>
             </div>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="100px">
+      <el-table-column :label="$t(`global.operation`)" width="100px">
         <template slot-scope="{ row }">
-          <el-tooltip effect="dark" content="该用户关联项目协作模式，产生了相应的策略不能直接移除，请先将用户从对应协作模式中移除" placement="top">
+          <el-tooltip effect="dark" :content="$t('project.rbac.removePolicyTooltip')" placement="top">
             <span>
-              <el-button v-if="row.hasSystemPolicy" size="mini" type="info" plain disabled>移除</el-button>
+              <el-button v-if="row.hasSystemPolicy" size="mini" type="info" plain disabled>{{$t('project.rbac.remove')}}</el-button>
             </span>
           </el-tooltip>
-          <el-tooltip effect="dark" content="所有用户具备 read-only 权限，可以通过项目配置 -> 设置访问权限为私有将其移除" placement="top">
+          <el-tooltip effect="dark" :content="$t('project.rbac.removeReadOnlyTooltip')" placement="top">
             <span>
-              <el-button v-if="row.readOnly" size="mini" type="info" plain disabled>移除</el-button>
+              <el-button v-if="row.readOnly" size="mini" type="info" plain disabled>{{$t('project.rbac.remove')}}</el-button>
             </span>
           </el-tooltip>
-          <el-button v-if="!row.hasSystemPolicy && !row.readOnly" size="mini" type="danger" @click="handleDelete(row)" plain>移除</el-button>
+          <el-button v-if="!row.hasSystemPolicy && !row.readOnly" size="mini" type="danger" @click="handleDelete(row)" plain>{{$t('project.rbac.remove')}}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -141,13 +141,7 @@ export default {
     return {
       members: [],
       rolesFiltered: [],
-      loading: false,
-      identityTypeMap: {
-        github: 'GitHub',
-        system: '系统创建',
-        ldap: 'OpenLDAP',
-        oauth: 'OAuth'
-      }
+      loading: false
     }
   },
   computed: {
@@ -156,6 +150,14 @@ export default {
         project => project.name === this.projectName
       )
       return project ? project.public : false
+    },
+    identityTypeMap () {
+      return {
+        github: 'GitHub',
+        system: this.$t('project.rbac.identityTypeSystem'),
+        ldap: 'OpenLDAP',
+        oauth: 'OAuth'
+      }
     }
   },
   methods: {
@@ -175,9 +177,9 @@ export default {
       })
     },
     async handleDelete (row) {
-      this.$confirm('确定要删除这个成员吗？', '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      this.$confirm(this.$t('project.rbac.confirmToDeleteMember'), this.$t(`global.confirm`), {
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         if (row.uid !== '*') {
@@ -254,14 +256,14 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
-        { title: '权限管理', url: '' },
-        { title: '成员管理', url: '' }
+        { title: this.$t('project.rbac.permissionManagement'), url: '' },
+        { title: this.$t('project.rbac.membersManagement'), url: '' }
       ]
     })
   }

@@ -1,7 +1,7 @@
 <template>
   <div class="service-container">
     <!--start of workspace-tree-dialog-->
-    <el-dialog :append-to-body="true" :visible.sync="workSpaceModalVisible" width="60%" title="请选择要同步的文件或文件目录" class="fileTree-dialog">
+    <el-dialog :append-to-body="true" :visible.sync="workSpaceModalVisible" width="60%" :title="$t('services.k8s.selectFileToSync')" class="fileTree-dialog">
       <GitFileTree
         ref="worktree"
         :codehostId="source.codehostId"
@@ -17,7 +17,7 @@
     </el-dialog>
     <!--end of workspace-tree-dialog-->
     <el-dialog
-      :title="currentUpdatedServiceName ? '更新服务' : '新建服务-从代码库同步'"
+      :title="currentUpdatedServiceName ? $t('services.common.updateService') : $t('services.k8s.createServiceSyncFromRepo')"
       width="720px"
       center
       @close="closeSelectRepo"
@@ -28,12 +28,12 @@
     >
       <div class="from-code-container">
         <el-form :model="source" :rules="sourceRules" label-position="left" ref="sourceForm" label-width="130px">
-          <el-form-item label="代码源" prop="codehostId" :rules="{required: true, message: '代码源不能为空', trigger: 'change'}">
+          <el-form-item :label="$t('repository.info.repository')" prop="codehostId" :rules="{required: true, message: $t('repository.prompt.selectGitProvider'), trigger: 'change'}">
             <el-select
               v-model="source.codehostId"
               size="small"
               style="width: 100%;"
-              placeholder="请选择代码源"
+              :placeholder="$t('repository.prompt.selectGitProvider')"
               @change="getRepoOwnerById(source.codehostId)"
               filterable
             >
@@ -45,7 +45,7 @@
               >{{host.address + '('+host.alias+')'}}</el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="组织名/用户名" prop="repoOwner" :rules="{required: true, message: '组织名/用户名不能为空', trigger: 'change'}">
+          <el-form-item :label="$t('repository.info.orgOrUser')" prop="repoOwner" :rules="{required: true, message: $t('repository.prompt.selectOrgOrUsername'), trigger: 'change'}">
             <el-select
               v-model.trim="source.repoOwner"
               size="small"
@@ -57,20 +57,20 @@
               :loading="searchRepoOwnerLoading"
               allow-create
               clearable
-              placeholder="请选择组织名/用户名"
+              :placeholder="$t('repository.prompt.selectOrgOrUsername')"
               filterable
             >
               <el-option v-for="(repo,index) in codeInfo['repoOwners']" :key="index" :label="repo.path" :value="repo.path">
                 <span>{{repo.path}}</span>
                 <template v-if="source.gitType === 'gitee-enterprise'">
-                  <span v-if="repo.kind==='enterprise'">(企业)</span>
-                  <span v-else-if="repo.kind==='org'">(团队)</span>
+                  <span v-if="repo.kind==='enterprise'">{{$t('repository.prompt.enterprise')}}</span>
+                  <span v-else-if="repo.kind==='org'">{{$t('repository.prompt.org')}}</span>
                 </template>
               </el-option>
             </el-select>
           </el-form-item>
           <template>
-            <el-form-item label="代码库" prop="repoName" :rules="{required: true, message: '名称不能为空', trigger: 'change'}">
+            <el-form-item :label="$t(`global.repository`)" prop="repoName" :rules="{required: true, message: $t('repository.prompt.selectRepo'), trigger: 'change'}">
               <el-select
                 @change="getBranchInfoById(source.codehostId,source.repoOwner,source.repoName,source)"
                 @clear="clearRepoName"
@@ -82,16 +82,16 @@
                 allow-create
                 clearable
                 size="small"
-                placeholder="请选择代码库"
+                :placeholder="$t('repository.prompt.selectRepo')"
                 filterable
               >
                 <el-option v-for="(repo,index) in codeInfo['repos']" :key="index" :label="repo.name" :value="repo.name"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="分支" prop="branchName" :rules="{required: true, message: '分支不能为空', trigger: 'change'}">
+            <el-form-item :label="$t('repository.info.branch')" prop="branchName" :rules="{required: true, message: $t('repository.prompt.selectBranch'), trigger: 'change'}">
               <el-select
                 v-model.trim="source.branchName"
-                placeholder="请选择"
+                :placeholder="$t('repository.prompt.selectBranch')"
                 style="width: 100%;"
                 size="small"
                 filterable
@@ -106,7 +106,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item prop="path" label="选择文件(夹)" :rules="{required: true, message: '请选择文件', trigger: 'change'}">
+            <el-form-item prop="path" :label="$t('repository.info.fileOrFolder')" :rules="{required: true, message: $t('repository.prompt.selectFileOrFolder'), trigger: 'change'}">
               {{ source.path}}
               <el-button
                 v-if="showSelectPath"
@@ -118,9 +118,9 @@
                 size="mini"
                 circle
               ></el-button>
-              <span v-if="disabledReload" class="preload-error">当前服务名称和选中的文件夹名称不符，请重新选择</span>
+              <span v-if="disabledReload" class="preload-error">{{$t('services.k8s.serviceNameMismatch')}}</span>
               <div class="preload-container" v-if="source.services && source.services.length > 0">
-                <span class="contains">包含服务:</span>
+                <span class="contains">{{$t('services.k8s.servicesIncluded')}}</span>
                 <span v-for="(service,index) in source.services" :key="index" class="service-name">{{service}}</span>
               </div>
             </el-form-item>
@@ -128,7 +128,7 @@
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button size="small" @click="dialogImportFromRepoVisible=false" plain>取消</el-button>
+        <el-button size="small" @click="dialogImportFromRepoVisible=false" plain>{{$t(`global.cancel`)}}</el-button>
         <el-button
           size="small"
           type="primary"
@@ -136,7 +136,7 @@
           :disabled="disabledReload"
           @click="loadRepoService()"
           plain
-        >同步</el-button>
+        >{{$t('global.sync')}}</el-button>
       </span>
     </el-dialog>
     <ImportFromTemplate
@@ -152,18 +152,18 @@
       :projectName="projectName"
       :dialogImportFromNamespaceVisible.sync="openImportNamespaceDialog"
       :importServiceFromNamespaceSuccess="importServiceFromNamespaceSuccess"
-    ></ImportFromNamespace>
+    />
     <div class="menu-container">
       <el-row>
         <el-col :span="10">
           <div class="source-dropdown">
             <el-radio-group v-model="mode" size="mini">
-              <el-tooltip effect="dark" content="服务管理" placement="top">
+              <el-tooltip effect="dark" :content="$t('services.common.servicesManagement')" placement="top">
                 <el-radio-button label="edit">
                   <i class="iconfont iconiconlog"></i>
                 </el-radio-button>
               </el-tooltip>
-              <el-tooltip effect="dark" content="服务编排" placement="top">
+              <el-tooltip effect="dark" :content="$t('services.common.serviceOrchestration')" placement="top">
                 <el-radio-button v-hasPermi="{projectName: projectName, action: 'edit_service'}" label="arrange">
                   <i class="iconfont iconvery-sort"></i>
                 </el-radio-button>
@@ -173,7 +173,7 @@
         </el-col>
         <el-col :span="14" class="text-right">
           <div style="line-height: 32px;">
-            <el-tooltip effect="dark" content="手工输入" placement="top">
+            <el-tooltip effect="dark" :content="$t('services.k8s.inputByManual')" placement="top">
               <el-button
                 v-if="deployType==='k8s'"
                 v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}"
@@ -184,7 +184,7 @@
                 circle
               ></el-button>
             </el-tooltip>
-            <el-tooltip effect="dark" content="从代码库同步" placement="top">
+            <el-tooltip effect="dark" :content="$t('services.common.syncFromRepository')" placement="top">
               <el-button
                 v-if="deployType==='k8s'"
                 v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}"
@@ -204,8 +204,8 @@
                 v-hasPermi="{type:'project',projectName: projectName, action: 'create_service',isBtn:true}"
               ></el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item @click.native="createService('template')">使用模板新建</el-dropdown-item>
-                <el-dropdown-item @click.native="createService('namespace')">从 Kubernetes 导入</el-dropdown-item>
+                <el-dropdown-item @click.native="createService('template')">{{$t('services.common.syncFromTemplate')}}</el-dropdown-item>
+                <el-dropdown-item @click.native="createService('namespace')">{{$t('services.k8s.importFromK8sNamespace')}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -237,10 +237,10 @@
             <i v-if="data.type==='k8s'" class="service-type iconfont iconrongqifuwu"></i>
             <el-tooltip v-if="isShared(data)" effect="light" placement="top">
               <div slot="content">
-                <span>{{`服务名：${data.service_name}`}}</span>
+                <span>{{`${$t('services.k8s.serviceName')}:${data.service_name}`}}</span>
                 <span>
                   <br />
-                  {{`所属项目：${data.product_name}`}}
+                  {{`${$t('services.k8s.originProject')}:${data.product_name}`}}
                 </span>
               </div>
               <div class="tree-service-name" :class="{'kind':data.type==='kind'?true:false}">
@@ -260,7 +260,7 @@
                 @click.stop="() => reEditServiceName(node, data)"
               ></el-button>
               <span v-if="isShared(data)">
-                <el-tag v-if="data.type === 'k8s'" type="primary" effect="dark" size="mini" style="cursor: not-allowed;">共享</el-tag>
+                <el-tag v-if="data.type === 'k8s'" type="primary" effect="dark" size="mini" style="cursor: not-allowed;">{{$t('services.k8s.sharedService')}}</el-tag>
               </span>
               <span v-else :style="{'visibility': showHover[data.service_name] || data.visibility==='public' ? 'visible': 'hidden'}">
                 <el-tooltip
@@ -268,22 +268,22 @@
                   effect="dark"
                   placement="top"
                 >
-                  <div slot="content">共享服务可在其他项目的服务编排中使用</div>
+                  <div slot="content">{{$t('services.k8s.sharedServiceTooltip')}}</div>
                   <el-tag
                     v-if="data.type === 'k8s'"
                     :type="data.visibility==='public'?'primary':'info'"
                     :effect="data.visibility==='public'?'dark':'plain'"
                     @click="changeServicePermission(data)"
                     size="mini"
-                  >共享</el-tag>
+                  >{{$t('services.k8s.sharedService')}}</el-tag>
                 </el-tooltip>
-                <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+                <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
                   <el-tag
                     v-if="data.type === 'k8s'"
                     type="info"
                     :effect="data.visibility==='public'?'dark':'plain'"
                     size="mini"
-                  >共享</el-tag>
+                  >{{$t('services.k8s.sharedService')}}</el-tag>
                 </el-tooltip>
               </span>
               <span :style="{'visibility': showHover[data.service_name] ? 'visible': 'hidden'}" class="operation-container">
@@ -328,7 +328,7 @@
               ref="serviceNamedRef"
               @blur="inputServiceNameDoneWhenBlur"
               @keyup.enter.native="inputServiceNameDoneWhenBlur"
-              placeholder="请输入服务名称"
+              :placeholder="$t('services.common.inputServiceName')"
             ></el-input>
           </el-form-item>
         </el-form>
@@ -378,11 +378,11 @@
           slot-scope="{ node, data }"
         >
           <i v-if="data.type==='k8s'" class="service-type el-icon-share"></i>
-          <el-tooltip v-if="node.label!=='共享服务列表'" effect="light" :content="`所属项目：${data.product_name}`" placement="bottom">
+          <el-tooltip v-if="node.label!==$t('services.k8s.sharedServicesList')" effect="light" :content="`${$t('services.k8s.originProject')}:${data.product_name}`" placement="bottom">
             <span class="tree-service-name shared-list">{{`${node.label}`}}</span>
           </el-tooltip>
           <span v-else class="tree-service-name shared-list">{{`${node.label}`}}</span>
-          <span v-if="data.label!=='共享服务列表' && showHover[data.service_name] " class="operation-container">
+          <span v-if="data.label!==$t('services.k8s.sharedServicesList') && showHover[data.service_name] " class="operation-container">
             <el-button
               v-hasPermi="{projectName: projectName, action: 'edit_service',isBtn:true}"
               v-if="data.product_name!==projectName"
@@ -396,7 +396,7 @@
       </el-tree>
     </div>
     <div v-if="mode==='edit'" class="search-container">
-      <el-input placeholder="搜索服务" size="small" clearable suffix-icon="el-icon-search" v-model="searchService"></el-input>
+      <el-input :placeholder="$t('services.common.searchService')" size="small" clearable suffix-icon="el-icon-search" v-model="searchService"></el-input>
     </div>
   </div>
 </template>
@@ -491,25 +491,6 @@ export default {
         path: '',
         isDir: false
       },
-      sourceRules: {
-        url: [
-          {
-            required: true,
-            message: '请输入 URL，包含协议',
-            trigger: ['blur', 'change']
-          }
-        ]
-      },
-      serviceRules: {
-        newServiceName: [
-          {
-            type: 'string',
-            required: true,
-            validator: this.validateServiceName,
-            trigger: ['blur', 'change']
-          }
-        ]
-      },
       previousNodeKey: ''
     }
   },
@@ -521,21 +502,6 @@ export default {
         data.visibility === 'public' &&
         data.product_name !== this.projectName
       )
-    },
-    validateServiceName (rule, value, callback) {
-      if (value === '') {
-        callback(new Error('请输入服务名称'))
-      } else if (
-        this.filteredServices.map(ser => ser.service_name).includes(value)
-      ) {
-        callback(new Error('服务名称与现有名称重复'))
-      } else {
-        if (!/^[a-z0-9-]+$/.test(value)) {
-          callback(new Error('名称只支持小写字母和数字，特殊字符只支持中划线'))
-        } else {
-          callback()
-        }
-      }
     },
     setHovered (name) {
       this.$nextTick(() => {
@@ -570,7 +536,7 @@ export default {
         owner: data.product_name
       })
       updateEnvTemplateAPI(projectName, payload).then(res => {
-        this.$message.success('添加共享服务成功')
+        this.$message.success(this.$t('services.k8s.addSharedServiceSuccess'))
         this.getServiceGroup()
         this.$emit('onRefreshProjectInfo')
         this.$emit('onRefreshService')
@@ -581,15 +547,15 @@ export default {
     deleteSharedService (node, data) {
       this.previousNodeKey = ''
       let deleteText = ''
-      const title = '确认'
+      const title = this.$t('global.confirm')
       const services = []
       const payload = this.$utils.cloneObj(this.projectInfo)
       if (data.type === 'k8s') {
-        deleteText = `确定要移除 ${data.service_name} 这个共享服务吗？`
+        deleteText = this.$t('services.k8s.confirmToDeleteSharedService', { serviceName: data.service_name })
       }
       this.$confirm(`${deleteText}`, `${title}`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         const projectName = this.projectName
@@ -614,7 +580,7 @@ export default {
           this.$emit('onRefreshSharedService')
           this.$emit('onRefreshService')
           this.$emit('update:showNext', true)
-          this.$message.success('共享服务移除成功')
+          this.$message.success(this.$t('services.k8s.deleteSharedServiceSuccess'))
           this.$emit('onDeleteService', data.service_name)
         })
       })
@@ -626,7 +592,7 @@ export default {
         res.services.push([])
         res.services.forEach((order, orderIndex) => {
           this.serviceGroup.push({
-            label: `启动顺序 ${orderIndex}`,
+            label: `${this.$t('services.common.startupSequence')} ${orderIndex}`,
             id: orderIndex,
             children: []
           })
@@ -717,7 +683,7 @@ export default {
               this.getServiceGroup()
               this.dialogImportFromRepoVisible = false
               this.$message({
-                message: '服务导入成功',
+                message: this.$t('services.k8s.importServiceSuccess'),
                 type: 'success'
               })
               if (this.source.services && this.source.services.length > 0) {
@@ -767,7 +733,7 @@ export default {
       const serviceLength = this.serviceGroup.length
       if (this.serviceGroup[serviceLength - 1].children.length) {
         this.serviceGroup.push({
-          label: `启动顺序 ${serviceLength}`,
+          label: `${$t('services.common.startupSequence')} ${serviceLength}`,
           id: serviceLength,
           children: []
         })
@@ -780,17 +746,17 @@ export default {
       this.showDragContainer = false
     },
     allowDrag (draggingNode) {
-      return !draggingNode.data.label.includes('启动顺序')
+      return !draggingNode.data.label.includes(this.$t('services.common.startupSequence'))
     },
     allowDrop (draggingNode, dropNode, type) {
-      if (dropNode.data.label.includes('启动顺序') && type === 'inner') {
+      if (dropNode.data.label.includes(this.$t('services.common.startupSequence')) && type === 'inner') {
         return true
       } else if (
-        !dropNode.data.label.includes('启动顺序') &&
+        !dropNode.data.label.includes(this.$t('services.common.startupSequence')) &&
         type !== 'inner'
       ) {
         return true
-      } else if (dropNode.data.label.includes('启动顺序') && type === 'prev') {
+      } else if (dropNode.data.label.includes(this.$t('services.common.startupSequence')) && type === 'prev') {
         return false
       }
     },
@@ -1083,13 +1049,13 @@ export default {
         this.services.splice(index, 1)
       } else {
         let deleteText = ''
-        const title = '确认'
+        const title = this.$t('global.confirm')
         if (data.type === 'k8s') {
-          deleteText = `确定要删除 ${data.service_name} 这个服务吗？`
+          deleteText = this.$t('services.k8s.confirmToDeleteService', { serviceName: data.service_name })
         }
         this.$confirm(`${deleteText}`, `${title}`, {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }).then(() => {
           deleteServiceTemplateAPI(
@@ -1098,7 +1064,7 @@ export default {
             this.projectName,
             data.visibility
           ).then(() => {
-            this.$message.success('删除成功')
+            this.$message.success(this.$t('services.k8s.deleteServiceSuccess'))
             this.$emit('update:showNext', true)
             this.$emit('onDeleteService', data.service_name)
             this.$emit('onRefreshService')
@@ -1130,18 +1096,18 @@ export default {
           this.$emit('onRefreshService')
           this.$emit('onRefreshSharedService')
           if (serviceDetail.visibility === 'public') {
-            this.$message.success('设置服务共享成功')
+            this.$message.success(this.$t('services.k8s.setSharedServiceSuccess'))
           } else if (serviceDetail.visibility === 'private') {
-            this.$message.success('服务已取消共享')
+            this.$message.success(this.$t('services.k8s.unsetSharedServiceSuccess'))
           }
         }
       }
     },
     askSaveYamlConfig (switchNode = false) {
-      return this.$confirm('服务配置未保存，是否保存？', '提示', {
+      return this.$confirm(this.$t('services.k8s.serviceIsNotSaved'), this.$t('global.tips'), {
         distinguishCancelAndClose: true,
-        confirmButtonText: '保存',
-        cancelButtonText: '放弃',
+        confirmButtonText: this.$t(`global.save`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         this.$emit('updateYaml', switchNode)
@@ -1273,7 +1239,7 @@ export default {
       )
       return [
         {
-          label: '共享服务列表',
+          label: this.$t('services.k8s.sharedServicesList'),
           children: services.map((element, index) => {
             element.visibility = 'public'
             element.label = element.service_name
@@ -1293,6 +1259,44 @@ export default {
     },
     queryServiceName () {
       return this.$route.query.service_name
+    },
+    sourceRules () {
+      return {
+        url: [
+          {
+            required: true,
+            message: this.$t('repository.prompt.inputAddress'),
+            trigger: ['blur', 'change']
+          }
+        ]
+      }
+    },
+    serviceRules () {
+      const validateServiceName = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t('services.common.inputServiceName')))
+        } else if (
+          this.filteredServices.map(ser => ser.service_name).includes(value)
+        ) {
+          callback(new Error(this.$t('services.k8s.serviceNameIsDuplicated')))
+        } else {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            callback(new Error(this.$t('services.k8s.checkServiceName')))
+          } else {
+            callback()
+          }
+        }
+      }
+      return {
+        newServiceName: [
+          {
+            type: 'string',
+            required: true,
+            validator: validateServiceName,
+            trigger: ['blur', 'change']
+          }
+        ]
+      }
     }
   },
   watch: {

@@ -1,11 +1,11 @@
 <template>
 <div class="projects-guide-helm-service-container">
     <div class="guide-container">
-      <Step :activeStep="1" :stepThreeTitle="`配置环境`"/>
+      <Step :activeStep="1" :thirdStepTitle="$t('project.onboardingComp.configureEnv')"/>
       <div class="current-step-container">
         <div class="title-container">
-          <span class="first">第二步</span>
-          <span class="second">创建服务模板，后续均可在项目中重新配置</span>
+          <span class="first">{{$t('project.onboardingComp.secondStep')}}</span>
+          <span class="second">{{$t('project.onboardingComp.secondStepTip')}}</span>
         </div>
       </div>
     </div>
@@ -17,7 +17,7 @@
         <el-button type="primary"
                    size="small"
                    @click="toNext"
-                   :disabled="!showNext">下一步</el-button>
+                   :disabled="!showNext">{{$t('project.onboardingComp.nextStep')}}</el-button>
       </div>
     </div>
 </div>

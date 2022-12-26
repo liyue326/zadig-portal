@@ -6,7 +6,7 @@
                 class="text-right">
           <div style="line-height: 32px;">
             <el-tooltip effect="dark"
-                        content="创建模板"
+                        :content="$t(`templates.dockerfile.createTemplate`)"
                         placement="top">
               <el-button v-hasPermi="{type: 'system', action: 'create_template',isBtn:true}"
                          size="mini"
@@ -82,13 +82,13 @@
                       ref="serviceNamedRef"
                       @blur="inputFileNameDoneWhenBlur"
                       @keyup.enter.native="inputFileNameDoneWhenBlur"
-                      placeholder="请输入模板名称"></el-input>
+                      :placeholder="$t(`templates.dockerfile.inputTemplateName`)"></el-input>
           </el-form-item>
         </el-form>
       </div>
     </div>
     <div class="search-container">
-      <el-input placeholder="搜索模板"
+      <el-input :placeholder="$t(`templates.dockerfile.searchTemplate`)"
                 size="small"
                 clearable
                 suffix-icon="el-icon-search"
@@ -120,30 +120,11 @@ export default {
       showHover: {},
       searchFile: '',
       showNewServiceInput: false,
-      serviceRules: {
-        newFileName: [
-          {
-            type: 'string',
-            required: true,
-            validator: this.validateFileName,
-            trigger: ['blur', 'change']
-          }
-        ]
-      },
       previousNodeKey: ''
     }
   },
 
   methods: {
-    validateFileName (rule, value, callback) {
-      if (value === '') {
-        callback(new Error('请输入模板名称'))
-      } else if (this.selectFiles.map(ser => ser.name).includes(value)) {
-        callback(new Error('模板名称与现有名称重复'))
-      } else {
-        callback()
-      }
-    },
     setHovered (name) {
       this.$nextTick(() => {
         this.$set(this.showHover, name, true)
@@ -203,15 +184,15 @@ export default {
         this.files.splice(index, 1)
       } else {
         let deleteText = ''
-        const title = '确认'
-        deleteText = `确定要删除 ${data.name} 这个模板吗？`
+        const title = this.$t(`global.confirm`)
+        deleteText = this.$t('templates.dockerfile.deleteConfirmation', { name: data.name })
         this.$confirm(`${deleteText}`, `${title}`, {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }).then(() => {
           deleteDockerfileTemplateAPI(data.id).then(() => {
-            this.$message.success('删除成功')
+            this.$message.success(this.$t(`templates.dockerfile.templateDeleted`))
             this.$emit('onRefreshFile')
             const parent = node.parent
             const children = parent.data.children || parent.data
@@ -222,10 +203,10 @@ export default {
       }
     },
     askSaveYamlConfig (switchNode = false) {
-      return this.$confirm('服务配置未保存，是否保存？', '提示', {
+      return this.$confirm(this.$t(`templates.dockerfile.confirmToSaveTemplate`), this.$t(`global.tips`), {
         distinguishCancelAndClose: true,
-        confirmButtonText: '保存',
-        cancelButtonText: '放弃',
+        confirmButtonText: this.$t(`global.save`),
+        cancelButtonText: this.$t(`templates.dockerfile.deleteChange`),
         type: 'warning'
       }).then(() => {
         this.$emit('updateFile', switchNode)
@@ -279,8 +260,28 @@ export default {
     },
     queryFileName () {
       return this.$route.query.name
+    },
+    serviceRules () {
+      const validateFileName = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t(`templates.dockerfile.inputTemplateName`)))
+        } else if (this.selectFiles.map(ser => ser.name).includes(value)) {
+          callback(new Error(this.$t(`templates.dockerfile.templateNameIsDuplicated`)))
+        } else {
+          callback()
+        }
+      }
+      return {
+        newFileName: [
+          {
+            type: 'string',
+            required: true,
+            validator: validateFileName,
+            trigger: ['blur', 'change']
+          }
+        ]
+      }
     }
-
   },
   watch: {
     selectFiles: {

@@ -63,7 +63,7 @@ export default {
           formatter: (params) => {
             if (params && params.length && params[0]) {
               const { data, marker, name } = params && params.length && params[0]
-              return `${name}<br/>${marker}周测试收益数: ${data.value} `
+              return `${name}<br/>${marker}${this.$t('dataStatistics.insight.testBenefits')}: ${data.value} `
             }
             return '-'
           }

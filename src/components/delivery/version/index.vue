@@ -1,7 +1,7 @@
 <template>
   <div
     v-loading="loading"
-    element-loading-text="加载中..."
+    :element-loading-text="$t(`global.loading`)"
     element-loading-spinner="iconfont iconfont-loading iconvery-versionmana"
     class="version-list-container"
   >
@@ -9,35 +9,35 @@
       <div v-if="showHookConfig" class="hook-config">
         <span class="hook-switch">
           <span>
-            Hook 配置
+            {{$t('deliveryCenter.hookConfiguration')}}
             <a
               href="https://docs.koderover.com/zadig/project/version/#hook-%E5%A4%96%E9%83%A8%E7%B3%BB%E7%BB%9F"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <el-tag size="mini" type="success" effect="dark" class="help-tag">帮助</el-tag>
+              <el-tag size="mini" type="success" effect="dark" class="help-tag">{{$t('global.help')}}</el-tag>
             </a>
           </span>
           <el-switch v-model="versionHook.enable" style="margin-left: 10px;" @change="saveHook" :disabled="!isProjectAdmin"></el-switch>
         </span>
         <el-form ref="hookRef" :model="versionHook" v-if="versionHook.enable" label-position="left" inline class="hook-form">
-          <el-form-item prop="hook_host" :rules="{required: true, message: '请选择外部系统', trigger: 'blur'}">
-            <el-select v-model="versionHook.hook_host" placeholder="选择外部系统" size="small" clearable style="width: 100%;">
+          <el-form-item prop="hook_host" :rules="{required: true, message: $t('deliveryCenter.selectExternalSystem'), trigger: 'blur'}">
+            <el-select v-model="versionHook.hook_host" :placeholder="$t('deliveryCenter.selectExternalSystem')" size="small" clearable style="width: 100%;">
               <el-option v-for="external in externalList" :key="external.id" :label="external.server" :value="external.server"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item style=" margin-right: 5px; margin-left: -5px;">
             <span>/</span>
           </el-form-item>
-          <el-form-item prop="path" :rules="{required: true, message: '请输入访问路径', trigger: 'blur'}">
-            <el-input v-model="versionHook.path" placeholder="输入访问路径" size="small"></el-input>
+          <el-form-item prop="path" :rules="{required: true, message: $t('deliveryCenter.inputAccessAddress'), trigger: 'blur'}">
+            <el-input v-model="versionHook.path" :placeholder="$t('deliveryCenter.inputAccessAddress')" size="small"></el-input>
           </el-form-item>
         </el-form>
         <i v-if="versionHook.enable" class="hook-icon el-icon-finished" @click="saveHook"></i>
       </div>
     </div>
     <el-table :data="versionList" v-if="versionList.length > 0" style="width: 100%;">
-      <el-table-column label="版本">
+      <el-table-column :label="$t('deliveryCenter.versionName')">
         <template slot-scope="scope">
           <span class="version-link">
             <router-link
@@ -57,37 +57,37 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="create_by" label="所属项目" v-if="!projectName">
+      <el-table-column prop="create_by" :label="$t('deliveryCenter.originProject')" v-if="!projectName">
         <template slot-scope="scope">
           <span>{{ scope.row.versionInfo.productName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" v-if="showStatus">
+      <el-table-column :label="$t(`global.status`)" v-if="showStatus">
         <template slot-scope="{ row }">
           <el-tag
             :type="helmStatusEnum[row.versionInfo.status].tag || 'info'"
             size="small"
-          >{{ helmStatusEnum[row.versionInfo.status].text || '未知' }}</el-tag>
+          >{{ helmStatusEnum[row.versionInfo.status].text || $t('deliveryCenter.helmStatus.unknown') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="标签">
+      <el-table-column :label="$t('deliveryCenter.versionTag')">
         <template slot-scope="scope">
           <span v-for="(label,index) in scope.row.versionInfo.labels" :key="index" style="margin-right: 3px;">
             <el-tag size="small">{{label}}</el-tag>
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="create_by" label="创建人">
+      <el-table-column prop="create_by" :label="$t(`global.creator`)">
         <template slot-scope="scope">
           <span>{{ scope.row.versionInfo.createdBy }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="create_at" label="创建时间">
+      <el-table-column prop="create_at" :label="$t('deliveryCenter.creationTime')">
         <template slot-scope="scope">
           <span>{{ $utils.convertTimestamp(scope.row.versionInfo.created_at) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column :label="$t(`global.operation`)">
         <template slot-scope="scope">
           <el-button
             v-if="checkPermissionSyncMixin({type:'project',projectName: projectName, action: 'delete_delivery'})"
@@ -95,16 +95,16 @@
             @click="deleteVersion(scope.row.versionInfo)"
             type="danger"
             plain
-          >删除</el-button>
-          <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
-            <el-button class="permission-disabled" size="mini" type="danger" plain>删除</el-button>
+          >{{$t(`global.delete`)}}</el-button>
+          <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
+            <el-button class="permission-disabled" size="mini" type="danger" plain>{{$t(`global.delete`)}}</el-button>
           </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
     <div v-if="versionList.length === 0 && !loading" class="version-not-available">
       <img src="@assets/icons/illustration/versionManage.svg" alt />
-      <p>暂无可展示的版本信息</p>
+      <p>{{$t('deliveryCenter.noVersion')}}</p>
     </div>
   </div>
 </template>
@@ -136,41 +136,23 @@ export default {
         hook_host: '',
         path: ''
       },
-      showStatus: false,
-      helmStatusEnum: {
-        success: {
-          text: '成功',
-          tag: 'success'
-        },
-        failed: {
-          text: '失败',
-          tag: 'danger'
-        },
-        creating: {
-          text: '创建中',
-          tag: 'info'
-        },
-        retrying: {
-          text: '重试中',
-          tag: 'warning'
-        }
-      }
+      showStatus: false
     }
   },
   methods: {
     deleteVersion (version) {
       const projectName = version.productName
       const versionId = version.id
-      this.$confirm(`确定删除 ${version.version} 这个版本？`, '删除版本', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      this.$confirm(this.$t('deliveryCenter.confirmToDeleteVersion', { version: version.version }), this.$t('deliveryCenter.deleteVersion'), {
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       })
         .then(() => {
           deleteVersionAPI(projectName, versionId).then(res => {
             this.$message({
               type: 'success',
-              message: '版本删除成功'
+              message: this.$t('deliveryCenter.versionHasBeenDeleted')
             })
             this.getVersionServiceList()
             this.searchVersionByService()
@@ -179,7 +161,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: this.$t('deliveryCenter.deletionCancellation')
           })
         })
     },
@@ -236,7 +218,7 @@ export default {
           updateSingleProjectAPI(this.projectName, payload).then(res => {
             this.$message({
               type: 'success',
-              message: '配置更新成功'
+              message: this.$t('deliveryCenter.configurationHasBeenUpdated')
             })
           })
         })
@@ -278,6 +260,26 @@ export default {
       } else {
         return false
       }
+    },
+    helmStatusEnum () {
+      return {
+        success: {
+          text: this.$t('deliveryCenter.helmStatus.success'),
+          tag: 'success'
+        },
+        failed: {
+          text: this.$t('deliveryCenter.helmStatus.failed'),
+          tag: 'danger'
+        },
+        creating: {
+          text: this.$t('deliveryCenter.helmStatus.creating'),
+          tag: 'info'
+        },
+        retrying: {
+          text: this.$t('deliveryCenter.helmStatus.retrying'),
+          tag: 'warning'
+        }
+      }
     }
   },
   created () {
@@ -285,13 +287,13 @@ export default {
       bus.$emit(`set-topbar-title`, {
         title: '',
         breadcrumb: [
-          { title: '项目', url: `/v1/projects` },
+          { title: this.$t('subTopbarMenu.projects'), url: `/v1/projects` },
           {
             title: this.projectName,
             isProjectName: true,
             url: `/v1/projects/detail/${this.projectName}/detail`
           },
-          { title: '版本管理', url: `` }
+          { title: this.$t('subTopbarMenu.versions'), url: `` }
         ]
       })
       this.getUserBinding(this.projectName)
@@ -299,8 +301,8 @@ export default {
       bus.$emit(`set-topbar-title`, {
         title: '',
         breadcrumb: [
-          { title: '交付中心', url: `/v1/delivery` },
-          { title: '版本管理', url: `` }
+          { title: this.$t('sidebarMenu.deliveryCenter'), url: `/v1/delivery` },
+          { title: this.$t('subTopbarMenu.versions'), url: `` }
         ]
       })
     }

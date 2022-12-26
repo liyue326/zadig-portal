@@ -18,7 +18,7 @@
                 <div class="time">{{$utils.convertTimestamp(task.create_time)}}</div>
               </template>
               <template #default>
-                <van-button plain hairline @click.stop="taskOperation('cancel',task)" size="small" type="danger">取消</van-button>
+                <van-button plain hairline @click.stop="taskOperation('cancel',task)" size="small" type="danger">{{$t(`global.cancel`)}}</van-button>
               </template>
             </van-cell>
           </van-cell-group>
@@ -38,7 +38,7 @@
                 <div class="time">{{$utils.convertTimestamp(task.create_time)}}</div>
               </template>
               <template #default>
-                <van-button plain hairline @click.stop="taskOperation('cancel',task)" size="small" type="danger">取消</van-button>
+                <van-button plain hairline @click.stop="taskOperation('cancel',task)" size="small" type="danger">{{$t(`global.cancel`)}}</van-button>
               </template>
             </van-cell>
           </van-cell-group>

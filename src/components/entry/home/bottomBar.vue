@@ -19,7 +19,7 @@
         <li>
           <span>
             <i class="iconfont"></i>
-            <a href="https://docs.koderover.com/" target="_blank" rel="noopener noreferrer">帮助文档</a>
+            <a href="https://docs.koderover.com/" target="_blank" rel="noopener noreferrer">{{$t(`global.helpDoc`)}}</a>
           </span>
         </li>
       </ul>

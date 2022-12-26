@@ -1,7 +1,7 @@
 <template>
   <div
     v-loading="loading"
-    element-loading-text="加载中..."
+    :element-loading-text="$t(`global.loading`)"
     element-loading-spinner="iconfont iconfont-loading icondocker"
     class="setting-registry-container"
   >
@@ -65,7 +65,7 @@
           <el-input size="small" clearable type="passsword" show-password v-if="dialogRegistryFormVisible" v-model="registry.secret_key"></el-input>
         </el-form-item>
         <el-button type="text" @click="registry.advanced_setting.modified = !registry.advanced_setting.modified">
-          高级配置
+          {{$t(`project.createProjectComp.advancedConfigurations`)}}
           <i :class="[registry.advanced_setting.modified ? 'el-icon-arrow-up' : 'el-icon-arrow-down']" style="margin-left: 8px;"></i>
         </el-button>
         <template v-if="registry.advanced_setting.modified">
@@ -91,8 +91,8 @@
         </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="small" @click="dialogRegistryFormVisible = false">取 消</el-button>
-        <el-button :plain="true" type="success" size="small" @click="mode === 'create' ? registryAction('add'): registryAction('update')">保存</el-button>
+        <el-button size="small" @click="dialogRegistryFormVisible = false">{{$t(`global.cancel`)}}</el-button>
+        <el-button :plain="true" type="success" size="small" @click="mode === 'create' ? registryAction('add'): registryAction('update')">{{$t(`global.save`)}}</el-button>
       </div>
     </el-dialog>
     <!--registry-create-dialog-->
@@ -106,11 +106,11 @@
             :href="`https://docs.koderover.com/zadig/settings/image-registry/`"
             :underline="false"
             target="_blank"
-          >帮助文档</el-link>
+          >{{$t(`global.helpDoc`)}}</el-link>
         </template>
       </el-alert>
       <div class="sync-container">
-        <el-button :plain="true" @click="addRegistryBtn" size="small" type="success">新建</el-button>
+        <el-button :plain="true" @click="addRegistryBtn" size="small" type="success">{{$t('global.add')}}</el-button>
       </div>
       <div class="registry-list">
         <template>
@@ -140,10 +140,10 @@
               </template>
             </el-table-column>
 
-            <el-table-column label="操作" width="180px">
+            <el-table-column :label="$t(`global.operation`)" width="180px">
               <template slot-scope="scope">
-                <el-button @click="registryAction('edit',scope.row)" size="mini" type="primary" plain>编辑</el-button>
-                <el-button @click="registryAction('delete',scope.row)" size="mini" type="danger" plain>删除</el-button>
+                <el-button @click="registryAction('edit',scope.row)" size="mini" type="primary" plain>{{$t(`global.edit`)}}</el-button>
+                <el-button @click="registryAction('delete',scope.row)" size="mini" type="danger" plain>{{$t(`global.delete`)}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -431,8 +431,8 @@ export default {
                 `修改「开启 SSL 校验」或 「TLS 证书内容（公钥）」会对正在运行的工作流任务产生影响，确认修改？`,
                 '确认',
                 {
-                  confirmButtonText: '确定',
-                  cancelButtonText: '取消',
+                  confirmButtonText: this.$t(`global.confirm`),
+                  cancelButtonText: this.$t(`global.cancel`),
                   type: 'warning'
                 }
               ).then(() => {
@@ -466,8 +466,8 @@ export default {
                 `修改「开启 SSL 校验」或 「TLS 证书内容（公钥）」会对正在运行的工作流任务产生影响，确认修改？`,
                 '确认',
                 {
-                  confirmButtonText: '确定',
-                  cancelButtonText: '取消',
+                  confirmButtonText: this.$t(`global.confirm`),
+                  cancelButtonText: this.$t(`global.cancel`),
                   type: 'warning'
                 }
               ).then(() => {
@@ -487,8 +487,8 @@ export default {
       } else if (action === 'delete') {
         const id = registry.id
         this.$confirm(`确定要删除 ${registry.reg_addr} ?`, '确认', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }).then(({ value }) => {
           deleteRegistryAPI(id).then(res => {
@@ -542,8 +542,7 @@ export default {
     }
   },
   created () {
-    bus.$emit(`set-topbar-title`, { title: '镜像仓库', breadcrumb: [] })
-
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t(`sidebarMenu.dockerRegistry`), url: '' }] })
     this.getRegistry()
   }
 }

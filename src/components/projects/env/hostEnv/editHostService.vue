@@ -1,8 +1,8 @@
 <template>
        <el-transfer
-        filter-placeholder="请输入服务名称"
+       :filter-placeholder="$t('environments.hosting.inputServiceNameToSearch')"
         v-model="selectService"
-        :titles="['服务列表', '已选服务']"
+       :titles="[$t('environments.hosting.serviceList'), $t('environments.hosting.selectedServices')]"
         :data="serviceList"
         class="transfer"
         :render-content="renderFunc"
@@ -22,14 +22,11 @@ export default {
     return {
       hostingNamespace: [],
       form: null,
-      rules: {
-        env_name: [{ required: true, message: '请输入环境名称', trigger: 'blur' }]
-      },
       serviceList: [],
       selectService: [],
       renderFunc (h, option) {
         if (option.env_name) {
-          const content = `使用项目：${option.product_name}；使用环境：${option.env_name}`
+          const content = this.$t('environments.hosting.serviceNameLabelTooltip', { projectName: option.product_name, envName: option.env_name })
           return <el-tooltip content={content} placement="top">
             <span>{ option.label }</span>
           </el-tooltip>

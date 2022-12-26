@@ -3,7 +3,7 @@
     <!--start of workspace-tree-dialog-->
     <el-dialog :visible.sync="artifactModalVisible"
                width="60%"
-               title="Artifact 文件导出"
+               :title="$t(`testing.taskDetails.exportArtifact`)"
                class="downloadArtifact-dialog">
       <ArtifactDownload ref="downloadArtifact"
                          :workflowName="workflowName"
@@ -15,40 +15,40 @@
       <el-col :span="6">
 
         <div class="section-head">
-          基本信息
+          {{$t(`testing.taskDetails.basicInformation.title`)}}
         </div>
 
         <el-form class="basic-info"
                  label-width="100px"
                  label-position="left">
-          <el-form-item label="状态">
+          <el-form-item :label="$t(`global.status`)">
             <el-tag size="small"
                     effect="dark"
                     :type="$utils.taskElTagType(taskDetail.status)"
                     close-transition>
-              {{ myTranslate(taskDetail.status) }}
+              {{ taskDetail.status?$t(`workflowTaskStatus.${taskDetail.status}`):$t(`workflowTaskStatus.notRunning`) }}
             </el-tag>
           </el-form-item>
-          <el-form-item label="创建者">
+          <el-form-item :label="$t(`testing.taskDetails.basicInformation.creator`)">
             {{ taskDetail.task_creator }}
           </el-form-item>
           <el-form-item v-if="taskDetail.task_revoker"
-                        label="取消者">
+                        :label="$t(`testing.taskDetails.basicInformation.canceller`)">
             {{ taskDetail.task_revoker }}
           </el-form-item>
-          <el-form-item label="持续时间">
+          <el-form-item :label="$t(`testing.taskDetails.basicInformation.duration`)">
             {{ taskDetail.interval }}
           </el-form-item>
           <el-form-item v-if="showOperation()"
-                        label="操作">
+                        :label="$t(`global.operation`)">
             <el-button v-hasPermi="{projectName: projectName, action: 'run_test',isBtn:true}" v-if="taskDetail.status==='failed' || taskDetail.status==='cancelled' || taskDetail.status==='timeout'"
                        @click="rerun"
                        type="text"
-                       size="medium">失败重试</el-button>
+                       size="medium">{{$t(`testing.taskDetails.basicInformation.retry`)}}</el-button>
             <el-button v-hasPermi="{projectName: projectName, action: 'run_test',isBtn:true}" v-if="taskDetail.status==='running'||taskDetail.status==='created'"
                        @click="cancel"
                        type="text"
-                       size="medium">取消任务</el-button>
+                       size="medium">{{$t(`testing.taskDetails.basicInformation.cancel`)}}</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -56,16 +56,15 @@
 
     <div v-if="testArray.length > 0"
          class="section-head">
-      测试任务
+      {{$t(`testing.taskDetails.taskInfo.head`)}}
     </div>
     <template v-if="testArray.length > 0">
-      <span class="section-title">自动化测试</span>
       <el-table :data="testArray"
                 row-key="_target"
                 :expand-row-keys="expandedTests"
                 @expand-change="updateTestExpanded"
                 row-class-name="my-table-row"
-                empty-text="无"
+                :empty-text="$t(`global.emptyText`)"
                 class="test-table">
         <el-table-column type="expand">
           <template slot-scope="scope">
@@ -78,37 +77,37 @@
         </el-table-column>
 
         <el-table-column prop="_target"
-                         label="名称"
+                         :label="$t(`global.name`)"
                          width="200px">
           <template slot-scope="scope">
             <span>{{$utils.showServiceName(scope.row._target)}}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="运行状态">
+        <el-table-column :label="$t(`testing.taskDetails.taskInfo.executionStatus`)">
           <template slot-scope="scope">
             <span :class="colorTranslation(scope.row.testingv2SubTask.status, 'pipeline', 'task')">
-              {{ myTranslate(scope.row.testingv2SubTask.status) }}
+              {{ scope.row.testingv2SubTask.status?$t(`workflowTaskStatus.${scope.row.testingv2SubTask.status}`):$t(`workflowTaskStatus.notRunning`) }}
             </span>
             {{ makePrettyElapsedTime(scope.row.testingv2SubTask) }}
           </template>
         </el-table-column>
 
-        <el-table-column label="测试报告">
+        <el-table-column :label="$t(`testing.taskDetails.taskInfo.report`)">
           <template slot-scope="scope">
             <span v-if="scope.row.testingv2SubTask.report_ready === true">
               <router-link class="show-test-result" :to="getTestReport(scope.row.testingv2SubTask, scope.row._target)">
-                查看
+                {{$t(`testing.taskDetails.taskInfo.view`)}}
               </router-link>
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="文件导出">
+        <el-table-column :label="$t(`testing.taskDetails.taskInfo.exportedFile`)">
           <template slot-scope="scope">
             <span v-if="scope.row.testingv2SubTask.job_ctx.is_has_artifact"
                   @click="artifactModalVisible=true"
                   class="download-artifact-link">
-              下载
+              {{$t(`testing.taskDetails.taskInfo.download`)}}
             </span>
           </template>
         </el-table-column>
@@ -120,7 +119,7 @@
 
 <script>
 import { workflowTaskDetailAPI, workflowTaskDetailSSEAPI, restartTestTaskAPI, cancelTestTaskAPI } from '@api'
-import { wordTranslate, colorTranslate } from '@utils/wordTranslate.js'
+import { colorTranslate } from '@utils/wordTranslate.js'
 import ArtifactDownload from '@/components/common/artifactDownload.vue'
 import TaskDetailTest from './container/taskDetailTest.vue'
 export default {
@@ -179,7 +178,7 @@ export default {
     rerun () {
       const taskUrl = `/v1/projects/detail/${this.projectName}/test/detail/function/${this.workflowName}/${this.taskID}`
       restartTestTaskAPI(this.projectName, this.workflowName, this.taskID).then(res => {
-        this.$message.success('任务已重新启动')
+        this.$message.success(this.$t(`testing.restartSuccess`))
         this.$router.push(taskUrl)
       })
     },
@@ -192,7 +191,7 @@ export default {
         if (this.$refs && this.$refs.testComp) {
           this.$refs.testComp.killLog('test')
         }
-        this.$message.success('任务取消成功')
+        this.$message.success(this.$t(`testing.cancellationSuccess`))
       })
     },
     handleInputConfirm () {
@@ -244,9 +243,6 @@ export default {
     },
     repoID (repo) {
       return `${repo.source}/${repo.repo_owner}/${repo.repo_name}`
-    },
-    myTranslate (word) {
-      return wordTranslate(word, 'pipeline', 'task')
     },
     colorTranslation (word, category, subitem) {
       return colorTranslate(word, category, subitem)

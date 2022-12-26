@@ -1,48 +1,48 @@
 <template>
   <div class="env-changelog-container">
-    <el-dialog :title="`API 请求：${currentLog.time}`" :visible.sync="payloadDialogVisible" width="60%">
+    <el-dialog :title="$t('environments.changelog.APIPayloadDialogTitle',{ time:currentLog.time })" :visible.sync="payloadDialogVisible" width="60%">
       <div>
         <vue-json-pretty v-if="currentLog.request_body" :data="currentLog.request_body"></vue-json-pretty>
-        <p v-else>暂无请求 Payload 信息</p>
+        <p v-else>{{$t('environments.changelog.noPayload')}}</p>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="small" @click="payloadDialogVisible = false">确 定</el-button>
+        <el-button type="primary" size="small" @click="payloadDialogVisible = false">{{$t(`global.confirm`)}}</el-button>
       </span>
     </el-dialog>
     <div class="section">
       <div class="operation">
         <div class="type">
-          <el-select v-model="search.searchType" size="small" placeholder="请选择查询类型">
+          <el-select v-model="search.searchType" size="small" :placeholder="$t(`environments.changelog.selectType`)">
             <el-option v-for="type in searchTypes" :key="type.value" :label="type.label" :value="type.value"></el-option>
           </el-select>
         </div>
         <div class="keyword">
-          <el-input clearable size="small" v-model="search.keyword" @keyup.enter.native="getEnvLogBySearch" placeholder="请输入关键字"></el-input>
+          <el-input clearable size="small" v-model="search.keyword" @keyup.enter.native="getEnvLogBySearch" :placeholder="$t(`environments.changelog.inputKeyword`)"></el-input>
         </div>
-        <el-button plain size="small" @click="getEnvLogBySearch" type="primary">查询</el-button>
+        <el-button plain size="small" @click="getEnvLogBySearch" type="primary">{{$t(`environments.changelog.search`)}}</el-button>
       </div>
       <div class="storage-list">
         <template>
           <el-table
             :data="results"
             v-loading="loading"
-            element-loading-text="拼命加载中"
+            :element-loading-text="$t('global.loading')"
             element-loading-spinner="el-icon-loading"
             style="width: 100%;"
           >
-            <el-table-column width="180px" label="时间">
+            <el-table-column width="180px" :label="$t(`environments.changelog.time`)">
               <template slot-scope="{ row }">{{$utils.convertTimestamp(row.created_at,'yyyy-mm-dd-ss')}}</template>
             </el-table-column>
-            <el-table-column label="用户名" prop="username"></el-table-column>
-            <el-table-column label="操作" prop="method"></el-table-column>
-            <el-table-column label="功能" prop="function"></el-table-column>
-            <el-table-column label="详情" prop="name"></el-table-column>
-            <el-table-column width="120px" label="状态码">
+            <el-table-column :label="$t(`environments.changelog.username`)" prop="username"></el-table-column>
+            <el-table-column :label="$t(`global.operation`)" prop="method"></el-table-column>
+            <el-table-column :label="$t(`environments.changelog.function`)" prop="function"></el-table-column>
+            <el-table-column :label="$t(`environments.changelog.detail`)" prop="name"></el-table-column>
+            <el-table-column width="120px" :label="$t(`environments.changelog.statusCode`)">
               <template slot-scope="{ row }">
                 <el-tag effect="dark" :type="getStatusColor(row.status)" size="small">{{row.status}}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column width="120px" label="API 请求">
+            <el-table-column width="120px" :label="$t(`environments.changelog.APIPayload`)">
               <template slot-scope="{ row }">
                 <el-button @click="viewRequestPayload(row)" icon="el-icon-document" type="text"></el-button>
               </template>
@@ -73,24 +73,6 @@ import bus from '@utils/eventBus'
 export default {
   data () {
     return {
-      searchTypes: [
-        {
-          label: '用户名',
-          value: 'username'
-        },
-        {
-          label: '功能',
-          value: 'function'
-        },
-        {
-          label: '状态码',
-          value: 'status'
-        },
-        {
-          label: '详情',
-          value: 'detail'
-        }
-      ],
       results: [],
       loading: false,
       payloadDialogVisible: false,
@@ -137,7 +119,7 @@ export default {
           this.results = res.logs
           if (type === 'search') {
             this.$message({
-              message: '查询完毕',
+              message: this.$t(`environments.changelog.searchCompleted`),
               type: 'success'
             })
           }
@@ -178,6 +160,26 @@ export default {
     },
     envName () {
       return this.$route.params.env_name
+    },
+    searchTypes () {
+      return [
+        {
+          label: this.$t(`environments.changelog.username`),
+          value: 'username'
+        },
+        {
+          label: this.$t(`environments.changelog.function`),
+          value: 'function'
+        },
+        {
+          label: this.$t(`environments.changelog.statusCode`),
+          value: 'status'
+        },
+        {
+          label: this.$t(`environments.changelog.detail`),
+          value: 'detail'
+        }
+      ]
     }
   },
   components: {
@@ -187,21 +189,21 @@ export default {
     bus.$emit('set-topbar-title', {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: '环境',
+          title: this.$t('subTopbarMenu.environments'),
           url: `/v1/projects/detail/${this.projectName}/envs/detail`
         },
         {
           title: this.envName,
           url: `/v1/projects/detail/${this.projectName}/envs/detail?envName=${this.envName}`
         },
-        { title: '变更记录', url: '' }
+        { title: this.$t(`environments.changelog.changelog`), url: '' }
       ]
     })
     this.getEnvLog()
@@ -227,7 +229,7 @@ export default {
 
       .type {
         display: inline-block;
-        width: 120px;
+        width: 140px;
       }
 
       .keyword {

@@ -33,7 +33,7 @@
             <el-button v-hasPermi="{type: 'system', action: fileStatus === 'added'?'edit_template':'create_template',isBtn:true, disabled: disabledSave }" type="primary"
                        size="small"
                        :disabled="disabledSave"
-                       @click="updateFile">保存</el-button>
+                       @click="updateFile">{{$t(`global.save`)}}</el-button>
           </div>
         </div>
     </div>
@@ -115,7 +115,7 @@ export default {
           this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })
           this.$message({
             type: 'success',
-            message: `模板 ${fileName} 更新成功`
+            message: this.$t('templates.dockerfile.templateUpdated', { name: fileName })
           })
         }
       } else if (status === 'named') {
@@ -127,7 +127,7 @@ export default {
           this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })
           this.$message({
             type: 'success',
-            message: `模板 ${fileName} 创建成功`
+            message: this.$t('templates.dockerfile.templateCreated', { name: fileName })
           })
         }
       }

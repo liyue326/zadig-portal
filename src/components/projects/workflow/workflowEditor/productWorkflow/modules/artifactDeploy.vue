@@ -7,24 +7,24 @@
               class="header">
         <el-col :span="2">
           <div class="index">
-            序号
+            {{$t(`global.number`)}}
           </div>
         </el-col>
         <el-col :span="9">
           <div class="service">
-            服务
+            {{$t(`status.service`)}}
           </div>
         </el-col>
 
         <el-col :span="9">
           <div class="deploy">
-            部署
+            {{$t(`status.deploy`)}}
           </div>
         </el-col>
 
         <el-col :span="4">
           <div class="view">
-            是否显示
+            {{$t(`global.whetherToDisplay`)}}
             <el-tooltip effect="dark" content="执行工作流任务时是否在服务列表中显示，供用户选择。" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>

@@ -19,7 +19,7 @@
         <span>{{node.label}}</span>
       </span>
     </el-tree>
-    <el-button style="margin-top: 0.5rem;" type="primary" plain size="mini" @click="emitCheckedPath">确定</el-button>
+    <el-button style="margin-top: 0.5rem;" type="primary" plain size="mini" @click="emitCheckedPath">{{$t(`global.confirm`)}}</el-button>
   </el-card>
 </template>
 

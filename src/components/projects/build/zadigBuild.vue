@@ -12,12 +12,12 @@
           inline-message
         >
           <slot name="buildName">
-            <el-form-item label="构建名称" prop="name">
-              <el-input v-model="buildConfig.name" placeholder="构建名称" autofocus size="small" :disabled="!isCreate" auto-complete="off"></el-input>
+            <el-form-item :label="$t(`build.buildName`)" prop="name">
+              <el-input v-model="buildConfig.name" :placeholder="$t(`build.buildName`)" autofocus size="small" :disabled="!isCreate" auto-complete="off"></el-input>
             </el-form-item>
           </slot>
           <slot v-if="!useTemplate" name="serviceName">
-            <el-form-item label="服务选择">
+            <el-form-item :label="$t(`workflow.selectService`)">
               <el-select v-model="buildConfig.targets" multiple size="small" value-key="key" filterable>
                 <el-option
                   v-for="(service,index) in serviceTargets"
@@ -29,7 +29,7 @@
             </el-form-item>
           </slot>
           <slot v-if="useTemplate" name="template">
-            <el-form-item label="选择模板" prop="template_id">
+            <el-form-item :label="$t(`build.prompt.selectBuildTemplate`)" prop="template_id">
               <el-select v-model="buildConfig.template_id" size="small" filterable @change="changeTemplate">
                 <el-option
                   v-for="(template,index) in templates"
@@ -50,9 +50,9 @@
         <ServiceRepoSelect ref="serviceRepoSelectRef" :serviceTargets="serviceTargets" :targets.sync="buildConfig.target_repos" :currentTemplateEnvs="currentTemplateEnvs" :isCreate="isCreate" :validObj="validObj" :mini="mini" class="build-secondary-form" showFirstLine />
       </section>
       <section v-show="!useTemplate">
-        <div class="primary-title not-first-child">构建变量</div>
+        <div class="primary-title not-first-child">{{$t(`build.variables`)}}</div>
         <EnvVariable :preEnvs="buildConfig.pre_build" :validObj="validObj" :fromServicePage="fromServicePage" :mini="mini" />
-        <div class="primary-title not-first-child">通用构建脚本</div>
+        <div class="primary-title not-first-child">{{$t(`build.commonScript`)}}</div>
         <div class="deploy-script">
           <Resize :resize="'both'">
             <Editor v-model="buildConfig.scripts" />
@@ -64,7 +64,7 @@
       <section>
         <div style="margin-bottom: 8px;">
           <el-button type="primary" size="small" plain @click="buildConfig.advanced_setting_modified = !buildConfig.advanced_setting_modified">
-            高级配置
+            {{$t(`project.createProjectComp.advancedConfigurations`)}}
             <i :class="[buildConfig.advanced_setting_modified ? 'el-icon-arrow-up' : 'el-icon-arrow-down']" style="margin-left: 8px;"></i>
           </el-button>
         </div>
@@ -98,18 +98,6 @@ import ValidateSubmit from '@utils/validateAsync'
 
 import { getCodeSourceMaskedAPI, getBuildTemplatesAPI, getBuildTemplateDetailAPI } from '@api'
 import { cloneDeep, differenceBy, intersectionBy } from 'lodash'
-
-const validateBuildConfigName = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入构建名称'))
-  } else {
-    if (!/^[a-z0-9-]+$/.test(value)) {
-      callback(new Error('名称只支持小写字母和数字，特殊字符只支持中划线'))
-    } else {
-      callback()
-    }
-  }
-}
 
 const initBuildConfig = {
   name: '',
@@ -174,7 +162,31 @@ export default {
   },
   data () {
     return {
-      createRules: {
+      validObj: new ValidateSubmit(),
+      allCodeHosts: [],
+      templates: [],
+      configDataLoading: true,
+      buildConfig: cloneDeep(initBuildConfig),
+      currentTemplateEnvs: []
+    }
+  },
+  computed: {
+    projectName () {
+      return this.$route.params.project_name
+    },
+    createRules () {
+      const validateBuildConfigName = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t(`build.prompt.fillInBuildName`)))
+        } else {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            callback(new Error(this.$t(`build.prompt.buildNameConvention`)))
+          } else {
+            callback()
+          }
+        }
+      }
+      return {
         name: [
           {
             type: 'string',
@@ -187,28 +199,17 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请选择构建模板',
+            message: this.$t(`build.prompt.selectBuildTemplateII`),
             trigger: ['blur', 'change']
           }
         ],
         'pre_build.image_id': {
           type: 'string',
           required: true,
-          message: '请选择操作系统',
+          message: this.$t(`build.prompt.selectImage`),
           trigger: 'blur'
         }
-      },
-      validObj: new ValidateSubmit(),
-      allCodeHosts: [],
-      templates: [],
-      configDataLoading: true,
-      buildConfig: cloneDeep(initBuildConfig),
-      currentTemplateEnvs: []
-    }
-  },
-  computed: {
-    projectName () {
-      return this.$route.params.project_name
+      }
     }
   },
   watch: {

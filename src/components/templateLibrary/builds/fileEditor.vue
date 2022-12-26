@@ -11,7 +11,7 @@
           @click="handleBuildConfig"
           :disabled="saveDisabled"
           :loading="saveLoading"
-        >保存</el-button>
+        >{{$t(`global.save`)}}</el-button>
       </footer>
     </slot>
   </div>

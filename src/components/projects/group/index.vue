@@ -1,17 +1,17 @@
 <template>
   <div class="var-group-container">
     <div class="btn-container">
-      <el-button plain size="small" type="primary" @click="varGroup('new')">新建</el-button>
+      <el-button plain size="small" type="primary" @click="varGroup('new')">{{$t('global.add')}}</el-button>
     </div>
     <el-table v-loading="loading" :data="groupList" class="group-container">
-      <el-table-column label="变量组名称" prop="name" />
-      <el-table-column label="描述信息" prop="description" />
-      <el-table-column label="更新时间" prop="updated_at" />
-      <el-table-column label="最后修改" prop="updated_by" />
-      <el-table-column label="操作" width="150px">
+      <el-table-column :label="$t('project.varsGroup.name')" prop="name" />
+      <el-table-column :label="$t('global.desc')" prop="description" />
+      <el-table-column :label="$t('global.updateTime')" prop="updated_at" />
+      <el-table-column :label="$t('global.lastModified')" prop="updated_by" />
+      <el-table-column :label="$t(`global.operation`)">
         <template slot-scope="{ row }">
-          <el-button size="mini" type="primary" @click="varGroup('edit', row)" plain>编辑</el-button>
-          <el-button size="mini" type="danger" @click="varGroup('delete', row)" plain>删除</el-button>
+          <el-button size="mini" type="primary" @click="varGroup('edit', row)" plain>{{$t(`global.edit`)}}</el-button>
+          <el-button size="mini" type="danger" @click="varGroup('delete', row)" plain>{{$t(`global.delete`)}}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -53,13 +53,13 @@ export default {
   methods: {
     varGroup (tag, row) {
       if (tag === 'delete') {
-        this.$confirm(`确定要删除 ${row.name} ?`, '确认', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm(this.$t('project.varsGroup.confirmToDeleteVarsGroup', { name: row.name }), this.$t('global.confirm'), {
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }).then(() => {
           deleteVariablesGroupAPI(this.projectName, row.id).then(res => {
-            this.$message.success(`变量组 ${row.name} 删除成功！`)
+            this.$message.success(this.$t('project.varsGroup.deleteVarsGroupSuccess', { name: row.name }))
             this.getGroupList()
           })
         })
@@ -103,13 +103,13 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
-        { title: '变量组', url: '' }
+        { title: this.$t('subTopbarMenu.varsGroup'), url: '' }
       ]
     })
   }

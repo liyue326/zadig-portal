@@ -7,7 +7,7 @@
       </el-col>
       <el-col :span="2">
         <div class="item-desc">
-          <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?buildOverallStatusZh:"未运行"}}</a>
+          <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?$t(`workflowTaskStatus.${jobInfo.status}`):$t(`workflowTaskStatus.notRunning`)}}</a>
         </div>
       </el-col>
       <el-col :span="2">
@@ -21,18 +21,18 @@
     </header>
     <main>
       <div class="error-wrapper">
-        <el-alert v-if="jobInfo.error" title="错误信息" :description="jobInfo.error" type="error" close-text="知道了"></el-alert>
+        <el-alert v-if="jobInfo.error" :title="$t(`global.errorMsg`)" :description="jobInfo.error" type="error" :close-text="$t(`global.ok`)"></el-alert>
       </div>
       <section>
         <el-row class="item" :gutter="0" v-for="(build,index) in jobInfo.spec.distribute_target" :key="index">
           <el-col :span="4">
-            <div class="item-title">服务名称</div>
+            <div class="item-title">{{$t(`global.serviceName`)}}</div>
           </el-col>
           <el-col :span="8">
             <span class="item-desc">{{build.service_name}}({{build.service_module}})</span>
           </el-col>
           <el-col :span="4">
-            <div class="item-title">镜像信息</div>
+            <div class="item-title">{{$t(`status.imgInfo`)}}</div>
           </el-col>
           <el-col :span="6">
             <el-tooltip effect="dark" :content="build.target_image" placement="top">
@@ -90,7 +90,7 @@ export default {
       return this.$utils.calcOverallBuildStatus(this.jobInfo, {})
     },
     buildOverallStatusZh () {
-      return this.$translate.translateTaskStatus(this.buildOverallStatus)
+      return this.$t(`workflowTaskStatus.${this.buildOverallStatus}`)
     },
     buildOverallColor () {
       return this.$translate.calcTaskStatusColor(this.buildOverallStatus)
@@ -181,7 +181,11 @@ export default {
           if (oldVal && val.name !== oldVal.name) {
             this.firstLoad = false
           }
-          if (val.status && !this.firstLoad) {
+          if (
+            (val.status === 'running' && !this.firstLoad) ||
+            (val.status === 'passed' && !this.firstLoad) ||
+            (val.status === 'failed' && !this.firstLoad)
+          ) {
             this.getLog()
             this.firstLoad = true
           }

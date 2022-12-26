@@ -4,10 +4,10 @@
       <div class="error-wrapper">
         <el-alert
           v-if="distributeDeploy.release_imageSubTask.error"
-          title="错误信息"
+          :title="$t(`global.errorMsg`)"
           :description="distributeDeploy.release_imageSubTask.error"
           type="error"
-          close-text="知道了"
+          :close-text="$t(`global.ok`)"
         ></el-alert>
       </div>
       <div slot="header" class="clearfix subtask-header">
@@ -31,14 +31,14 @@
             <div
               class="grid-content item-desc"
               :class="$translate.calcTaskStatusColor(distributeDeploy.release_imageSubTask.distribute_info[0].distribute_status)"
-            >{{distributeDeploy.release_imageSubTask.distribute_info[0].distribute_status?$translate.translateTaskStatus(distributeDeploy.release_imageSubTask.distribute_info[0].distribute_status):"未运行"}}</div>
+            >{{distributeDeploy.release_imageSubTask.distribute_info[0].distribute_status?$t(`workflowTaskStatus.${distributeDeploy.release_imageSubTask.distribute_info[0].distribute_status}`):$t(`workflowTaskStatus.notRunning`)}}</div>
           </el-col>
           <el-col
             v-if=" distributeDeploy.release_imageSubTask.distribute_info[0].distribute_status && distributeDeploy.release_imageSubTask.distribute_info[0].distribute_status !=='running'"
             :span="6"
           >
             <div class="grid-content item-title">
-              <i class="iconfont iconshijian"></i> 持续时间
+              <i class="iconfont iconshijian"></i> {{$t(`workflow.duration`)}}
             </div>
           </el-col>
           <el-col
@@ -53,7 +53,7 @@
         <el-row :gutter="0">
           <el-col :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconshengji"></i> 分发方式
+              <i class="iconfont iconshengji"></i> {{$t(`workflow.distributionWay`)}}
             </div>
           </el-col>
           <el-col :span="6">
@@ -61,7 +61,7 @@
           </el-col>
           <el-col :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconSliceCopy"></i> 镜像信息
+              <i class="iconfont iconSliceCopy"></i> {{$t(`status.imgInfo`)}}
             </div>
           </el-col>
           <el-col :span="6">
@@ -92,18 +92,18 @@
           <el-row :gutter="0">
             <el-col :span="6">
               <div class="grid-content item-title">
-                <i class="iconfont iconzhuangtai"></i> 部署状态
+                <i class="iconfont iconzhuangtai"></i> {{$t(`status.deployStatus`)}}
               </div>
             </el-col>
             <el-col :span="6">
               <div
                 class="grid-content item-desc"
                 :class="$translate.calcTaskStatusColor(deploy.deploy_status)"
-              >{{deploy.deploy_status?$translate.translateTaskStatus(deploy.deploy_status):"未运行"}}</div>
+              >{{deploy.deploy_status?$t(`workflowTaskStatus.${deploy.deploy_status}`):$t(`workflowTaskStatus.notRunning`)}}</div>
             </el-col>
             <el-col :span="6">
               <div class="grid-content item-title">
-                <i class="iconfont iconvery-environ"></i> 部署环境
+                <i class="iconfont iconvery-environ"></i> {{$t(`workflow.deploymentEnv`)}}
               </div>
             </el-col>
             <el-col :span="6">
@@ -113,7 +113,7 @@
           <el-row :gutter="0">
             <el-col :span="6">
               <div class="grid-content item-title">
-                <i class="iconfont iconvery-service"></i> 服务名称
+                <i class="iconfont iconvery-service"></i> {{$t(`global.serviceName`)}}
               </div>
             </el-col>
             <el-col :span="6">
@@ -121,7 +121,7 @@
             </el-col>
             <el-col :span="6">
               <div class="grid-content item-title">
-                <i class="iconfont iconSliceCopy"></i> 镜像信息
+                <i class="iconfont iconSliceCopy"></i> {{$t(`status.imgInfo`)}}
               </div>
             </el-col>
             <el-col :span="6">
@@ -162,11 +162,11 @@
             <div
               class="grid-content item-desc"
               :class="$translate.calcTaskStatusColor(distributeDeploy.distribute2kodoSubTask.status)"
-            >{{distributeDeploy.distribute2kodoSubTask.status?$translate.translateTaskStatus(distributeDeploy.distribute2kodoSubTask.status):"未运行"}}</div>
+            >{{distributeDeploy.distribute2kodoSubTask.status?$t(`workflowTaskStatus.${distributeDeploy.distribute2kodoSubTask.status}`):$t(`workflowTaskStatus.notRunning`)}}</div>
           </el-col>
           <!-- <el-col :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconjiqun1"></i> 持续时间
+              <i class="iconfont iconjiqun1"></i> {{$t(`workflow.duration`)}}
             </div>
           </el-col>
           <el-col :span="6">
@@ -178,7 +178,7 @@
         <el-row :gutter="0">
           <el-col :span="6">
             <div class="grid-content item-title">
-              <i class="iconfont iconshengji"></i> 分发方式
+              <i class="iconfont iconshengji"></i> {{$t(`workflow.distributionWay`)}}
             </div>
           </el-col>
           <el-col :span="6">

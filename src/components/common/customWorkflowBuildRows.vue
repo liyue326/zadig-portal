@@ -4,10 +4,10 @@
       <el-table-column type="expand" width="50px" v-if="type!=='zadig-scanning'">
         <template slot-scope="props">
           <el-table :data="props.row.key_vals.filter(item=>item.isShow)" style="width: 70%; margin: 0 auto;" size="mini">
-            <el-table-column label="键">
+            <el-table-column :label="$t(`global.key`)">
               <template slot-scope="scope">{{scope.row.key}}</template>
             </el-table-column>
-            <el-table-column label="值">
+            <el-table-column :label="$t(`global.value`)">
               <template slot-scope="scope">
                 <el-select v-model="scope.row.value" v-if="scope.row.type === 'choice'" size="small" :style="{ width: elSelectWidth}">
                   <el-option v-for="(item,index) in scope.row.choice_option" :key="index" :value="item" :label="item">{{item}}</el-option>
@@ -26,15 +26,15 @@
           </el-table>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="测试名称" width="100px" v-if="type=='zadig-test'"></el-table-column>
-      <el-table-column prop="name" label="扫描名称" width="100px" v-if="type=='zadig-scanning'"></el-table-column>
+      <el-table-column prop="name" :label="$t(`global.testName`)" width="100px" v-if="type=='zadig-test'"></el-table-column>
+      <el-table-column prop="name" :label="$t(`workflow.scanName`)" width="100px" v-if="type=='zadig-scanning'"></el-table-column>
       <el-table-column
         prop="service_module"
-        label="服务"
+        :label="$t(`project.services`)"
         width="100px"
         v-if="type!=='zadig-test'&&type!=='zadig-scanning'"
       ></el-table-column>
-      <el-table-column label="代码库">
+      <el-table-column :label="$t(`global.repository`)">
         <template slot-scope="scope">
           <el-row v-for="build of scope.row.repos" class="build-row" :key="build.code_host_id">
             <template>
@@ -47,7 +47,7 @@
               </el-col>
               <div v-if="build.showTip">
                 <el-col :span="7">
-                  <span style="color: #909399; font-size: 12px; line-height: 33px;">使用变更的代码执行</span>
+                  <span style="color: #909399; font-size: 12px; line-height: 33px;">{{$t(`workflow.executeWithChangedCode`)}}</span>
                 </el-col>
               </div>
               <div v-else>
@@ -63,12 +63,12 @@
                     clearable
                     size="small"
                     value-key="id"
-                    placeholder="请选择分支或标签"
+                    :placeholder="$t(`repository.prompt.chooseBranchOrTag`)"
                     @change="changeBranchOrTag(build)"
                   >
                     <el-option-group v-for="group in build.branchAndTagList" :key="group.label" :label="group.label">
                       <el-option v-for="(item, index) in group.options" :key="index" :label="item.name" :value="item">
-                        <span v-if="item.id.startsWith('addTag')||item.id.startsWith('addBranch')">{{`使用 "${item.name}"`}}</span>
+                        <span v-if="item.id.startsWith('addTag')||item.id.startsWith('addBranch')">{{`${$t('repository.prompt.usePRorTagTemplate')}"${item.name}"`}}</span>
                         <span v-else>{{item.name}}</span>
                       </el-option>
                     </el-option-group>
@@ -80,7 +80,7 @@
                     v-model="build.prs"
                     multiple
                     size="small"
-                    placeholder="请选择 PR"
+                    :placeholder="$t(`repository.prompt.choosePR`)"
                     filterable
                     clearable
                     :style="{ width: elSelectWidth}"
@@ -93,24 +93,24 @@
                       popper-class="gray-popper"
                     >
                       <div slot="content">
-                        {{`创建人: ${$utils.tailCut(item.authorUsername,10)}`}}
+                        {{`${$t('repository.info.creatorTemplate')}${$utils.tailCut(item.authorUsername,10)}`}}
                         <br />
-                        {{`时间: ${$utils.convertTimestamp(item.createdAt)}`}}
+                        {{`${$t('repository.info.creationTimeTemplate')}${$utils.convertTimestamp(item.createdAt)}`}}
                         <br />
-                        {{`源分支: ${item.sourceBranch}`}}
+                        {{`${$t('repository.info.sourceBranchTemplate')}${item.sourceBranch}`}}
                         <br />
-                        {{`目标分支: ${item.targetBranch}`}}
+                        {{`${$t('repository.info.targetBranchTemplate')}${item.targetBranch}`}}
                       </div>
                       <el-option :label="`#${item[build.prNumberPropName]} ${item.title}`" :value="item[build.prNumberPropName]"></el-option>
                     </el-tooltip>
                   </el-select>
-                  <el-tooltip v-else content="PR 不存在，支持手动输入 PR 号，多个 PR 用 , 分隔" placement="top" popper-class="gray-popper">
+                  <el-tooltip v-else :content="$t(`repository.prompt.prDoesNotExist`)" placement="top" popper-class="gray-popper">
                     <el-input
                       v-model="build.prs"
                       class="short-input"
                       size="small"
                       :style="{ width: elSelectWidth}"
-                      placeholder="请填写 PR 号"
+                      :placeholder="$t(`repository.prompt.inputPR`)"
                       :disabled="build.branchOrTag && build.branchOrTag.type === 'tag'"
                     ></el-input>
                   </el-tooltip>

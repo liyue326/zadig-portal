@@ -1,5 +1,6 @@
 import store from 'storejs'
 import { isEmpty } from 'lodash'
+import i18n from '@/lang'
 const forge = require('node-forge') // rsa加密
 const aesjs = require('aes-js')
 const entitiesRegexp = /[&"'<>]/g
@@ -154,16 +155,16 @@ const utils = {
   timeFormat (sec) {
     if (!isNaN(sec)) {
       if (sec < 60) {
-        return Math.floor(sec) + ' 秒'
+        return Math.floor(sec) + ' ' + i18n.t('timeFormate.seconds')
       } else if (sec >= 60) {
         let min = 0
         let second = 0
         min = parseInt(sec / 60)
         second = Math.floor(sec % 60)
         if (second === 0) {
-          return min + ' 分 ' + '0 秒'
+          return min + ' ' + i18n.t('timeFormate.minutes') + ' ' + '0' + ' ' + i18n.t('timeFormate.seconds')
         } else {
-          return min + ' 分 ' + second + ' 秒'
+          return min + ' ' + i18n.t('timeFormate.minutes') + ' ' + second + ' ' + i18n.t('timeFormate.seconds')
         }
       }
     } else {
@@ -683,7 +684,7 @@ const utils = {
   },
   showClusterName (cluster) {
     if (cluster.local) {
-      return '本地集群'
+      return i18n.t('environments.common.localCluster')
     } else {
       return `${cluster.name}`
     }

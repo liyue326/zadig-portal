@@ -3,24 +3,24 @@
     <div class="title">
       <span>
         <i class="iconfont iconfuwu"></i>
-      </span> 检测到的服务组件
+      </span> {{$t('services.common.detectedServiceModules')}}
       <el-tooltip effect="dark" placement="top">
-        <div slot="content">可被更新的服务容器名称</div>
+        <div slot="content">{{$t('services.common.detectedServiceModulesTooltip')}}</div>
         <span>
           <i class="el-icon-question"></i>
         </span>
       </el-tooltip>
     </div>
     <el-table :data="serviceModules" stripe style="width: 100%;">
-      <el-table-column prop="name" label="服务组件"></el-table-column>
-      <el-table-column prop="image_name" label="镜像名"></el-table-column>
-      <el-table-column prop="image" label="当前镜像版本"></el-table-column>
-      <el-table-column label="构建信息/操作">
+      <el-table-column prop="name" :label="$t('services.common.serviceModule')"></el-table-column>
+      <el-table-column prop="image_name" :label="$t('services.common.serviceImageName')"></el-table-column>
+      <el-table-column prop="image" :label="$t('services.common.serviceImageLabel')"></el-table-column>
+      <el-table-column :label="$t('services.common.buildInfoAndOperation')">
         <template slot-scope="scope">
           <div v-for="(buildName, index) in scope.row.build_names" :key="index">
             <span class="build-name" @click="openBuild(scope.row, buildName)">{{ buildName }}</span>
           </div>
-          <el-button v-hasPermi="{projectName: projectName, action: 'create_build',isBtn:true}" size="small" type="text" @click="openBuild(scope.row)">添加构建</el-button>
+          <el-button v-hasPermi="{projectName: projectName, action: 'create_build',isBtn:true}" size="small" type="text" @click="openBuild(scope.row)">{{$t('services.common.addServiceBuild')}}</el-button>
         </template>
       </el-table-column>
     </el-table>

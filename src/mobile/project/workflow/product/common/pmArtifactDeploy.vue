@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form-item v-if="!disableServiceSelection" label="服务">
+    <el-form-item v-if="!disableServiceSelection" :label="$t(`project.services`)">
       <el-select
         v-model="pickedTargetServices"
         @change="getArtifactFile"
@@ -22,7 +22,7 @@
       </el-select>
     </el-form-item>
     <el-table v-if="pickedTargetServices.length > 0" :data="pickedTargetServices" empty-text="无">
-      <el-table-column prop="name" label="服务" width="150px"></el-table-column>
+      <el-table-column prop="name" :label="$t(`project.services`)" width="150px"></el-table-column>
       <el-table-column label="交付物">
         <template slot-scope="scope">
           <div class="workflow-build-rows">

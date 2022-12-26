@@ -1,23 +1,23 @@
 <template>
   <el-dialog
-    :title="`${clonedUserInfo.name?clonedUserInfo.name:clonedUserInfo.account} 的用户信息`"
+    :title="$t('sysSetting.users.updateUserInfoDialogTitle',{name:clonedUserInfo.name?clonedUserInfo.name:clonedUserInfo.account})"
     width="30%"
     custom-class="edit-role-dialog"
     :close-on-click-modal="false"
     :visible.sync="dialogEditRoleVisible"
   >
     <el-form :model="clonedUserInfo" @submit.native.prevent :rules="editUserRule" ref="addUserForm" label-position="top">
-      <el-form-item label="邮箱" prop="email">
+      <el-form-item :label="$t('sysSetting.users.mail')" prop="email">
         <el-input size="small" v-model="clonedUserInfo.email"></el-input>
       </el-form-item>
-      <el-form-item label="昵称" prop="name">
+      <el-form-item :label="$t('sysSetting.users.nickname')" prop="name">
         <el-input size="small" v-model="clonedUserInfo.name"></el-input>
       </el-form-item>
-      <el-form-item label="手机" prop="phone">
+      <el-form-item :label="$t('sysSetting.users.phone')" prop="phone">
         <el-input size="small" v-model="clonedUserInfo.phone"></el-input>
       </el-form-item>
-      <el-form-item label="角色" prop="isAdmin">
-        <el-select style="width: 100%;" size="small" v-model="clonedUserInfo.isAdmin" multiple placeholder="请选择角色">
+      <el-form-item :label="$t('sysSetting.users.role')" prop="isAdmin">
+        <el-select style="width: 100%;" size="small" v-model="clonedUserInfo.isAdmin" multiple :placeholder="$t('sysSetting.users.selectRole')">
           <el-option
             v-for="item in roleList"
             :key="item.name"
@@ -28,8 +28,8 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" native-type="submit" size="small" @click="handleUserInfoUpdate()" class="start-create">确定</el-button>
-      <el-button plain native-type="submit" size="small" @click="dialogEditRoleVisible = false">取消</el-button>
+      <el-button type="primary" native-type="submit" size="small" @click="handleUserInfoUpdate()" class="start-create">{{$t(`global.confirm`)}}</el-button>
+      <el-button plain native-type="submit" size="small" @click="dialogEditRoleVisible = false">{{$t(`global.cancel`)}}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -54,17 +54,22 @@ export default {
     return {
       clonedUserInfo: {},
       dialogEditRoleVisible: false,
-      editUserRule: {
+      roleList: []
+    }
+  },
+  computed: {
+    editUserRule () {
+      return {
         email: [
           {
             type: 'string',
             required: true,
-            message: '请输入登录邮箱',
+            message: this.$t('sysSetting.users.inputMail'),
             trigger: 'blur'
           },
           {
             type: 'email',
-            message: '请输入正确的邮箱地址',
+            message: this.$t('sysSetting.users.checkMail'),
             trigger: ['blur', 'change']
           }
         ],
@@ -72,24 +77,12 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请输入昵称',
-            trigger: 'blur'
-          }
-        ],
-        password: [
-          {
-            type: 'string',
-            required: true,
-            message: '请输入密码',
+            message: this.$t('sysSetting.users.inputNickname'),
             trigger: 'blur'
           }
         ]
-      },
-      roleList: []
+      }
     }
-  },
-  mounted () {
-    this.getRoleList()
   },
   methods: {
     async handleUserInfoUpdate () {
@@ -121,7 +114,7 @@ export default {
             console.log(error)
           )
         }
-        this.$message.success('用户信息修改成功')
+        this.$message.success(this.$t('sysSetting.users.updateUserSuccess'))
         this.$emit('refreshUserList')
         this.dialogEditRoleVisible = false
       }
@@ -165,6 +158,9 @@ export default {
         this.getRoleList()
       }
     }
+  },
+  mounted () {
+    this.getRoleList()
   }
 }
 </script>

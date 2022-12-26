@@ -1,32 +1,32 @@
 <template>
   <div>
     <div v-if="currentStep === 'account'">
-      <h1 class="title">找回密码</h1>
-      <h2 class="subtitle">请输入用户名</h2>
-      <el-form :model="retrieveForm" :rules="retrieveRules" label-position="left" ref="retrieveForm">
+      <h1 class="title">{{$t(`login.resetPassword`)}}</h1>
+      <h2 class="subtitle">{{$t(`login.inputUsername`)}}</h2>
+      <el-form :model="retrieveForm" :rules="retrieveRules" ref="retrieveForm">
         <el-form-item prop="account">
-          <el-input v-model="retrieveForm.account" placeholder="用户名"></el-input>
+          <el-input v-model="retrieveForm.account" :placeholder="$t(`login.username`)"></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="submit" class="btn-md btn-theme btn-block login-btn" @click="nextStep">下一步</el-button>
+      <el-button :loading="checkUserLoading" type="submit" class="btn-md btn-theme btn-block login-btn" @click="nextStep">{{$t(`login.next`)}}</el-button>
     </div>
     <div v-else-if="currentStep === 'sendmail'">
-      <h2 class="title">找回密码</h2>
-      <p class="subtitle">密码重置链接已经发送至你的注册邮箱</p>
+      <h2 class="title">{{$t(`login.resetPassword`)}}</h2>
+      <p class="subtitle">{{$t(`login.resetLinkTip`)}}</p>
       <p class="content">{{mail}}</p>
     </div>
     <div v-else-if="currentStep === 'setpass'">
-      <h1 class="title">设置新密码</h1>
-      <h2 class="subtitle">请输入新密码</h2>
-      <el-form :model="form" ref="form" label-position="left" :rules="rules">
+      <h1 class="title">{{$t(`login.setNewPassword`)}}</h1>
+      <h2 class="subtitle">{{$t(`login.inputNewPass`)}}</h2>
+      <el-form :model="form" ref="form" :rules="rules">
         <el-form-item prop="password">
-          <el-input type="password" v-model="form.password" placeholder="新密码" show-password></el-input>
+          <el-input type="password" v-model="form.password" :placeholder="$t(`login.inputNewPass`)" show-password></el-input>
         </el-form-item>
         <el-form-item prop="checkPass">
-          <el-input type="password" v-model="form.checkPass" placeholder="再次输入新密码" show-password :minlength="8"></el-input>
+          <el-input type="password" v-model="form.checkPass" :placeholder="$t(`login.inputNewPassAgain`)" show-password :minlength="8"></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="submit" @click="submit" class="btn-md btn-theme btn-block login-btn">重置密码</el-button>
+      <el-button type="submit" @click="submit" class="btn-md btn-theme btn-block login-btn">{{$t(`login.confirmReset`)}}</el-button>
     </div>
   </div>
 </template>
@@ -39,31 +39,9 @@ export default {
     retrieveToken: String
   },
   data () {
-    const validatePass = (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('请输入密码'))
-      } else if (value.length < 8) {
-        callback(new Error('新密码应不小于 8 位字符'))
-      } else {
-        if (this.form.checkPass) {
-          this.$refs.form.validateField('checkPass')
-        }
-        callback()
-      }
-    }
-    const validateConfirmedPass = (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('请再次输入密码'))
-      } else if (value.length < 8) {
-        callback(new Error('新密码应不小于 8 位字符'))
-      } else if (value !== this.form.password) {
-        callback(new Error('两次输入密码不一致!'))
-      } else {
-        callback()
-      }
-    }
     return {
       mail: '',
+      checkUserLoading: false,
       form: {
         password: null,
         checkPass: null
@@ -71,13 +49,42 @@ export default {
       retrieveForm: {
         account: ''
       },
-      currentStep: 'account',
-      retrieveRules: {
-        account: [{ required: true, message: '请输入用户名', trigger: 'blur' }]
-      },
-      rules: {
+      currentStep: 'account'
+    }
+  },
+  computed: {
+    rules () {
+      const validatePass = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t(`login.inputPass`)))
+        } else if (value.length < 8) {
+          callback(new Error(this.$t(`login.passwordLength`)))
+        } else {
+          if (this.form.checkPass) {
+            this.$refs.form.validateField('checkPass')
+          }
+          callback()
+        }
+      }
+      const validateConfirmedPass = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t(`login.inputNewPassAgain`)))
+        } else if (value.length < 8) {
+          callback(new Error(this.$t(`login.passwordLength`)))
+        } else if (value !== this.form.password) {
+          callback(new Error(this.$t(`login.passwordDontMatch`)))
+        } else {
+          callback()
+        }
+      }
+      return {
         password: [{ validator: validatePass, trigger: 'change' }],
         checkPass: [{ validator: validateConfirmedPass, trigger: 'change' }]
+      }
+    },
+    retrieveRules () {
+      return {
+        account: [{ required: true, message: this.$t(`login.inputUsername`), trigger: 'blur' }]
       }
     }
   },
@@ -85,10 +92,13 @@ export default {
     nextStep () {
       this.$refs.retrieveForm.validate(async valid => {
         if (valid) {
-          const res = await retrievePasswordAPI(this.retrieveForm.account).catch((error) =>
+          this.checkUserLoading = true
+          const res = await retrievePasswordAPI(this.retrieveForm.account).catch((error) => {
+            this.checkUserLoading = false
             console.log(error)
-          )
+          })
           if (res) {
+            this.checkUserLoading = false
             this.currentStep = 'sendmail'
             this.mail = res.email
           }
@@ -102,7 +112,7 @@ export default {
             console.log(error)
           )
           if (res) {
-            this.$message.success('重置成功')
+            this.$message.success(this.$t(`login.resetSuccess`))
             this.openLogin()
           }
         }

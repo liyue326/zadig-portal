@@ -2,9 +2,9 @@
   <el-dialog title="构建设置" :visible.sync="isShowBuildOperateDialog" width="50%" center @close="handleClose">
     <template>
       <div class="build-configs">
-        <h4>代码信息</h4>
+        <h4>{{$t(`global.gitMessage`)}}</h4>
         <el-table :data="value.branch_filter">
-          <el-table-column prop="repo_name" label="代码库" width="150px"></el-table-column>
+          <el-table-column prop="repo_name" :label="$t(`global.repository`)" width="150px"></el-table-column>
           <el-table-column prop="filter_regexp" label="分支/标签可选范围">
             <template slot-scope="scope">
               <el-input
@@ -38,9 +38,9 @@
               </el-select>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="100px">
+          <el-table-column :label="$t(`global.operation`)" width="100px">
             <template slot-scope="scope">
-              <el-button @click="delBuild(scope.$index,scope.row)" type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+              <el-button @click="delBuild(scope.$index,scope.row)" type="danger" icon="el-icon-delete" size="mini">{{$t(`global.delete`)}}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -48,7 +48,7 @@
           <el-select v-model="form.repo" value-key="repo_name" filterable size="small" placeholder="请选择代码库" style="width: 200px;">
             <el-option v-for="repo of originRepoList" :key="repo.repo_name" :label="repo.repo_name" :value="repo"></el-option>
           </el-select>
-          <el-button @click="addBuild" type="default" size="small" icon="el-icon-plus">添加</el-button>
+          <el-button @click="addBuild" type="default" size="small" icon="el-icon-plus">{{$t(`global.add`)}}</el-button>
         </div>
       </div>
     </template>

@@ -3,7 +3,7 @@
     <div class="values-title">
       <span class="title-left">
         <span class="secondary-title">Helm values 文件</span>
-        <el-button type="text" class="title-btn" @click="showGitImportDialog = true">从代码库导入</el-button>
+        <el-button type="text" class="title-btn" @click="showGitImportDialog = true">{{$t('global.importFromRepository')}}</el-button>
         <el-dropdown placement="bottom" style="margin-left: 10px;" v-if="useVarGroup">
           <el-button
             size="mini"
@@ -20,10 +20,10 @@
     <Resize class="desc mirror" :resize="setResize.direction" :height="setResize.height" @sizeChange="$refs.codemirror.refresh()">
       <codemirror ref="codemirror" v-model="importRepoInfoUse.overrideYaml" />
     </Resize>
-    <el-dialog title="从代码库导入" :visible.sync="showGitImportDialog" append-to-body>
+    <el-dialog :title="$t('global.importFromRepository')" :visible.sync="showGitImportDialog" append-to-body>
       <Repository ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig" :showAutoSync="showAutoSync" />
       <div slot="footer">
-        <el-button @click="showGitImportDialog = false" size="small">取 消</el-button>
+        <el-button @click="showGitImportDialog = false" size="small">{{$t(`global.cancel`)}}</el-button>
         <el-button type="primary" @click="importOverrideYaml" size="small" :loading="loadValueYamls">导 入</el-button>
       </div>
     </el-dialog>

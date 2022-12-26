@@ -2,15 +2,15 @@
   <div class="step-container">
     <div class="step-detail">
       <div class="guide-title">
-        <h4>项目初始化向导</h4>
+        <h4>{{$t('project.onboardingComp.projectOnboarding')}}</h4>
       </div>
       <el-row :gutter="0" class="steps-wrap" type="flex">
         <el-col :span="envDisabled?24:18" style="display: flex;">
           <OnboardingSteps :active="activeStep" class="steps-container" align-center simple finish-status="success">
-            <OnboardingStep title="项目配置" description />
-            <OnboardingStep title="新建服务" description />
-            <OnboardingStep :title="stepThreeTitle" description />
-            <OnboardingStep title="执行工作流" description />
+            <OnboardingStep :title="$t('project.onboardingComp.projectConfiguration')" description />
+            <OnboardingStep :title="$t('project.onboardingComp.createService')" description />
+            <OnboardingStep :title="thirdStepTitle" description />
+            <OnboardingStep :title="$t('project.onboardingComp.runWorkflow')" description />
           </OnboardingSteps>
         </el-col>
         <el-col v-if="!envDisabled" :span="6">
@@ -21,9 +21,9 @@
               <span></span>
               <span></span>
             </span>
-            <span class="env-blocks">
+            <span class="env-blocks" :class="{'en-mode':'en'=== $i18n.locale}">
               <i class="iconfont iconvery-environ"></i>
-              <span class="name">开发环境</span>
+              <span class="name">{{$t('project.onboardingComp.devEnv')}}</span>
             </span>
           </div>
           <div class="envs">
@@ -33,9 +33,9 @@
               <span></span>
               <span></span>
             </span>
-            <span class="env-blocks">
+            <span class="env-blocks" :class="{'en-mode':'en'=== $i18n.locale}">
               <i class="iconfont iconvery-environ"></i>
-              <span class="name">测试环境</span>
+              <span class="name">{{$t('project.onboardingComp.testEnv')}}</span>
             </span>
           </div>
           <div class="envs">
@@ -45,9 +45,9 @@
               <span></span>
               <span></span>
             </span>
-            <span class="env-blocks">
+            <span class="env-blocks" :class="{'en-mode':'en'=== $i18n.locale}">
               <i class="iconfont iconvery-environ"></i>
-              <span class="name">预发布环境</span>
+              <span class="name">{{$t('project.onboardingComp.preReleaseEnv')}}</span>
             </span>
           </div>
         </el-col>
@@ -67,7 +67,7 @@ export default {
       required: true,
       type: Number
     },
-    stepThreeTitle: {
+    thirdStepTitle: {
       default: '加入环境',
       type: String
     },
@@ -192,6 +192,10 @@ export default {
           color: #5daf34;
           font-size: 12px;
           line-height: 16px;
+        }
+
+        &.en-mode {
+          width: 160px;
         }
       }
     }

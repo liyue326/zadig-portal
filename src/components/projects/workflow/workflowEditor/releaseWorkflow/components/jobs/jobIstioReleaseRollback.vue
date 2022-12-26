@@ -1,25 +1,25 @@
 <template>
   <div class="job-istio-rollback">
     <el-form :label-width="formLabelWidth" :model="job" ref="ruleForm" label-position="left" class="mg-t24 mg-b24">
-      <el-form-item label="任务名称" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
-      <el-form-item label="集群" prop="spec.cluster_id" :rules="{ required: true, message: '请选择集群名称', trigger: ['change', 'blur'] }">
+      <el-form-item :label="$t(`workflow.cluster`)" prop="spec.cluster_id" :rules="{ required: true, message: '请选择集群名称', trigger: ['change', 'blur'] }">
         <el-select v-model="job.spec.cluster_id" placeholder="请选择集群名称" size="small" style="width: 220px;" @change="getNamespaceList">
           <el-option v-for="cluster in clusters" :key="cluster.id" :label="$utils.showClusterName(cluster)" :value="cluster.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="命名空间" prop="spec.namespace" :rules="{required: true, message: '命名空间不能为空', trigger: ['blur','change']}">
+      <el-form-item :label="$t(`workflow.namespace`)" prop="spec.namespace" :rules="{required: true, message: '命名空间不能为空', trigger: ['blur','change']}">
         <el-select v-model="job.spec.namespace" filterable placeholder="请选择" size="small" style="width: 220px;" @change="getWorkloadList">
           <el-option v-for="(item,index) in namespaceList" :key="index" :label="item" :value="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="容器名称">
+      <el-form-item :label="$t(`workflow.containerName`)">
         <el-select v-model="job.spec.targets" value-key="workload_name" multiple filterable placeholder="请选择" size="small" style="width: 220px;">
           <el-option v-for="(item,index) in workloadList" :key="index" :label="`${item.workload_name}/${item.container_name}`" :value="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="超时时间">
+      <el-form-item :label="$t(`global.timeout`)">
         <el-input-number style="width: 220px;" size="mini" :min="1" v-model="job.spec.timeout"></el-input-number>
         <span>分钟</span>
       </el-form-item>

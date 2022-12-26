@@ -1,13 +1,13 @@
 <template>
   <div class="template-repo-container">
-    <el-form ref="tempForm" :model="tempData" label-position="left" label-width="140px" :rules="rules">
+    <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <h4 class="flex-center" style="padding-left: 40px;">
         <el-button type="text" @click="triggerSubstantial(substantial)" :disabled="isUpdate">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
       </h4>
-      <el-form-item label="服务名称" prop="serviceName" v-if="!substantial">
-        <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
+      <el-form-item :label="$t(`global.serviceName`)" prop="serviceName" v-if="!substantial">
+        <el-input v-model="tempData.serviceName" :placeholder="$t('services.common.inputServiceName')" size="small" :disabled="isUpdate"></el-input>
       </el-form-item>
-      <el-form-item v-else label="服务名称">
+      <el-form-item v-else :label="$t(`global.serviceName`)">
         <span style="line-height: 41px;">批量创建的服务名称为 values 文件名称</span>
       </el-form-item>
       <el-form-item label="选择模板" prop="moduleName">
@@ -37,7 +37,7 @@
       <ImportValues v-else ref="importValues" :importRepoInfo.sync="importRepoInfo" />
       <el-form-item prop="auto_sync">
         <span slot="label">
-          <span>自动同步</span>
+          <span>{{$t('global.autoSync')}}</span>
            <el-tooltip effect="dark" content="开启后，对模板库操作应用到服务时，该服务配置将自动基于模板内容同步。" placement="top">
               <i class="pointer el-icon-question"></i>
            </el-tooltip>
@@ -45,8 +45,8 @@
         <el-switch v-model="tempData.auto_sync" />
       </el-form-item>
       <el-form-item style="text-align: right;">
-        <el-button size="small" @click="commitDialogVisible(false)">取消</el-button>
-        <el-button type="primary" size="small" @click="importTempRepo" :loading="importLoading">导入</el-button>
+        <el-button size="small" @click="commitDialogVisible(false)">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" size="small" @click="importTempRepo" :loading="importLoading">{{$t('global.import')}}</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -63,30 +63,9 @@ import {
   getHelmTemplateVariableAPI
 } from '@api'
 import { mapState } from 'vuex'
-
-const rules = {
-  serviceName: [{ required: true, message: '请输入服务名称', trigger: 'blur' }],
-  moduleName: [{ required: true, message: '请选择模板', trigger: ['blur', 'change'] }]
-}
-
-// const createTemplateForm = {
-//   source: 'chartTemplate',
-//   name: '',
-//   createFrom: {
-//     templateName: '',
-//     valuesYAML: '',  // 后端传输字段，这里使用的是 overrideYaml
-//     valuesPaths: [],
-//     codehostID: null,
-//     owner: '',
-//     repo: '',
-//     branch: ''
-//   }
-// }
-
 export default {
   name: 'TemplateRepo',
   data () {
-    this.rules = rules
     return {
       tempCharts: [],
       tempData: {
@@ -114,8 +93,13 @@ export default {
     }),
     projectName () {
       return this.$route.params.project_name
+    },
+    rules () {
+      return {
+        serviceName: [{ required: true, message: this.$t('services.common.inputServiceName'), trigger: 'blur' }],
+        moduleName: [{ required: true, message: '请选择模板', trigger: ['blur', 'change'] }]
+      }
     }
-
   },
   watch: {
     currentService: {

@@ -1,14 +1,14 @@
 <template>
   <div class="projects-runtime-container">
     <div class="guide-container">
-      <Step :activeStep="2" :stepThreeTitle="`配置环境`" />
+      <Step :activeStep="2" :thirdStepTitle="$t('project.onboardingComp.configureEnv')" />
       <div class="current-step-container">
         <div class="title-container">
-          <span class="first">第三步</span>
-          <span class="second">按需创建环境，后续可在项目中调整。</span>
+          <span class="first">{{$t('project.onboardingComp.thirdStep')}}</span>
+          <span class="second">{{$t('project.onboardingComp.thirdStepTip')}}</span>
         </div>
         <div class="account-integrations block-list">
-          <div class="second">配置以下几套环境：</div>
+          <div class="second">{{$t('project.onboardingComp.configureTheFollowingEnvironments')}}</div>
           <el-tabs v-model="activeName" type="card" @edit="handleTabsEdit">
             <el-tab-pane
               v-for="env in envInfos"
@@ -34,7 +34,7 @@
               </span>
             </el-tab-pane>
             <el-tab-pane name="addNew" v-if="canHandle">
-              <span slot="label" @click="handleTabsEdit('', 'add')">创建环境</span>
+              <span slot="label" @click="handleTabsEdit('', 'add')">{{$t('environments.common.envCreation')}}</span>
             </el-tab-pane>
           </el-tabs>
           <div v-loading="loading">
@@ -47,17 +47,17 @@
               inline-message
               class="common-parcel-block primary-form"
             >
-              <el-form-item label="K8s 集群" prop="cluster_id">
+              <el-form-item :label="$t('environments.common.k8sCluster')" prop="cluster_id">
                 <el-select filterable v-model="currentInfo.cluster_id" size="small" placeholder="请选择 K8s 集群" @change="changeCluster">
                   <el-option v-for="cluster in allCluster" :key="cluster.id" :label="$utils.showClusterName(cluster)" :value="cluster.id"></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="K8s 命名空间" prop="namespace">
+              <el-form-item :label="$t('environments.common.k8sNamespace')" prop="namespace">
                 <el-select
                   v-model="currentInfo.namespace"
                   :disabled="editButtonDisabled"
                   size="small"
-                  placeholder="选择已有或自定义命名空间"
+                  :placeholder="$t('environments.common.selectK8sNamespace')"
                   filterable
                   allow-create
                   clearable
@@ -68,10 +68,10 @@
                 <span class="editButton" @click="editButtonDisabled = !editButtonDisabled">
                   <i :class="[editButtonDisabled ? 'el-icon-edit-outline': 'el-icon-finished' ]"></i>
                 </span>
-                <span class="ns-desc" v-show="nsIsExisted">Zadig 中定义的服务将覆盖所选命名空间中的同名服务，请谨慎操作！</span>
+                <span class="ns-desc" v-show="nsIsExisted">{{$t('environments.common.namespaceAlreadyExistsTip')}}</span>
               </el-form-item>
-              <el-form-item label="镜像仓库">
-                <el-select filterable v-model.trim="currentInfo.registry_id" placeholder="请选择镜像仓库" size="small">
+              <el-form-item :label="$t(`status.imageRepo`)">
+                <el-select filterable v-model.trim="currentInfo.registry_id" :placeholder="$t('environments.common.selectImageRepository')" size="small">
                   <el-option
                     v-for="registry in imageRegistry"
                     :key="registry.id"
@@ -80,7 +80,7 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="服务选择" prop="selectedService">
+              <el-form-item :label="$t(`workflow.selectService`)" prop="selectedService">
                 <div class="select-service">
                   <el-select
                     v-model="currentInfo.selectedService"
@@ -126,7 +126,7 @@
               :checkResource="checkResource"
             />
             <div class="ai-bottom">
-              <el-button type="primary" size="small" @click="createHelmProductEnv" :loading="isCreating" :disabled="!cantNext">创建环境</el-button>
+              <el-button type="primary" size="small" @click="createHelmProductEnv" :loading="isCreating" :disabled="!cantNext">{{$t('environments.common.envCreation')}}</el-button>
               <div v-for="(env, index) in createRes" :key="index" class="ai-status">
                 <span class="env-name">{{env.name}}:</span>
                 <span>{{getStatusDesc(env)}}</span>
@@ -139,7 +139,7 @@
     <div class="controls__wrap">
       <div class="controls__right">
         <router-link :to="`/v1/projects/create/${projectName}/helm/delivery`">
-          <el-button type="primary" size="small" :disabled="cantNext">下一步</el-button>
+          <el-button type="primary" size="small" :disabled="cantNext">{{$t('project.onboardingComp.nextStep')}}</el-button>
         </router-link>
       </div>
     </div>
@@ -175,22 +175,7 @@ const envConfig = {
 
 export default {
   data () {
-    this.rules = {
-      cluster_id: [
-        { required: true, trigger: 'change', message: '请选择集群' }
-      ],
-      namespace: [
-        { required: true, trigger: 'change', message: '请选择命名空间' }
-      ],
-      selectedService: {
-        type: 'array',
-        required: true,
-        message: '请选择服务',
-        trigger: 'change'
-      }
-    }
     this.envConfigInit = cloneDeep(envConfig)
-
     return {
       loading: true,
       envInfos: [
@@ -223,9 +208,9 @@ export default {
     validateEnvName (name, env) {
       let message = ''
       if (typeof name === 'undefined' || name === '') {
-        message = '填写环境名称!'
+        message = this.$t('environments.common.inputEnvName')
       } else if (!/^[a-z0-9-]+$/.test(name)) {
-        message = '环境名称只支持小写字母和数字，特殊字符只支持中划线!'
+        message = this.$t('environments.common.checkEnvName')
       }
       if (message) {
         this.$message.error(message)
@@ -267,16 +252,16 @@ export default {
       let res = ''
       switch (envInfo.status) {
         case 'creating':
-          res = '环境创建中...'
+          res = this.$t('environments.common.envIsCreating')
           break
         case 'success':
-          res = '环境创建成功'
+          res = this.$t('environments.common.environmentHasBeenSuccessfullyCreated')
           break
         case 'failed':
-          res = `环境创建失败：${envInfo.error}`
+          res = this.$t('environments.common.environmentCreationFailedWithError', { error: envInfo.error })
           break
         case 'Unstable':
-          res = '环境创建成功（运行不稳定）'
+          res = this.$t('environments.common.environmentCreationUnstable')
           break
         default:
           res = envInfo.status
@@ -463,6 +448,22 @@ export default {
         cluster_id: infos.cluster_id,
         namespace: infos.namespace
       }
+    },
+    rules () {
+      return {
+        cluster_id: [
+          { required: true, trigger: 'change', message: this.$t('environments.common.selectK8sCluster') }
+        ],
+        namespace: [
+          { required: true, trigger: 'change', message: this.$t('environments.common.selectK8sNamespace') }
+        ],
+        selectedService: {
+          type: 'array',
+          required: true,
+          message: this.$t('environments.common.selectServices'),
+          trigger: 'change'
+        }
+      }
     }
   },
   created () {
@@ -470,7 +471,7 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         { title: this.projectName, isProjectName: true, url: '' }
       ]
     })

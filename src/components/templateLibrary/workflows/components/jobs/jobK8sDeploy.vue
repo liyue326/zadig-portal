@@ -1,33 +1,33 @@
 <template>
   <div class="job-k8s-deploy">
     <el-form :label-width="formLabelWidth" :model="job" ref="ruleForm" label-position="left" class="mg-t24 mg-b24">
-      <el-form-item label="任务名称" prop="name">
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name">
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
-      <el-form-item label="镜像仓库" prop="spec.docker_registry_id">
+      <el-form-item :label="$t(`status.imageRepo`)" prop="spec.docker_registry_id">
         <el-select v-model="job.spec.docker_registry_id" filterable placeholder="请选择" size="small" style="width: 220px;">
           <el-option v-for="item in dockerList" :key="item.id" :label="`${item.reg_addr}/${item.namespace}`" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="集群" prop="spec.cluster_id">
+      <el-form-item :label="$t(`workflow.cluster`)" prop="spec.cluster_id">
         <el-select v-model="job.spec.cluster_id" placeholder="请选择集群名称" size="small" style="width: 220px;" @change="getNamespaceList">
           <el-option v-for="cluster in clusters" :key="cluster.id" :label="$utils.showClusterName(cluster)" :value="cluster.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="命名空间" prop="spec.namespace">
+      <el-form-item :label="$t(`workflow.namespace`)" prop="spec.namespace">
         <el-select v-model="job.spec.namespace" filterable placeholder="请选择" size="small" style="width: 220px;" @change="getWorkloadList">
           <el-option v-for="item in namespaceList" :key="item" :label="item" :value="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="容器" prop="spec.targets">
+      <el-form-item :label="$t(`workflow.containerName`)" prop="spec.targets">
         <el-select v-model="job.spec.targets" placeholder="请选择" size="small" style="width: 220px;" filterable multiple value-key="target">
           <el-option v-for="item in workloadList" :key="item.target" :label="item.target" :value="item"></el-option>
         </el-select>
         <EnvTypeSelect v-model="job.spec.source" isRuntime isFixed style="display: inline-block;" />
       </el-form-item>
-      <el-form-item label="服务状态检测" class="status-check">
+      <el-form-item :label="$t(`workflow.serviceStatusCheck`)" class="status-check">
         <span slot="label">
-          容器状态检测
+          {{$t(`workflow.containerStatusDetection`)}}
           <el-tooltip effect="dark" content="开启后，部署任务会轮询容器运行状态，待容器正常运行，任务状态才为成功。" placement="top">
             <i class="el-icon-question" style="cursor: pointer;"></i>
           </el-tooltip>
@@ -36,7 +36,7 @@
           <el-switch v-model="job.spec.skip_check_run_status" :active-value="false" :inactive-value="true" active-color="#0066ff"></el-switch>
         </el-form-item>
       </el-form-item>
-      <el-form-item label="超时时间">
+      <el-form-item :label="$t(`global.timeout`)">
         <el-input-number size="mini" :min="1" v-model="job.spec.timeout"></el-input-number>
         <span>分钟</span>
       </el-form-item>
@@ -84,7 +84,7 @@ export default {
   data () {
     return {
       validateJobName,
-      formLabelWidth: '90px',
+      formLabelWidth: '120px',
       namespaceList: [],
       workloadList: [],
       dockerList: [],

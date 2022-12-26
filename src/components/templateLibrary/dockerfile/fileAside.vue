@@ -6,12 +6,12 @@
           <div class="tabs__item"
                :class="{'selected': $route.query.rightbar === 'var'}"
                @click="changeRoute('var')">
-            <span class="step-name">变量</span>
+            <span class="step-name">{{$t(`templates.dockerfile.variablesList`)}}</span>
           </div>
           <div class="tabs__item"
                :class="{'selected': $route.query.rightbar === 'build'}"
                @click="changeRoute('build')">
-            <span class="step-name">引用列表</span>
+            <span class="step-name">{{$t(`templates.dockerfile.referenceList`)}}</span>
           </div>
         </div>
       </div>
@@ -19,20 +19,20 @@
         <div v-if="$route.query.rightbar === 'build'"
              class="service-aside--variables">
           <header class="service-aside-box__header">
-            <div class="service-aside-box__title">引用列表</div>
+            <div class="service-aside-box__title">{{$t(`templates.dockerfile.referenceList`)}}</div>
           </header>
           <div class="service-aside-box__content">
               <el-table :data="buildReference"
                         stripe
                         style="width: 100%;">
                 <el-table-column prop="project_name"
-                                 label="项目">
+                                 :label="$t(`global.project`)">
                 </el-table-column>
                 <el-table-column prop="value"
-                                 label="构建">
+                                 :label="$t(`global.build`)">
                   <template slot-scope="scope">
                     <router-link v-if="scope.row.build_name" :to="`/v1/projects/detail/${scope.row.project_name}/builds/detail/${scope.row.build_name}`">{{scope.row.build_name}}</router-link>
-                    <span v-else>空</span>
+                    <span v-else>{{$t(`templates.dockerfile.noneVariable`)}}</span>
                   </template>
                 </el-table-column>
               </el-table>
@@ -41,7 +41,7 @@
         <div v-if="$route.query.rightbar === 'var'"
              class="service-aside--variables">
           <header class="service-aside-box__header">
-            <div class="service-aside-box__title">变量</div>
+            <div class="service-aside-box__title">{{$t(`templates.dockerfile.variablesList`)}}</div>
           </header>
           <div class="service-aside-box__content">
               <el-table :data="fileContent.variable"
@@ -54,7 +54,7 @@
                                  label="Value">
                   <template slot-scope="scope">
                     <span v-if="scope.row.value">{{scope.row.value}}</span>
-                    <span v-else>空</span>
+                    <span v-else>{{$t(`templates.dockerfile.noneVariable`)}}</span>
                   </template>
                 </el-table-column>
               </el-table>
@@ -121,8 +121,6 @@ export default {
 .aside__wrap {
   position: relative;
   display: flex;
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
   flex: 1;
   height: 100%;
 
@@ -192,62 +190,26 @@ export default {
     width: 5px;
     height: 100%;
     border-left: 1px solid transparent;
-    -webkit-transition: border-color ease-in-out 200ms;
     transition: border-color ease-in-out 200ms;
-
-    .capture-area__component {
-      position: relative;
-      top: 50%;
-      left: -6px;
-      display: inline-block;
-      height: 38px;
-      -webkit-transform: translateY(-50%);
-      transform: translateY(-50%);
-
-      .capture-area {
-        position: absolute;
-        width: 10px;
-        height: 38px;
-        background-color: #fff;
-        border: 1px solid #dbdbdb;
-        border-radius: 5px;
-      }
-    }
   }
 
   .aside__inner {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -ms-flex: 1;
     flex: 1;
-    -ms-flex-direction: row-reverse;
     flex-direction: row-reverse;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: reverse;
-    -webkit-box-flex: 1;
 
     .aside__content {
-      -ms-flex: 1;
       flex: 1;
       width: 200px;
       overflow-x: hidden;
       background-color: #fff;
-      -webkit-box-flex: 1;
 
       .service-aside--variables {
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -ms-flex-direction: column;
         flex-direction: column;
         flex-grow: 1;
         height: 100%;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
 
         .service-aside-box__header {
           display: flex;
@@ -257,11 +219,6 @@ export default {
           width: 100%;
           height: 35px;
           padding: 10px 7px 10px 20px;
-          -webkit-box-pack: justify;
-          -ms-flex-pack: justify;
-          -webkit-box-align: center;
-          -ms-flex-align: center;
-          -ms-flex-negative: 0;
 
           .service-aside-box__title {
             margin-right: 20px;
@@ -278,8 +235,6 @@ export default {
           padding: 12px 16px;
           overflow-x: hidden;
           overflow-y: auto;
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
 
           h4 {
             margin: 0;
@@ -295,19 +250,12 @@ export default {
         }
 
         .service-aside-help__content {
-          display: -webkit-box;
-          display: -ms-flexbox;
           display: flex;
-          -ms-flex: 1;
           flex: 1;
-          -ms-flex-direction: column;
           flex-direction: column;
           height: 100%;
           padding: 0 20px 10px 20px;
           overflow-y: auto;
-          -webkit-box-flex: 1;
-          -webkit-box-orient: vertical;
-          -webkit-box-direction: normal;
         }
       }
 
@@ -358,6 +306,7 @@ export default {
           .step-name {
             font-weight: 500;
             font-size: 14px;
+            writing-mode: vertical-rl;
           }
         }
       }

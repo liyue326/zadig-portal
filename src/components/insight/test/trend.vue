@@ -21,7 +21,7 @@ export default {
           trigger: 'axis'
         },
         legend: {
-          data: ['成功', '失败', '超时']
+          data: [this.$t('workflowTaskStatus.passed'), this.$t('workflowTaskStatus.failed'), this.$t('workflowTaskStatus.timeout')]
         },
         grid: {
           left: '3%',
@@ -54,7 +54,7 @@ export default {
         },
         series: [
           {
-            name: '成功',
+            name: this.$t('workflowTaskStatus.passed'),
             type: 'line',
             smooth: true,
             stack: '总量',
@@ -62,7 +62,7 @@ export default {
             data: []
           },
           {
-            name: '失败',
+            name: this.$t('workflowTaskStatus.failed'),
             type: 'line',
             smooth: true,
             stack: '总量',
@@ -70,7 +70,7 @@ export default {
             data: []
           },
           {
-            name: '超时',
+            name: this.$t('workflowTaskStatus.timeout'),
             type: 'line',
             smooth: true,
             stack: '总量',

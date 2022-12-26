@@ -13,26 +13,26 @@
               </header>
               <section>
                 <el-form :model="loginForm" status-icon :rules="rules" ref="loginForm" label-position="left" hide-required-asterisk>
-                  <el-form-item label="用户名" prop="account">
-                    <el-input v-model="loginForm.account" placeholder="请输入用户名" autocomplete="off"></el-input>
+                  <el-form-item :label="$t(`login.username`)" prop="account">
+                    <el-input v-model="loginForm.account" :placeholder="$t(`login.inputUsername`)" autocomplete="off"></el-input>
                   </el-form-item>
-                  <el-form-item label="密码" prop="password">
+                  <el-form-item :label="$t(`login.password`)" prop="password">
                     <el-input
                       type="password"
                       @keyup.enter.native="login"
                       v-model="loginForm.password"
                       autocomplete="off"
-                      placeholder="请输入密码"
+                      :placeholder="$t(`login.inputPass`)"
                       show-password
                     ></el-input>
                   </el-form-item>
                 </el-form>
-                <el-button type="submit" @click="login" v-loading="loading" class="btn-md btn-theme login-btn">登录</el-button>
+                <el-button type="submit" @click="login" v-loading="loading" class="btn-md btn-theme login-btn">{{$t(`login.signIn`)}}</el-button>
               </section>
               <div class="bottom">
-                <a @click="showForgotPassword = true">找回密码</a>
+                <a @click="showForgotPassword = true">{{$t(`login.forgotPassword`)}}</a>
                 <span v-if="showRegistration" class="divide">|</span>
-                <a v-if="showRegistration" @click="showSignUp = true">注册</a>
+                <a v-if="showRegistration" @click="showSignUp = true">{{$t(`login.signUp`)}}</a>
               </div>
             </div>
           </div>
@@ -45,15 +45,15 @@
         </el-col>
         <el-col class="bg-img none-992" :xs="0" :sm="0" :md="11" :lg="11">
           <div class="information">
-            <h3>{{showCopywriting.title}}</h3>
-            <p>{{showCopywriting.content}}</p>
+            <h3>{{showSlogan.title}}</h3>
+            <p>{{showSlogan.content}}</p>
           </div>
         </el-col>
       </el-row>
     </div>
     <footer>
       <div class="copyright">
-        筑栈（上海）信息技术有限公司 KodeRover ©{{moment().format('YYYY')}}
+       {{$t(`login.companyInfo`)}}{{` ©${moment().format('YYYY')}`}}
         <el-tooltip>
           <div slot="content">
             <span v-if="processEnv.VERSION">Version: {{processEnv.VERSION}}</span>
@@ -64,6 +64,7 @@
           </div>
           <span v-if="processEnv && processEnv.BUILD_TIME" class="el-icon-info"></span>
         </el-tooltip>
+        <LangSwitcher class="language-switcher" />
       </div>
     </footer>
   </div>
@@ -99,20 +100,7 @@ export default {
         account: '',
         password: ''
       },
-      rules: {
-        account: [
-          { required: true, message: '请输入用户名', trigger: 'change' }
-        ],
-        password: [{ required: true, message: '请输入密码', trigger: 'change' }]
-      },
-      moment,
-      copywriting: {
-        common: {
-          title: 'Zadig，让工程师更加专注创造～',
-          content:
-            '工程师热爱的云原生持续交付平台：具备灵活易用的高并发工作流、面向开发者的云原生环境、高效协同的测试管理、强大免运维的模板库、客观精确的效能洞察以及云原生 IDE 插件等重要特性，为工程师提供统一的协作平面。'
-        }
-      }
+      moment
     }
   },
   methods: {
@@ -183,8 +171,24 @@ export default {
     processEnv () {
       return process.env
     },
-    showCopywriting () {
-      return this.copywriting.common
+    slogan () {
+      return {
+        common: {
+          title: this.$t(`login.sloganTitle`),
+          content: this.$t(`login.sloganDesc`)
+        }
+      }
+    },
+    rules () {
+      return {
+        account: [
+          { required: true, message: this.$t(`login.inputUsername`), trigger: 'change' }
+        ],
+        password: [{ required: true, message: this.$t(`login.inputPass`), trigger: 'change' }]
+      }
+    },
+    showSlogan () {
+      return this.slogan.common
     },
     bigLogoUrl () {
       if (this.enterpriseInfo) {
@@ -416,6 +420,15 @@ export default {
       margin-bottom: 30px;
       color: #8f9bb2;
       font-size: 14px;
+
+      /deep/ .language-switcher {
+        color: #8f9bb2;
+        cursor: pointer;
+
+        .iconfont {
+          font-size: 16px;
+        }
+      }
     }
   }
 }

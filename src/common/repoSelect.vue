@@ -145,7 +145,7 @@
                 v-if="!showAdvancedSetting[repo_index]"
                 @click="$set(showAdvancedSetting,repo_index,true)"
               >
-                展开
+               {{$t('global.expand')}}
                 <i class="el-icon-arrow-down" />
               </el-button>
               <el-button
@@ -156,7 +156,7 @@
                 v-if="showAdvancedSetting[repo_index]"
                 @click="$set(showAdvancedSetting,repo_index,false)"
               >
-                收起
+                {{$t('global.collapse')}}
                 <i class="el-icon-arrow-up" />
               </el-button>
             </div>

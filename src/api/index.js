@@ -343,6 +343,18 @@ export function serviceTemplateWithConfigAPI (name, projectName) {
   return http.get(`/api/aslan/service/services/${name}?projectName=${projectName}`)
 }
 
+export function saveServiceVariableAPI (name, projectName, payload) {
+  return http.put(`/api/aslan/service/services/${name}/variable?projectName=${projectName}`, payload)
+}
+
+export function parseK8sYamlVariableAPI (payload) {
+  return http.post(`/api/aslan/template/yaml/extractVariable`, payload)
+}
+
+export function flatVariableToKvAPI (payload) {
+  return http.post(`/api/aslan/template/yaml/flatkvs`, payload)
+}
+
 export function serviceTemplateAPI (name, type, projectName) {
   return http.get(`/api/aslan/service/services/${name}/${type}?projectName=${projectName}`)
 }
@@ -1431,8 +1443,16 @@ export function updateServiceAPI (projectName, serviceName, serviceType, envName
   })
 }
 
-export function updateK8sEnvAPI (projectName, envName, payload, envType = '', force = '') {
+export function updatePmEnvAPI (projectName, envName, payload, envType = '', force = '') {
   return http.put(`/api/aslan/environment/environments/${envName}?projectName=${projectName}&envType=${envType}&force=${force}`, payload)
+}
+
+export function updateK8sEnvAPI (projectName, envName, payload, force = '') {
+  return http.put(`/api/aslan/environment/environments/${envName}/k8s/default-values?projectName=${projectName}&force=${force}`, payload)
+}
+
+export function getAffectedServicesAPI (projectName, envName, payload) {
+  return http.post(`/api/aslan/environment/environments/${envName}/affectedservices?projectName=${projectName}`, payload)
 }
 
 export function getServiceDeployableEnvsAPI (projectName, serviceName) {
@@ -1564,10 +1584,6 @@ export function getSubscribeAPI () {
 
 export function saveSubscribeAPI (payload) {
   return http.post('/api/aslan/system/notification/subscribe', payload)
-}
-
-export function downloadConfigAPI () {
-  return http.get('/api/v1/picket/kubeconfig')
 }
 
 export function updateServiceImageAPI (payload, type, projectName, envName, envType = '') {
@@ -1859,6 +1875,10 @@ export function getAllChartValuesYamlAPI (projectName, envName, serviceName = []
 
 export function getEnvDefaultVariableAPI (projectName, envName, ifPassFilter = true) {
   return http.get(`/api/aslan/environment/rendersets/default-values?projectName=${projectName}&envName=${envName}&ifPassFilter=${ifPassFilter}`)
+}
+
+export function getServiceDefaultVariableAPI (projectName, envName, serviceName = [], ifPassFilter = true) {
+  return http.get(`/api/aslan/environment/rendersets/variables?projectName=${projectName}&envName=${envName}&serviceName=${serviceName.join(',')}&ifPassFilter=${ifPassFilter}`)
 }
 
 export function createHelmEnvAPI (projectName, payload, scene = '') {

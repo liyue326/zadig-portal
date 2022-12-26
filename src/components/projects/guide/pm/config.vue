@@ -1,11 +1,11 @@
 <template>
   <div class="projects-pm-service-container">
     <div class="guide-container">
-      <Step :activeStep="1" envDisabled/>
+      <Step :thirdStepTitle="$t('environments.common.envCreation')" :activeStep="1" envDisabled/>
       <div class="current-step-container">
         <div class="title-container">
-          <span class="first">第二步</span>
-          <span class="second">配置服务的构建脚本，后续仍可在项目中重新配置</span>
+          <span class="first">{{$t('project.onboardingComp.secondStep')}}</span>
+          <span class="second">{{$t('project.onboardingComp.secondStepTip')}}</span>
         </div>
       </div>
     </div>
@@ -22,7 +22,7 @@
     </div>
     <div class="controls__wrap">
       <div class="controls__right">
-        <el-button type="primary" size="small" :disabled="!showNext" @click="toNext">下一步</el-button>
+        <el-button type="primary" size="small" :disabled="!showNext" @click="toNext">{{$t('project.onboardingComp.nextStep')}}</el-button>
       </div>
     </div>
   </div>
@@ -82,7 +82,7 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         { title: this.projectName, isProjectName: true, url: '' }
       ]
     })

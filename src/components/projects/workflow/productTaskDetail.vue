@@ -1,31 +1,31 @@
 <template>
   <div class="workflow-task-detail workflow-or-pipeline-task-detail">
-    <el-dialog :visible.sync="artifactModalVisible" width="60%" title="文件导出" class="downloadArtifact-dialog">
+    <el-dialog :visible.sync="artifactModalVisible" width="60%" :title="$t(`workflow.fileExport`)" class="downloadArtifact-dialog">
       <ArtifactDownload ref="downloadArtifact" :workflowName="workflowName" :taskId="taskID" :showArtifact="artifactModalVisible" />
     </el-dialog>
     <div class="common-parcel-block">
       <div class="workflow-basic-info">
         <div class="basic-left">
-          <div class="primary-title not-first-child">基本信息</div>
+          <div class="primary-title not-first-child">{{$t(`workflow.baseInfo`)}}</div>
           <el-form class="secondary-form" label-width="100px" label-position="left">
-            <el-form-item label="状态">
+            <el-form-item :label="$t(`global.status`)">
               <el-tag
                 size="small"
                 effect="dark"
                 :type="$utils.taskElTagType(taskDetail.status)"
                 close-transition
-              >{{ myTranslate(taskDetail.status) }}</el-tag>
+              >{{ taskDetail.status?$t(`workflowTaskStatus.${taskDetail.status}`):$t(`workflowTaskStatus.notRunning`) }}</el-tag>
             </el-form-item>
-            <el-form-item label="创建者">{{ taskDetail.task_creator }}</el-form-item>
-            <el-form-item v-if="taskDetail.task_revoker" label="取消者">{{ taskDetail.task_revoker }}</el-form-item>
-            <el-form-item label="环境">{{ workflow.namespace }}</el-form-item>
-            <el-form-item label="持续时间">
+            <el-form-item :label="$t(`global.creator`)">{{ taskDetail.task_creator }}</el-form-item>
+            <el-form-item v-if="taskDetail.task_revoker" :label="$t(`global.canceller`)">{{ taskDetail.task_revoker }}</el-form-item>
+            <el-form-item :label="$t(`project.environments`)">{{ workflow.namespace }}</el-form-item>
+            <el-form-item :label="$t(`workflow.duration`)">
               {{ taskDetail.interval }}
               <el-tooltip v-if="taskDetail.intervalSec<0" content="本地系统时间和服务端可能存在不一致，请同步。" placement="top">
                 <i class="el-icon-warning" style="color: red;"></i>
               </el-tooltip>
             </el-form-item>
-            <el-form-item v-if="taskDetail.releases && taskDetail.releases.length > 0 && taskDetail.status==='passed'" label="交付清单">
+            <el-form-item v-if="taskDetail.releases && taskDetail.releases.length > 0 && taskDetail.status==='passed'" :label="$t(`workflow.deliveryList`)">
               <router-link
                 :to="`/v1/delivery/version/detail/${projectName}/${taskDetail.releases[0].id}?version=${taskDetail.releases[0].version}&type=k8s`"
               >
@@ -35,32 +35,32 @@
                 </span>
               </router-link>
             </el-form-item>
-            <el-form-item v-if="showOperation()" label="操作">
+            <el-form-item v-if="showOperation()" :label="$t(`global.operation`)">
               <el-button
                 v-hasPermi="{projectName: projectName, action: 'run_workflow',resource:{name:taskDetail.pipeline_name,type:'workflow'},isBtn:true}"
                 v-if="taskDetail.status==='failed' || taskDetail.status==='cancelled' || taskDetail.status==='timeout'"
                 @click="rerun"
                 type="text"
                 size="medium"
-              >失败重试</el-button>
+              >{{$t(`testing.taskDetails.basicInformation.retry`)}}</el-button>
               <el-button
                 v-hasPermi="{projectName: projectName, action: 'run_workflow',resource:{name:taskDetail.pipeline_name,type:'workflow'},isBtn:true}"
                 v-if="taskDetail.status==='running'||taskDetail.status==='created'"
                 @click="cancel"
                 type="text"
                 size="medium"
-              >取消任务</el-button>
+              >{{$t(`testing.taskDetails.basicInformation.cancel`)}}</el-button>
             </el-form-item>
           </el-form>
         </div>
         <div class="basic-right" v-if="buildSummary.length > 0 || jenkinsSummary.length > 0">
-          <div class="primary-title not-first-child">构建信息</div>
+          <div class="primary-title not-first-child">{{$t(`workflow.buildInfo`)}}</div>
           <div class="build-summary" v-if="buildSummary.length > 0">
             <el-table :data="buildSummary" style="width: 90%;" class="blank-background-header">
-              <el-table-column label="服务" min-width="160">
+              <el-table-column :label="$t(`project.services`)" min-width="160">
                 <template slot-scope="scope">{{scope.row.service_name}}</template>
               </el-table-column>
-              <el-table-column label="代码" min-width="160">
+              <el-table-column :label="$t(`global.gitMessage`)" min-width="160">
                 <template slot-scope="scope">
                   <div v-if="scope.row.builds.length > 0">
                     <el-row :gutter="0" v-for="(build,index) in scope.row.builds" :key="index">
@@ -94,14 +94,14 @@
                   <span v-else>暂无 Issue</span>
                 </template>
               </el-table-column>
-              <el-table-column label="变量" width="100">
+              <el-table-column :label="$t(`global.var`)" width="100">
                 <template slot-scope="{ row }">
                   <el-popover placement="left" width="400" trigger="hover">
                     <el-table :data="row.envs" class="blank-background-header">
                       <el-table-column prop="key" label="Key"></el-table-column>
                       <el-table-column prop="value" label="Value"></el-table-column>
                     </el-table>
-                    <el-button slot="reference" type="text">查看</el-button>
+                    <el-button slot="reference" type="text">{{$t(`workflow.view`)}}</el-button>
                   </el-popover>
                 </template>
               </el-table-column>
@@ -112,11 +112,11 @@
           </div>
         </div>
         <div class="basic-right version-info" v-if="taskDetail.workflow_args && taskDetail.workflow_args.version_args">
-          <div class="primary-title not-first-child">版本信息</div>
+          <div class="primary-title not-first-child">{{$t(`workflow.versionInfo`)}}</div>
           <el-form class="secondary-form" label-width="100px" label-position="left">
-            <el-form-item label="版本名称">{{taskDetail.workflow_args.version_args.version}}</el-form-item>
-            <el-form-item label="版本描述">{{taskDetail.workflow_args.version_args.desc}}</el-form-item>
-            <el-form-item label="版本标签">
+            <el-form-item :label="$t(`workflow.versionName`)">{{taskDetail.workflow_args.version_args.version}}</el-form-item>
+            <el-form-item :label="$t(`workflow.versionInfo`)">{{taskDetail.workflow_args.version_args.desc}}</el-form-item>
+            <el-form-item :label="$t(`workflow.versionTag`)">
               <span v-for="(label,index) in taskDetail.workflow_args.version_args.labels" :key="index" style="margin-right: 3px;">
                 <el-tag size="small">{{label}}</el-tag>
               </span>
@@ -126,7 +126,7 @@
       </div>
 
       <template v-if="buildDeployArray.length > 0">
-        <div class="primary-title not-first-child">环境更新</div>
+        <div class="primary-title not-first-child">{{$t(`status.updateEnv`)}}</div>
         <el-alert
           class="description"
           v-if="jenkinsSummary.length > 0"
@@ -162,13 +162,13 @@
             </template>
           </el-table-column>
 
-          <el-table-column prop="_target" label="服务" min-width="200px">
+          <el-table-column prop="_target" :label="$t(`project.services`)" min-width="200px">
             <template slot-scope="scope">
               <span>{{$utils.showServiceName(scope.row._target,scope.row.buildv2SubTask.service)}}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="构建" min-width="250px">
+          <el-table-column :label="$t(`project.builds`)" min-width="250px">
             <template slot-scope="scope">
               <span :class="scope.row.buildOverallColor">{{ scope.row.buildOverallStatusZh }}</span>
               {{ scope.row.buildOverallTimeZh }}
@@ -180,7 +180,7 @@
 
           <el-table-column min-width="250">
             <template slot="header">
-              部署
+              {{$t(`status.deploy`)}}
               <DeployIcons />
             </template>
             <template slot-scope="scope">
@@ -196,7 +196,7 @@
                         <i class="iconfont iconhelmrepo"></i>
                         {{task.service_name}}
                       </span>
-                      {{':'+ myTranslate(task.status)}}
+                      {{task.status?$t(`workflowTaskStatus.${task.status}`):$t(`workflowTaskStatus.notRunning`)}}
                     </span>
                     {{ makePrettyElapsedTime(task) }}
                     <el-tooltip v-if="calcElapsedTimeNum(task)<0" content="本地系统时间和服务端可能存在不一致，请同步。" placement="top">
@@ -208,7 +208,7 @@
               <div v-if="scope.row.buildv2SubTask.service_type==='pm'">
                 <span>
                   <i class="iconfont iconwuliji"></i>
-                  主机
+                 {{$t(`global.host`)}}
                 </span>
               </div>
             </template>
@@ -216,7 +216,7 @@
         </el-table>
       </template>
       <template v-if="artifactDeployArray.length > 0">
-        <div class="primary-title not-first-child">环境更新</div>
+        <div class="primary-title not-first-child">{{$t(`status.updateEnv`)}}</div>
 
         <el-table
           :data="artifactDeployArray"
@@ -233,14 +233,14 @@
             </template>
           </el-table-column>
 
-          <el-table-column prop="_target" label="服务" min-width="200px">
+          <el-table-column prop="_target" :label="$t(`project.services`)" min-width="200px">
             <template slot-scope="scope">
               <span>{{$utils.showServiceName(scope.row._target,scope.row.deploySubTask.service_name)}}</span>
             </template>
           </el-table-column>
 
           <el-table-column min-width="200px">
-            <template slot="header">交付物部署</template>
+            <template slot="header">{{$t(`productWorkflowStage.artifact`)}}</template>
             <template slot-scope="scope">
               <span :class="scope.row.buildOverallColor">{{ scope.row.buildOverallStatusZh }}</span>
               {{ scope.row.buildOverallTimeZh }}
@@ -252,7 +252,7 @@
         </el-table>
       </template>
       <template v-if="artifact_deployArray.length > 0">
-        <div class="primary-title not-first-child">环境更新</div>
+        <div class="primary-title not-first-child">{{$t(`status.updateEnv`)}}</div>
 
         <el-table
           :data="artifact_deployArray"
@@ -269,14 +269,14 @@
             </template>
           </el-table-column>
 
-          <el-table-column prop="_target" label="服务" min-width="200px">
+          <el-table-column prop="_target" :label="$t(`project.services`)" min-width="200px">
             <template slot-scope="scope">
               <span>{{$utils.showServiceName(scope.row._target)}}</span>
             </template>
           </el-table-column>
 
           <el-table-column min-width="200px">
-            <template slot="header">交付物部署</template>
+            <template slot="header">{{$t(`productWorkflowStage.artifact`)}}</template>
             <template slot-scope="scope">
               <span :class="scope.row.buildOverallColor">{{ scope.row.buildOverallStatusZh }}</span>
               {{ scope.row.buildOverallTimeZh }}
@@ -287,9 +287,8 @@
           </el-table-column>
         </el-table>
       </template>
-      <div v-if="testArray.length > 0" class="primary-title not-first-child">产品测试</div>
+      <div v-if="testArray.length > 0" class="primary-title not-first-child">{{$t(`workflow.productTest`)}}</div>
       <template v-if="testArray.length > 0">
-        <span class="secondary-title">自动化测试</span>
         <el-table
           :data="testArray"
           row-key="_target"
@@ -311,17 +310,17 @@
             </template>
           </el-table-column>
 
-          <el-table-column prop="_target" label="名称" width="200px">
+          <el-table-column prop="_target" :label="$t(`global.name`)" width="200px">
             <template slot-scope="scope">
               <span>{{$utils.showServiceName(scope.row._target)}}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="运行状态">
+          <el-table-column :label="$t(`workflow.runStatus`)">
             <template slot-scope="scope">
               <span
                 :class="colorTranslation(scope.row.testingv2SubTask.status, 'pipeline', 'task')"
-              >{{ myTranslate(scope.row.testingv2SubTask.status) }}</span>
+              >{{ scope.row.testingv2SubTask.status?$t(`workflowTaskStatus.${scope.row.testingv2SubTask.status}`):$t(`workflowTaskStatus.notRunning`) }}</span>
               {{ makePrettyElapsedTime(scope.row.testingv2SubTask) }}
               <el-tooltip v-if="calcElapsedTimeNum(scope.row.testingv2SubTask)<0" content="本地系统时间和服务端可能存在不一致，请同步。" placement="top">
                 <i class="el-icon-warning" style="color: red;"></i>
@@ -329,28 +328,28 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="测试报告">
+          <el-table-column  :label="$t(`status.testReport`)">
             <template slot-scope="scope">
               <span v-if="scope.row.testingv2SubTask.report_ready === true" class="show-test-result">
-                <router-link :to="getTestReport(scope.row.testingv2SubTask, scope.row._target)">查看</router-link>
+                <router-link :to="getTestReport(scope.row.testingv2SubTask, scope.row._target)">{{$t(`workflow.view`)}}</router-link>
               </span>
             </template>
           </el-table-column>
 
-          <el-table-column label="文件导出">
+          <el-table-column :label="$t(`workflow.fileExport`)">
             <template slot-scope="scope">
               <span
                 v-if="scope.row.testingv2SubTask.job_ctx.is_has_artifact"
                 @click="artifactModalVisible=true"
                 class="download-artifact-link"
-              >下载</span>
+              >{{$t(`workflow.download`)}}</span>
             </template>
           </el-table-column>
         </el-table>
       </template>
 
       <template v-if="distributeArray.length > 0">
-        <div class="primary-title not-first-child">分发部署</div>
+        <div class="primary-title not-first-child">{{$t(`productWorkflowStage.distribute`)}}</div>
 
         <el-table
           :data="distributeArray"
@@ -372,26 +371,26 @@
               />
             </template>
           </el-table-column>
-          <el-table-column prop="_target" label="服务" min-width="200px">
+          <el-table-column prop="_target" :label="$t(`project.services`)" min-width="200px">
             <template slot-scope="scope">
               <span>{{$utils.showServiceName(scope.row._target)}}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="分发" min-width="250px">
+          <el-table-column :label="$t(`productWorkflowStage.release_image`)" min-width="250px">
             <template slot-scope="scope">
               <template  v-if="scope.row.release_imageSubTask">
-                <span :class="colorTranslation(scope.row.release_imageSubTask.distribute_info[0].distribute_status, 'pipeline', 'task')">{{'镜像：' + myTranslate(scope.row.release_imageSubTask.distribute_info[0].distribute_status) }}</span>
+                <span :class="colorTranslation(scope.row.release_imageSubTask.distribute_info[0].distribute_status, 'pipeline', 'task')">{{'镜像：' + (scope.row.release_imageSubTask.distribute_info[0].distribute_status?$t(`workflowTaskStatus.${scope.row.release_imageSubTask.distribute_info[0].distribute_status}`):$t(`workflowTaskStatus.notRunning`)) }}</span>
               </template>
               <template v-if="scope.row.distribute2kodoSubTask">
-                <span :class="colorTranslation(scope.row.distribute2kodoSubTask.status, 'pipeline', 'task')">{{ '对象存储：' + myTranslate(scope.row.distribute2kodoSubTask.status) }}</span>
+                <span :class="colorTranslation(scope.row.distribute2kodoSubTask.status, 'pipeline', 'task')">{{ '对象存储：' + (scope.row.distribute2kodoSubTask.status?$t(`workflowTaskStatus.${scope.row.distribute2kodoSubTask.status}`):$t(`workflowTaskStatus.notRunning`)) }}</span>
               </template>
             </template>
           </el-table-column>
 
-          <el-table-column label="部署" min-width="250px">
+          <el-table-column :label="$t(`productWorkflowStage.deploy`)" min-width="250px">
             <template slot-scope="scope">
-              <span v-if="scope.row.release_imageSubTask && checkDistributeDeploy(scope.row.release_imageSubTask.distribute_info)" :class="colorTranslation(scope.row.release_imageSubTask.distribute_info[0].deploy_status, 'pipeline', 'task')">{{ myTranslate(scope.row.release_imageSubTask.distribute_info[0].deploy_status) }}</span>
+              <span v-if="scope.row.release_imageSubTask && checkDistributeDeploy(scope.row.release_imageSubTask.distribute_info)" :class="colorTranslation(scope.row.release_imageSubTask.distribute_info[0].deploy_status, 'pipeline', 'task')">{{ scope.row.release_imageSubTask.distribute_info[0].deploy_status?$t(`workflowTaskStatus.${scope.row.release_imageSubTask.distribute_info[0].deploy_status}`):$t(`workflowTaskStatus.notRunning`) }}</span>
               <span v-else>N/A</span>
             </template>
           </el-table-column>
@@ -410,7 +409,7 @@ import {
   restartWorkflowAPI,
   cancelWorkflowAPI
 } from '@api'
-import { wordTranslate, colorTranslate } from '@utils/wordTranslate.js'
+import { colorTranslate } from '@utils/wordTranslate.js'
 import DeployIcons from '@/components/common/deployIcons'
 import ArtifactDownload from '@/components/common/artifactDownload.vue'
 import TaskDetailBuild from './productTaskDetail/build.vue'
@@ -533,9 +532,7 @@ export default {
     artifactDeployArray () {
       const arr = this.$utils.mapToArray(this.artifactDeployMap, '_target')
       for (const target of arr) {
-        target.buildOverallStatusZh = this.myTranslate(
-          target.deploySubTask.status
-        )
+        target.buildOverallStatusZh = target.deploySubTask.status ? this.$t(`workflowTaskStatus.${target.deploySubTask.status}`) : this.$t(`workflowTaskStatus.notRunning`)
         target.buildOverallColor = this.colorTranslation(
           target.deploySubTask.status,
           'pipeline',
@@ -553,9 +550,7 @@ export default {
     artifact_deployArray () {
       const arr = this.$utils.mapToArray(this.artifact_deployMap, '_target')
       for (const target of arr) {
-        target.buildOverallStatusZh = this.myTranslate(
-          target.artifact_deploySubTask.status
-        )
+        target.buildOverallStatusZh = target.artifact_deploySubTask.status ? this.$t(`workflowTaskStatus.${target.artifact_deploySubTask.status}`) : this.$t(`workflowTaskStatus.notRunning`)
         target.buildOverallColor = this.colorTranslation(
           target.artifact_deploySubTask.status,
           'pipeline',
@@ -583,9 +578,7 @@ export default {
           target.buildv2SubTask,
           target.docker_buildSubTask
         )
-        target.buildOverallStatusZh = this.myTranslate(
-          target.buildOverallStatus
-        )
+        target.buildOverallStatusZh = target.buildOverallStatus ? this.$t(`workflowTaskStatus.${target.buildOverallStatus}`) : this.$t(`workflowTaskStatus.notRunning`)
         target.buildOverallColor = this.colorTranslation(
           target.buildOverallStatus,
           'pipeline',
@@ -872,10 +865,6 @@ export default {
     repoID (repo) {
       return `${repo.source}/${repo.repo_owner}/${repo.repo_name}`
     },
-
-    myTranslate (word) {
-      return wordTranslate(word, 'pipeline', 'task')
-    },
     colorTranslation (word, category, subitem) {
       return colorTranslate(word, category, subitem)
     },
@@ -933,14 +922,14 @@ export default {
       bus.$emit('set-topbar-title', {
         title: '',
         breadcrumb: [
-          { title: '项目', url: '/v1/projects' },
+          { title: this.$t(`global.project`), url: '/v1/projects' },
           {
             title: this.projectName,
             isProjectName: true,
             url: `/v1/projects/detail/${this.projectName}/detail`
           },
           {
-            title: '工作流',
+            title: this.$t(`global.workflow`),
             url: `/v1/projects/detail/${this.projectName}/pipelines`
           },
           {

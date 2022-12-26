@@ -1,7 +1,7 @@
 <template>
   <section class="pipeline-build-container job-freestyle">
     <el-form ref="ruleForm" label-width="120px" :model="job" class="mg-t24 mg-b24" size="small" label-position="left">
-      <el-form-item label="任务名称" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
         <el-input v-model="job.name" size="small" style="width: 400px;"></el-input>
       </el-form-item>
       <section class="common-parcel-block">
@@ -23,7 +23,7 @@
         <section>
           <div style="margin-bottom: 8px;">
             <el-button type="primary" size="small" plain @click="advanced_setting_modified = !advanced_setting_modified">
-              高级配置
+              {{$t(`project.createProjectComp.advancedConfigurations`)}}
               <i :class="[advanced_setting_modified ? 'el-icon-arrow-up' : 'el-icon-arrow-down']" style="margin-left: 8px;"></i>
             </el-button>
           </div>

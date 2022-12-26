@@ -1,9 +1,8 @@
 <template>
   <el-form class="run-workflow"
-           label-width="90px"
-           label-position="left">
+           label-width="90px">
     <el-form-item prop="productName"
-                  label="环境">
+                  :label="$t(`project.environments`)">
       <el-select :value="runner.product_tmpl_name && runner.namespace ? `${runner.product_tmpl_name} / ${runner.namespace}` : ''"
                  @change="getPresetInfo"
                  size="medium"
@@ -32,13 +31,13 @@
         <span><i style="color: #909399;"
              class="el-icon-question"></i></span>
       </el-tooltip>
-      <div v-if="imageRegistryByEnv" class="show-image-info">镜像仓库：{{imageRegistryByEnv}}</div>
+      <div v-if="imageRegistryByEnv" class="show-image-info">{{$t(`status.imageRepo`)}}：{{imageRegistryByEnv}}</div>
     </el-form-item>
 
     <div v-if="buildDeployEnabled"
          v-loading="precreateLoading">
       <el-form-item v-if="quickSelectEnabled"
-                    label="构建">
+                    :label="$t(`status.build`)">
         <el-select v-model="pickedBuildTarget"
                    filterable
                    clearable
@@ -55,7 +54,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="服务">
+      <el-form-item :label="$t(`project.services`)">
         <el-select v-model="pickedBuildTargetNames"
                    filterable
                    multiple
@@ -83,10 +82,10 @@
         <template v-if="!quickSelectEnabled">
           <el-button size="small"
                      @click="quickSelectEnabled=!quickSelectEnabled"
-                     type="text">快捷选服务
+                     type="text">{{$t(`workflow.quickSelectService`)}}
           </el-button>
           <el-tooltip effect="dark"
-                      content="通过指定构建配置间接选择出需要的服务"
+                      :content="$t(`workflow.quickSelectServiceTip`)"
                       placement="top">
             <span><i style="color: #909399;"
                  class="el-icon-question"></i></span>
@@ -129,20 +128,20 @@
     <div v-if="buildDeployEnabled"
          class="advanced-setting">
       <el-collapse>
-        <el-collapse-item title="高级设置"
+        <el-collapse-item :title="$t(`workflow.advancedSetting`)"
                           name="advanced">
-          <el-checkbox v-model="runner.reset_cache">不使用工作空间缓存
+          <el-checkbox v-model="runner.reset_cache">{{$t(`workflow.notUseWorkspaceCaching`)}}
             <el-tooltip effect="dark"
-                        content="可能会增加任务时长。如果构建中不使用工作空间缓存，该设置会被忽略"
+                        :content="$t(`workflow.notUseWorkspaceCachingTip`)"
                         placement="top">
               <span><i style="color: #909399;"
                    class="el-icon-question"></i></span>
             </el-tooltip>
           </el-checkbox>
           <br>
-          <el-checkbox v-model="runner.ignore_cache">不使用 Docker 缓存
+          <el-checkbox v-model="runner.ignore_cache">{{$t(`workflow.notUseDockerCache`)}}
             <el-tooltip effect="dark"
-                        content="只对配置了镜像构建步骤的构建生效"
+                        :content="$t(`workflow.notUseDockerCacheTip`)"
                         placement="top">
               <span><i style="color: #909399;"
                    class="el-icon-question"></i></span>
@@ -157,7 +156,7 @@
                  :loading="startTaskLoading"
                  type="primary"
                  size="small">
-        {{ startTaskLoading?'启动中':'启动任务' }}
+        {{ startTaskLoading?$t(`workflow.starting`):$t(`workflow.run`) }}
       </el-button>
     </div>
   </el-form>

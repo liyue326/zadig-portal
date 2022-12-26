@@ -31,21 +31,21 @@
         </span>
         <span class="chart-right">
           <template v-if="serviceStatus[chart.serviceName] && serviceStatus[chart.serviceName].raw.deploy_strategy === 'import'">
-            <el-tooltip  effect="dark" content="该服务尚未通过 Zadig 部署，可执行「更新服务」操作使用 Zadig 上管理的服务配置重新部署" placement="top">
+            <el-tooltip  effect="dark" :content="$t('environments.helm.chartListComp.serviceDeployStrategyTip')" placement="top">
               <i class="el-icon-warning-outline common-icon"></i>
             </el-tooltip>
           </template>
-          <el-tooltip v-if="chart.updatable" effect="dark" content="服务配置有变更" placement="top">
+          <el-tooltip v-if="chart.updatable" effect="dark" :content="$t('environments.helm.chartListComp.serviceConfigChangedTip')"  placement="top">
             <i class="el-icon-question common-icon"></i>
           </el-tooltip>
-          <el-tooltip v-if="checkPermissionSyncMixin({projectName: projectName, action:'manage_environment',resource:{name:envName,type:'env'}})" effect="dark" content="更新服务" placement="top">
+          <el-tooltip v-if="checkPermissionSyncMixin({projectName: projectName, action:'manage_environment',resource:{name:envName,type:'env'}})" effect="dark" :content="$t('environments.common.updateService')"  placement="top">
             <i
               class="iconfont icongengxin common-icon pointer"
               :class="[chart.status === 'pending' ? 'disabled' : '']"
               @click="updateChartService(chart, 'update', chart.status === 'pending')"
             ></i>
           </el-tooltip>
-          <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+          <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
             <i class="iconfont icongengxin common-icon pointer disabled"></i>
           </el-tooltip>
           <i class="el-icon-document common-icon pointer" @click="updateChartService(chart, 'value')"></i>
@@ -56,7 +56,7 @@
       <i :class="[leftShow ? 'el-icon-arrow-left' : 'el-icon-arrow-right']"></i>
     </div>
     <el-dialog
-      :title="`更新服务 - ${currentChart.serviceName}`"
+      :title="$t('environments.helm.chartListComp.updateServiceDialogTitle',{serviceName:currentChart.serviceName})"
       :visible.sync="updateDialogVisible"
       width="60%"
       :before-close="dialogBeforeClose"
@@ -71,16 +71,16 @@
         :envScene="`updateRenderSet`"
       />
       <div v-if="currentChart.showSync" style="margin: 12px 20px;">
-        <el-checkbox v-model="currentChart.updateServiceTmpl">同时更新服务配置</el-checkbox>
+        <el-checkbox v-model="currentChart.updateServiceTmpl">{{$t('environments.helm.chartListComp.updateServiceConfigurationCheck')}}</el-checkbox>
       </div>
       <div slot="footer">
-        <el-button size="small" @click="dialogBeforeClose()">取 消</el-button>
-        <el-button type="primary" size="small" @click="updateChart()">确 定</el-button>
+        <el-button size="small" @click="dialogBeforeClose()">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" size="small" @click="updateChart()">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
 
     <el-dialog
-      :title="`Values 文件 - ${currentChart.serviceName}`"
+      :title="$t('environments.helm.chartListComp.updateValuesDialogTitle',{serviceName:currentChart.serviceName})"
       :visible.sync="valuesDialogVisible"
       width="60"
       :before-close="dialogBeforeClose"
@@ -89,7 +89,7 @@
         <Codemirror class="value-codemirror" ref="codemirror" :value="currentChart.valuesYaml" :cmOption="cmOption" />
       </div>
       <div slot="footer">
-        <el-button size="small" @click="dialogBeforeClose()">取 消</el-button>
+        <el-button size="small" @click="dialogBeforeClose()">{{$t(`global.cancel`)}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -121,24 +121,6 @@ export default {
     }
     return {
       leftShow: true,
-      filteredItems: [
-        {
-          value: 'serviceName',
-          text: 'Chart 名称'
-        },
-        {
-          value: 'status',
-          text: '部署状态'
-        }
-      ],
-      defaultFilterList: {
-        status: [
-          { text: '部署成功', value: 'deployed' },
-          { text: '部署失败', value: 'failed' },
-          { text: '部署中', value: 'pending' },
-          { text: '尚未部署', value: 'notDeployed' }
-        ]
-      },
       chartNames: [],
       filteredChartNames: [],
       currentChart: {
@@ -158,6 +140,28 @@ export default {
     },
     envName () {
       return this.$route.query.envName
+    },
+    filteredItems () {
+      return [
+        {
+          value: 'serviceName',
+          text: this.$t('environments.helm.chartListComp.chartName')
+        },
+        {
+          value: 'status',
+          text: this.$t('environments.helm.chartListComp.chartDeployStatus')
+        }
+      ]
+    },
+    defaultFilterList () {
+      return {
+        status: [
+          { text: this.$t('environments.helm.chartListComp.deployStatusSuccess'), value: 'deployed' },
+          { text: this.$t('environments.helm.chartListComp.deployStatusFailed'), value: 'failed' },
+          { text: this.$t('environments.helm.chartListComp.deployStatusPending'), value: 'pending' },
+          { text: this.$t('environments.helm.chartListComp.deployStatusNotDeployed'), value: 'notDeployed' }
+        ]
+      }
     }
   },
   methods: {
@@ -286,7 +290,7 @@ export default {
       }
       updateHelmServiceVarAPI(this.projectName, this.envName, payload).then(
         () => {
-          this.$message.success(`${this.currentChart.serviceName} 更新成功！`)
+          this.$message.success(this.$t('environments.helm.chartListComp.chartHasBeenUpdatedSuccessfully', { serviceName: this.currentChart.serviceName }))
           this.fetchAllData()
           this.dialogBeforeClose()
         }

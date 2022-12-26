@@ -13,7 +13,7 @@ export default {
     SubTopbar
   },
   created () {
-    bus.$emit('set-topbar-title', { title: '交付中心', breadcrumb: [] })
+    bus.$emit('set-topbar-title', { title: this.$t('sidebarMenu.deliveryCenter'), breadcrumb: [] })
   }
 }
 </script>

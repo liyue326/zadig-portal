@@ -1,21 +1,15 @@
 <template>
   <div class="function-test-detail-container" v-loading="configDataLoading">
     <section class="common-parcel-block">
-      <el-form class="primary-form" :model="test" ref="testFormRef" label-width="120px" label-position="left">
+      <el-form class="primary-form" :model="test"  :rules="testRules" ref="testFormRef" label-width="120px" label-position="left">
         <el-form-item
-          prop="name"
-          label="测试名称"
-          :rules=" {
-            type: 'string',
-            required: true,
-            validator: validateTestName,
-            trigger: 'change'
-          }"
+            prop="name"
+            :label="$t(`testing.details.name`)"
         >
-          <el-input :disabled="isEdit" size="small" v-model="test.name" placeholder="请输入测试名称"></el-input>
+          <el-input :disabled="isEdit" size="small" v-model="test.name" :placeholder="$t(`testing.validation.testNameInsertionPrompt`)"></el-input>
         </el-form-item>
-        <el-form-item label="描述信息">
-          <el-input size="small" v-model="test.desc" placeholder="请输入描述信息"></el-input>
+        <el-form-item :label="$t(`testing.details.description`)">
+          <el-input size="small" v-model="test.desc" :placeholder="$t(`testing.validation.testDescriptionInsertionPrompt`)"></el-input>
         </el-form-item>
         <BuildEnv ref="buildEnvRef" :isCreate="!isEdit" :title="``" :secondaryProp="`pre_test`" :buildConfig="test" isTest />
       </el-form>
@@ -23,9 +17,9 @@
       <RepoSelect :config="test" :validObj="validObj" class="test-secondary-form" hidePrimary showFirstLine />
 
       <section>
-        <div class="primary-title not-first-child">测试变量</div>
+        <div class="primary-title not-first-child">{{$t(`testing.details.parameters`)}}</div>
         <EnvVariable :preEnvs="test.pre_test" :validObj="validObj" :fromWhere="fromWhere" />
-        <div class="primary-title not-first-child">测试脚本</div>
+        <div class="primary-title not-first-child">{{$t(`testing.details.scripts`)}}</div>
         <div class="deploy-script">
           <Resize :resize="'both'">
             <Editor v-model="test.scripts" />
@@ -34,25 +28,25 @@
       </section>
 
       <section>
-        <div class="primary-title not-first-child">测试报告配置</div>
+        <div class="primary-title not-first-child">{{$t(`testing.details.report.configuration`)}}</div>
         <el-form class="secondary-form" :model="test" label-width="150px" label-position="left">
-          <el-form-item label="Junit 报告所在目录">
-            <el-input size="small" v-model="test.test_result_path" style="width: 100%;" placeholder="请输入测试报告目录">
+          <el-form-item :label="$t(`testing.details.report.junitReportDirectory`)">
+            <el-input size="small" v-model="test.test_result_path" style="width: 100%;" :placeholder="$t(`testing.validation.testReportDirectoryInsertionPrompt`)">
               <template slot="prepend">$WORKSPACE/</template>
             </el-input>
           </el-form-item>
           <el-form-item class="label-icon">
             <template slot="label">
-              <span>HTML 报告文件地址</span>
+              <span>{{$t(`testing.details.report.htmlReportFileDirectory`)}}</span>
               <el-tooltip effect="dark" placement="top">
                 <div slot="content">
-                  HTML 测试报告文件将包含在工作流发送的 IM 通知内容中
+                  {{$t(`testing.details.report.htmlReportFileTooltip`)}}
                   <br />
                 </div>
                 <i class="el-icon-question"></i>
               </el-tooltip>
             </template>
-            <el-input size="small" v-model="test.test_report_path" style="width: 100%;" placeholder="请输入测试报告文件">
+            <el-input size="small" v-model="test.test_report_path" style="width: 100%;" :placeholder="$t(`testing.validation.testReportFileInsertionPrompt`)">
               <template slot="prepend">$WORKSPACE/</template>
             </el-input>
           </el-form-item>
@@ -63,24 +57,24 @@
     <section>
       <div style="margin-bottom: 8px;">
         <el-button type="primary" size="small" plain @click="switchAdvancedStatus">
-          高级配置
+          {{$t(`testing.details.advancedSettings.title`)}}
           <i :class="[test.advanced_setting_modified ? 'el-icon-arrow-up' : 'el-icon-arrow-down']" style="margin-left: 8px;"></i>
         </el-button>
       </div>
       <AdvancedConfig
-        class="common-parcel-block test-advanced-config"
-        v-show="test.advanced_setting_modified"
-        ref="advancedConfigRef"
-        :testConfig="test"
-        :allCodeHosts="allCodeHosts"
-        :validObj="validObj"
-        @validateFailed="test.advanced_setting_modified = true"
+          class="common-parcel-block test-advanced-config"
+          v-show="test.advanced_setting_modified"
+          ref="advancedConfigRef"
+          :testConfig="test"
+          :allCodeHosts="allCodeHosts"
+          :validObj="validObj"
+          @validateFailed="test.advanced_setting_modified = true"
       />
     </section>
 
     <footer class="create-footer">
       <router-link :to="`/v1/projects/detail/${projectName}/test`">
-        <el-button style="margin-right: 15px;" type="primary" plain>取消</el-button>
+        <el-button style="margin-right: 15px;" type="primary" plain>{{$t(`global.cancel`)}}</el-button>
       </router-link>
       <el-button @click="saveTest" type="primary">{{ isEdit ? '确认修改' : '立即新建' }}</el-button>
     </footer>
@@ -102,17 +96,7 @@ import {
   updateTestAPI,
   singleTestAPI
 } from '@api'
-const validateTestName = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入测试名称'))
-  } else {
-    if (!/^[a-zA-Z0-9-_]+$/.test(value)) {
-      callback(new Error('名称只支持字母和数字，特殊字符只支持中划线和下划线'))
-    } else {
-      callback()
-    }
-  }
-}
+
 export default {
   data () {
     return {
@@ -161,14 +145,8 @@ export default {
         },
         test_type: 'function'
       },
-      validateTestName,
       validObj: new ValidateSubmit(),
-      configDataLoading: false,
-      fromWhere: {
-        origin: 'test',
-        title: '测试',
-        vars: []
-      }
+      configDataLoading: false
     }
   },
   computed: {
@@ -180,6 +158,34 @@ export default {
     },
     projectName () {
       return this.$route.params.project_name
+    },
+    fromWhere () {
+      return {
+        origin: 'test',
+        title: this.$t(`subTopbarMenu.tests`),
+        vars: []
+      }
+    },
+    testRules () {
+      const validateTestName = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t(`testing.validation.testNameInsertionPrompt`)))
+        } else {
+          if (!/^[a-zA-Z0-9-_]+$/.test(value)) {
+            callback(new Error(this.$t(`testing.validation.testNameVaidationError`)))
+          } else {
+            callback()
+          }
+        }
+      }
+      return {
+        name: {
+          type: 'string',
+          required: true,
+          validator: validateTestName,
+          trigger: 'change'
+        }
+      }
     }
   },
   methods: {
@@ -217,7 +223,7 @@ export default {
         const fn = this.isEdit ? updateTestAPI : createTestAPI
         fn(this.projectName, this.test).then(res => {
           this.$message({
-            message: '保存成功',
+            message: this.$t(`global.successfullySaved`),
             type: 'success'
           })
           this.$router.push(
@@ -231,17 +237,17 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: `/v1/projects` },
+        { title: this.$t(`sidebarMenu.projects`), url: `/v1/projects` },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}`
         },
         {
-          title: '测试',
+          title: this.$t(`subTopbarMenu.tests`),
           url: `/v1/projects/detail/${this.projectName}/test`
         },
-        { title: this.isEdit ? this.name : '添加', url: '' }
+        { title: this.isEdit ? this.name : this.$t(`global.add`), url: '' }
       ]
     })
     this.test.product_name = this.projectName

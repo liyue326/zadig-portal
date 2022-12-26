@@ -1,6 +1,6 @@
 <template>
   <div class="auto-test">
-    <span class="title">自动化测试</span>
+    <span class="title">{{$t('dataStatistics.overview.deployAutomation')}}</span>
     <div class="auto-test-chart-container">
       <el-row :gutter="10">
         <el-col class="number-block" :span="6">
@@ -9,7 +9,7 @@
               <ICountUp :delay="delay" :endVal="totalCaseCount" class="counter-number" :options="options" />
             </h2>
             <span class="desc">
-              <i class="icon iconfont iconvery-testing"></i> 测试用例数
+              <i class="icon iconfont iconvery-testing"></i> {{$t('dataStatistics.overview.totalTestCases')}}
             </span>
           </div>
         </el-col>
@@ -19,7 +19,7 @@
               <ICountUp :delay="delay" :endVal="totalExecCount" class="counter-number" :options="options" />
             </h2>
             <span class="desc">
-              <i class="icon iconfont iconzhixing"></i> 执行次数
+              <i class="icon iconfont iconzhixing"></i> {{$t('dataStatistics.overview.totalExecutionCount')}}
             </span>
           </div>
         </el-col>
@@ -37,7 +37,7 @@
             </h2>
             <h2 v-else>N/A</h2>
             <span class="desc">
-              <i class="icon iconfont iconchenggong"></i> 成功率
+              <i class="icon iconfont iconchenggong"></i> {{$t('dataStatistics.overview.successRate')}}
             </span>
           </div>
         </el-col>
@@ -47,7 +47,7 @@
               <ICountUp :delay="delay" :endVal="averageDuration" class="counter-number" :options="options" />
             </h2>
             <span class="desc">
-              <i class="icon iconfont iconhaoshi"></i> 平均耗时 (s)
+              <i class="icon iconfont iconhaoshi"></i> {{$t('dataStatistics.overview.averageDuration')}}
             </span>
           </div>
         </el-col>

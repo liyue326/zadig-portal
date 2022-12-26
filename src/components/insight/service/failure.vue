@@ -1,15 +1,14 @@
 <template>
   <div style="width: 100%; height: 250px;">
     <el-table :data="serviceData" v-loading="loading" height="250" :show-header="true" class="service-table">
-      <el-table-column prop="serviceName" label="服务名">
+      <el-table-column prop="serviceName" :label="$t(`global.serviceName`)">
         <template slot-scope="scope">
           <router-link :to="`/v1/projects/detail/${scope.row.productName}/services?name=${scope.row.serviceName}`">
             <span class="service-name">{{scope.row.serviceName}}</span>
           </router-link>
         </template>
       </el-table-column>
-
-      <el-table-column prop="totalFailure" label="失败次数">
+      <el-table-column prop="totalFailure" :label="$t('dataStatistics.insight.numberOfFailures')">
         <template slot-scope="scope">
           <span>{{scope.row.totalFailure}}</span>
         </template>
@@ -40,9 +39,6 @@ export default {
         this.serviceData = res
         this.loading = false
       })
-    },
-    wordTranslation (word, category, subitem) {
-      return wordTranslate(word, category, subitem)
     }
   },
   watch: {

@@ -5,12 +5,12 @@
         <span>{{displayName}}</span>
       </template>
     </van-nav-bar>
-    <van-divider content-position="left">基本信息</van-divider>
+    <van-divider content-position="left">{{$t('global.basicInfo')}}</van-divider>
     <div class="task-info">
       <van-row>
         <van-col span="12">
           <div class="mobile-block">
-            <h2 class="mobile-block-title">创建者</h2>
+            <h2 class="mobile-block-title">{{$t(`global.creator`)}}</h2>
             <div class="mobile-block-desc">{{ workflow.update_by }}</div>
           </div>
         </van-col>
@@ -59,7 +59,7 @@
         </van-col>
       </van-row>
     </div>
-    <van-divider content-position="left">历史任务</van-divider>
+    <van-divider content-position="left">{{$t(`workflow.historyTask`)}}</van-divider>
     <div>
       <van-cell
         v-for="task in workflowTasks"
@@ -72,7 +72,7 @@
         <template #label>
           <span class="task-id">{{`#${task.task_id}`}}</span>
           <span class="status">
-            <van-tag plain :type="$utils.mobileVantTagType(task.status)">{{ myTranslate(task.status) }}</van-tag>
+            <van-tag plain :type="$utils.mobileVantTagType(task.status)">{{task.status?$t(`workflowTaskStatus.${task.status}`):$t(`workflowTaskStatus.notRunning`) }}</van-tag>
           </span>
           <span class="env" v-if="task.namespace">{{task.namespace}}</span>
         </template>
@@ -119,7 +119,6 @@ import {
   Popup
 } from 'vant'
 import { getWorkflowDetailAPI, workflowTaskListAPI } from '@api'
-import { wordTranslate } from '@utils/wordTranslate.js'
 import RunWorkflow from './runWorkflow.vue'
 import moment from 'moment'
 export default {
@@ -221,9 +220,6 @@ export default {
     },
     convertTimestamp (value) {
       return moment.unix(value).format('MM-DD HH:mm')
-    },
-    myTranslate (word) {
-      return wordTranslate(word, 'pipeline', 'task')
     },
     taskDuration (task_id, started) {
       const refresh = () => {

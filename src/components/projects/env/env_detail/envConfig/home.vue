@@ -9,8 +9,8 @@
     <el-dialog :visible.sync="dialogVisible" width="60%" custom-class="env-config-dialog" append-to-body>
       <ImportConfig :importRepoInfo="repoConfig" :cmOption="cmOption" :placeholder="placeholder" />
       <div slot="footer">
-        <el-button size="small" :disabled="dialogBtnLoading" @click="dialogVisible = false" v-show="repoConfig.actionType !== 'view'">取 消</el-button>
-        <el-button size="small" type="primary" :loading="dialogBtnLoading" @click="handleConfig">确 定</el-button>
+        <el-button size="small" :disabled="dialogBtnLoading" @click="dialogVisible = false" v-show="repoConfig.actionType !== 'view'">{{$t(`global.cancel`)}}</el-button>
+        <el-button size="small" type="primary" :loading="dialogBtnLoading" @click="handleConfig">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
     <VersionHistory ref="versionRef" @actionConfig="actionConfig" />
@@ -27,11 +27,9 @@ export default {
     return {
       currentConfig: '',
       allConfig: ['Ingress', 'ConfigMap', 'Secret', 'PVC'],
-
       dialogVisible: false,
       repoConfig: {},
       dialogBtnLoading: false,
-
       cmOption: {}
     }
   },
@@ -60,10 +58,10 @@ export default {
           showParams: {
             title:
               evt.actionType === 'add'
-                ? '添加环境配置'
-                : `${evt.actionType === 'view' ? '查看' : '编辑'} ${
+                ? this.$t('environments.k8s.envConfigComp.addEnvConfiguration')
+                : `${evt.actionType === 'view' ? this.$t('global.view') : this.$t('global.edit')} ${
                   evt.name
-                } 配置`,
+                } ${this.$t('environments.config.configuration')}`,
 
             showImport: evt.showImport || false,
             checkAssociated:
@@ -132,7 +130,7 @@ export default {
       return this.$route.params.env_name
     },
     placeholder () {
-      return `可直接粘贴 ${this.currentConfig} 类型的 K8s YAML 文件`
+      return this.$t('environments.config.pastePlaceholder', { currentConfig: this.currentConfig })
     }
   },
   created () {
@@ -140,18 +138,18 @@ export default {
     bus.$emit('set-topbar-title', {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
-        { title: '环境', url: '' },
+        { title: this.$t('subTopbarMenu.environments'), url: '' },
         {
           title: this.envName,
           url: `/v1/projects/detail/${this.projectName}/envs/detail?envName=${this.envName}`
         },
-        { title: '配置', url: '' }
+        { title: this.$t('environments.config.configuration'), url: '' }
       ]
     })
   },

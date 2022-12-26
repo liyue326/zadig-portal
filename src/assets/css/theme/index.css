@@ -4013,7 +4013,7 @@
   display: block;
 }
 .el-form-item {
-  margin-bottom: 8px;
+  margin-bottom: 18px;
 }
 .el-form-item::after,
 .el-form-item::before {

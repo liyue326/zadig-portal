@@ -1,12 +1,12 @@
 <template>
   <div class="version-config">
     <el-form ref="configRef" :rules="rules" :model="releaseInfo" label-width="90px" label-position="left" inline>
-      <el-form-item label="环境" prop="envName">
+      <el-form-item :label="$t(`project.environments`)" prop="envName">
         <el-select v-model="releaseInfo.envName" placeholder="请选择环境" size="small" @change="getServicesNameByEnv" clearable>
           <el-option :label="name" :value="name" v-for="name in envNames" :key="name"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="服务">
+      <el-form-item :label="$t(`project.services`)">
         <el-select
           v-model="newAddSelectedServicesName"
           placeholder="请选择服务"
@@ -20,7 +20,7 @@
           <el-option :label="service" :value="service" v-for="service in lastServiceNames" :key="service"></el-option>
         </el-select>
         <el-button type="text" size="small" @click="newAddSelectedServicesName = lastServiceNames">全选</el-button>
-        <el-button type="primary" size="mini" plain @click="addServiceNames">添加</el-button>
+        <el-button type="primary" size="mini" plain @click="addServiceNames">{{$t(`global.add`)}}</el-button>
       </el-form-item>
     </el-form>
 
@@ -41,8 +41,8 @@
         <div class="title">全局变量</div>
         <Codemirror v-model="globalYaml" class="mirror" />
         <div class="bottom">
-          <el-button type="primary" size="mini" plain @click="applyGlobalVars" :loading="useLoading">应用</el-button>
-          <el-button type="primary" size="mini" plain @click="resetAllVars" :disabled="useLoading">重置</el-button>
+          <el-button type="primary" size="mini" plain @click="applyGlobalVars" :loading="useLoading">{{$t('global.apply')}}</el-button>
+          <el-button type="primary" size="mini" plain @click="resetAllVars" :disabled="useLoading">{{$t('global.reset')}}</el-button>
         </div>
       </div>
     </Multipane>

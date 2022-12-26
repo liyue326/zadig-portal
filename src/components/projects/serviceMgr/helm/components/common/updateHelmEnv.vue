@@ -19,8 +19,8 @@
       <p>Zadig 中定义的服务将覆盖所选命名空间中的同名服务，请谨慎操作！</p>
     </div>
     <span slot="footer" class="dialog-footer">
-      <el-button size="small" :disabled="!checkedEnvList.length" type="primary" @click="autoUpgradeEnv">确 定</el-button>
-      <el-button size="small" @click="skipUpdate">跳过</el-button>
+      <el-button size="small" :disabled="!checkedEnvList.length" type="primary" @click="autoUpgradeEnv">{{$t(`global.confirm`)}}</el-button>
+      <el-button size="small" @click="skipUpdate">{{$t(`global.skip`)}}</el-button>
     </span>
   </el-dialog>
 </template>

@@ -2,7 +2,7 @@
   <div class="build-console">
     <header class="mg-b8">
       <el-col :span="6">
-        <span class="type">Kubernetes 部署:</span>
+        <span class="type">{{$t(`workflow.jobType.customDeploy`)}}</span>
         <span>
           <el-tooltip effect="dark" placement="top" :content="jobInfo.name">
             <span>{{$utils.tailCut(jobInfo.name, 20)}}</span>
@@ -11,7 +11,7 @@
       </el-col>
       <el-col :span="2">
         <div class="item-desc">
-          <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?buildOverallStatusZh:"未运行"}}</a>
+          <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?$t(`workflowTaskStatus.${jobInfo.status}`):$t(`workflowTaskStatus.notRunning`)}}</a>
         </div>
       </el-col>
       <el-col :span="2">
@@ -20,13 +20,13 @@
       <el-col v-if="jobInfo" :span="6">
         <span class="item-desc status">
           <span v-if="jobInfo.spec.skip_check_run_status">
-            <i class="el-icon-warning"></i>未开启容器状态检测
+            <i class="el-icon-warning"></i>{{$t(`workflow.notOpenServiceStatusCheck`)}}
           </span>
           <span v-else-if="!jobInfo.spec.skip_check_run_status && jobInfo.status ==='passed'">
-            <i class="el-icon-warning"></i>服务容器检测通过
+            <i class="el-icon-warning"></i>{{$t(`workflow.serviceStatusCheckPassed`)}}
           </span>
           <span v-else-if="!jobInfo.spec.skip_check_run_status && jobInfo.status ==='failed'">
-            <i class="el-icon-warning"></i>服务容器检测未通过
+            <i class="el-icon-warning"></i>{{$t(`workflow.serviceStatusCheckFailed`)}}
           </span>
         </span>
       </el-col>
@@ -38,18 +38,18 @@
     </header>
     <main>
       <div class="error-wrapper">
-        <el-alert v-if="jobInfo.error" title="错误信息" :description="jobInfo.error" type="error" close-text="知道了"></el-alert>
+        <el-alert v-if="jobInfo.error" :title="$t(`global.errorMsg`)" :description="jobInfo.error" type="error" :close-text="$t(`global.ok`)"></el-alert>
       </div>
       <el-row class="item" :gutter="0">
         <el-col :span="4">
-          <div class="item-title">容器</div>
+          <div class="item-title">{{$t(`workflow.containerName`)}}</div>
         </el-col>
         <el-col :span="8">
           <span class="item-desc">{{jobInfo.spec.target}}</span>
         </el-col>
         <el-col :span="4">
           <div class="item-title">
-            镜像名称
+            {{$t(`workflow.imageName`)}}
             <el-tooltip effect="dark" placement="top">
               <div slot="content">
                 构建镜像标签生成规则 ：
@@ -75,13 +75,13 @@
       </el-row>
       <el-row class="item">
         <el-col :span="4">
-          <div class="item-title">集群</div>
+          <div class="item-title">{{$t(`workflow.cluster`)}}</div>
         </el-col>
         <el-col :span="8">
           <div class="item-desc">{{jobInfo.spec.cluster_name}}</div>
         </el-col>
         <el-col :span="4">
-          <div class="item-title">命名空间</div>
+          <div class="item-title">{{$t(`workflow.namespace`)}}</div>
         </el-col>
         <el-col :span="8">
           <div class="item-desc">{{jobInfo.spec.namespace.toString()}}</div>
@@ -121,7 +121,7 @@ export default {
       return this.$utils.calcOverallBuildStatus(this.jobInfo, {})
     },
     buildOverallStatusZh () {
-      return this.$translate.translateTaskStatus(this.buildOverallStatus)
+      return this.$t(`workflowTaskStatus.${this.buildOverallStatus}`)
     },
     buildOverallColor () {
       return this.$translate.calcTaskStatusColor(this.buildOverallStatus)

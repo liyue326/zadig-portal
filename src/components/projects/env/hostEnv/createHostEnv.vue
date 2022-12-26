@@ -2,8 +2,8 @@
   <div class="create-external-container">
     <AddHostEnv ref="addHostEnv" />
     <div class="footer">
-      <el-button type="primary" @click="$router.back()" size="medium" plain>取消</el-button>
-      <el-button type="primary" v-hasPermi="{projectName: projectName, actions: 'create_environment',isBtn:true}" @click="save()" size="medium">立即创建</el-button>
+      <el-button type="primary" @click="$router.back()" size="medium" plain>{{$t(`global.cancel`)}}</el-button>
+      <el-button type="primary" v-hasPermi="{projectName: projectName, actions: 'create_environment',isBtn:true}" @click="save()" size="medium">{{$t('environments.common.createEnv')}}</el-button>
     </div>
   </div>
 </template>

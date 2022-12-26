@@ -2,7 +2,7 @@
   <div class="task-detail-artifact-deploy">
     <el-card v-if="deploy" class="box-card task-process" :body-style="{ margin: '15px 0 0 0' }">
       <div slot="header" class="clearfix subtask-header">
-        <span>交付物部署</span>
+        <span>{{$t(`productWorkflowStage.artifact`)}}</span>
         <div v-if="deploy.status==='running'" class="loader">
           <div class="ball-scale-multiple">
             <div></div>
@@ -13,23 +13,23 @@
       </div>
       <div class="deploy-item">
         <div class="error-wrapper">
-          <el-alert v-if="deploy.error" title="错误信息" :description="deploy.error" type="error" close-text="知道了"></el-alert>
+          <el-alert v-if="deploy.error" :title="$t(`global.errorMsg`)" :description="deploy.error" type="error" :close-text="$t(`global.ok`)"></el-alert>
         </div>
         <el-row :gutter="0">
           <el-col :span="6">
             <div class="item-title">
-              <i class="iconfont iconzhuangtai"></i> 部署状态
+              <i class="iconfont iconzhuangtai"></i> {{$t(`status.deployStatus`)}}
             </div>
           </el-col>
           <el-col :span="6">
             <div
               class="item-desc"
               :class="$translate.calcTaskStatusColor(deploy.status)"
-            >{{deploy.status?$translate.translateTaskStatus(deploy.status):"未运行"}}</div>
+            >{{deploy.status?$t(`workflowTaskStatus.${deploy.status}`):$t(`workflowTaskStatus.notRunning`)}}</div>
           </el-col>
           <el-col :span="6">
             <div class="item-title">
-              <i class="iconfont iconvery-environ"></i> 部署环境
+              <i class="iconfont iconvery-environ"></i> {{$t(`workflow.deploymentEnv`)}}
             </div>
           </el-col>
           <el-col :span="6">
@@ -52,7 +52,7 @@
           </el-col>
           <el-col :span="6">
             <div class="item-title">
-              <i class="iconfont iconvery-service"></i> 服务名称
+              <i class="iconfont iconvery-service"></i> {{$t(`global.serviceName`)}}
             </div>
           </el-col>
           <el-col :span="6">
@@ -63,7 +63,7 @@
           </el-col>
           <el-col :span="6" v-if="!deploy.artifact_info">
             <div class="item-title">
-              <i class="iconfont iconSliceCopy"></i> 镜像信息
+              <i class="iconfont iconSliceCopy"></i> {{$t(`status.imgInfo`)}}
             </div>
           </el-col>
           <el-col :span="6" v-if="!deploy.artifact_info">

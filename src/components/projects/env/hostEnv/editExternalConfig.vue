@@ -14,14 +14,14 @@
       <component ref="component" :envName="$route.query.envName" :projectName="projectName" class="com" :is="componentsList[currentStep]" />
     </div>
     <div class="bottom">
-      <div class="nextstep" @click="nextStep">{{currentStep===2 ? '完成' : '下一步'}} </div>
+      <div class="nextstep" @click="nextStep">{{currentStep===2 ? $t('project.onboardingComp.finish') : $t('project.onboardingComp.nextStep')}}</div>
       <span class="des" @click="exit" v-if="currentStep===1">退出向导</span>
     </div>
   </div>
 </template>
 <script>
 import ServiceBuild from '@/components/projects/common/hosting/serviceBuild'
-import EditHostService from './editHosService.vue'
+import EditHostService from './editHostService.vue'
 import RunWorkflow from '@/components/projects/common/hosting/runWorkflow'
 
 export default {
@@ -30,13 +30,13 @@ export default {
     return {
       componentsList: [EditHostService, ServiceBuild, RunWorkflow],
       stepMap: [{
-        title: '第一步',
+        title: this.$t('project.onboardingComp.firstStep'),
         description: '修改托管服务'
       }, {
-        title: '第二步',
+        title: this.$t('project.onboardingComp.secondStep'),
         description: '配置服务构建'
       }, {
-        title: '第三步',
+        title: this.$t('project.onboardingComp.thirdStep'),
         description: '运行工作流'
       }]
     }

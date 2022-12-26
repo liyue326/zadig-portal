@@ -29,14 +29,14 @@
               <el-input v-model="row.value" placeholder="Header Value" size="small"></el-input>
             </template>
           </el-table-column>
-          <el-table-column prop="value" label="操作" width="100px">
+          <el-table-column prop="value" :label="$t(`global.operation`)" width="100px">
             <template slot-scope="{$index}">
               <el-button style="font-size: 20px;" type="text" icon="el-icon-remove-outline" @click="deleteHeader($index)"></el-button>
               <el-button style="font-size: 20px;" type="text" icon="el-icon-circle-plus-outline" @click="addHeader"></el-button>
             </template>
           </el-table-column>
         </el-table>
-        <el-button type="text" @click="addHeader" class="add-header">添加</el-button>
+        <el-button type="text" @click="addHeader" class="add-header">{{$t(`global.add`)}}</el-button>
       </el-form-item>
       <el-form-item label="是否回调">
         <el-switch v-model="extensionStage.is_callback"></el-switch>
@@ -48,11 +48,11 @@
             :href="`https://docs.koderover.com/zadig/project/workflow/#扩展`"
             :underline="false"
             target="_blank"
-          >帮助文档</el-link>
+          >{{$t(`global.helpDoc`)}}</el-link>
           调用接口：{{`${origin}/api/callback`}}
         </div>
       </el-form-item>
-      <el-form-item label="超时时间" v-show="extensionStage.is_callback">
+      <el-form-item :label="$t(`global.timeout`)" v-show="extensionStage.is_callback">
         <el-input-number v-model="extensionStage.timeout" :min="1" :max="100" size="small"></el-input-number>分钟
       </el-form-item>
     </el-form>

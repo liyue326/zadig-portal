@@ -15,7 +15,7 @@ export default {
   created () {
     bus.$emit(`set-topbar-title`, {
       title: '',
-      breadcrumb: [{ title: '模板库', url: '/v1/template' }]
+      breadcrumb: [{ title: this.$t('project.templates'), url: '/v1/template' }]
     })
   }
 }

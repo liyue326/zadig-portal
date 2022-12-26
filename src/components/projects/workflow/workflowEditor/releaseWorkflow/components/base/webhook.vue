@@ -1,6 +1,6 @@
 <template>
   <div class="webhook">
-    <el-button type="primary" size="mini" icon="el-icon-plus" plain @click="triggerTypeDialogVisible = true">添加</el-button>
+    <el-button type="primary" size="mini" icon="el-icon-plus" plain @click="triggerTypeDialogVisible = true">{{$t(`global.add`)}}</el-button>
     <div>
       <el-row :gutter="20" class="webhook-row" v-for="(item,index) in webhooks" :key="index">
         <el-col :span="2">
@@ -20,7 +20,7 @@
               <span class="desc">{{item.name}}</span>
             </div>
             <div class="cate">
-              <span class="title">代码库：</span>
+              <span class="title">{{$t(`global.repository`)}}</span>
               <span class="desc">{{item.main_repo.repo_name + '/' + item.main_repo.branch}}</span>
             </div>
           </div>
@@ -28,11 +28,11 @@
         <el-col :span="9">
           <div class="content">
             <div class="cate">
-              <span class="title">目标分支：</span>
+              <span class="title">{{$t(`workflow.targetBranch`)}}</span>
               <span class="desc">{{item.main_repo.branch}}</span>
             </div>
             <div class="cate">
-              <span class="title">触发事件：</span>
+              <span class="title">{{$t(`workflow.triggerEvents`)}}</span>
               <span class="desc">
                 <div v-if="item.main_repo.events.length">
                   <span v-for="(event,index) in item.main_repo.events" :key="index">
@@ -84,10 +84,10 @@
         <el-col :span="6">
           <div class="content">
             <div class="cate">
-              <span class="title">触发方式：</span>
-              <span v-if="item.job_type === 'timing'" class="desc">定时循环</span>
-              <span v-else-if="item.job_type === 'gap'" class="desc">间隔循环</span>
-              <span v-else-if="item.job_type === 'crontab'" class="desc">Cron 表达式</span>
+              <span class="title">{{$t(`workflow.triggerWay`)}}</span>
+              <span v-if="item.job_type === 'timing'" class="desc">{{$t(`triggerWay.timingCycle`)}}</span>
+              <span v-else-if="item.job_type === 'gap'" class="desc">{{$t(`triggerWay.gapCycle`)}}</span>
+              <span v-else-if="item.job_type === 'crontab'" class="desc">{{$t(`triggerWay.cronExpression`)}}</span>
             </div>
           </div>
         </el-col>
@@ -119,26 +119,26 @@
 
     <el-dialog
       :visible.sync="webhookDialogVisible"
-      :title="webhookEditMode?'编辑触发器':'添加触发器'"
+      :title="webhookEditMode?$t(`workflow.editTrigger`):$t(`workflow.addTrigger`)"
       width="700px"
       :close-on-click-modal="false"
       append-to-body
     >
-      <el-form ref="webhookForm" :model="currentWebhook" label-position="left" label-width="90px" :rules="webhookRules">
-        <el-form-item label="名称" prop="name">
+      <el-form ref="webhookForm" :model="currentWebhook" label-position="left" label-width="120px" :rules="webhookRules">
+        <el-form-item :label="$t(`global.name`)" prop="name">
           <el-input
             size="small"
             autofocus
             ref="webhookNamedRef"
             :disabled="webhookEditMode"
             v-model="currentWebhook.name"
-            placeholder="请输入名称"
+            :placeholder="$t(`global.inputName`)"
           ></el-input>
         </el-form-item>
-        <el-form-item label="描述" prop="description">
+        <el-form-item :label="$t('global.desc')" prop="description">
           <el-input size="small" type="textarea" v-model="currentWebhook.description" placeholder="请输入描述"></el-input>
         </el-form-item>
-        <el-form-item label="代码库" prop="repo">
+        <el-form-item :label="$t(`global.repository`)" prop="repo">
           <el-select
             style="width: 100%;"
             v-model="currentWebhook.repo"
@@ -154,18 +154,18 @@
           </el-select>
         </el-form-item>
         <el-form-item
-          label="目标分支"
+          :label="$t(`workflow.targetBranch`)"
           prop="main_repo.branch"
           v-if="checkGitRepo"
           :rules="[
-          { required: true, message: currentWebhook.main_repo.is_regular ? '请输入正则表达式配置' : '请选择目标分支', trigger: ['blur', 'change'] }
+          { required: true, message: currentWebhook.main_repo.is_regular ? $t(`workflow.inputRegExpressionConfiguration`):$t(`workflow.selectTargetBranch`), trigger: ['blur', 'change'] }
         ]"
         >
           <el-input
             style="width: 100%;"
             v-if="currentWebhook.main_repo.is_regular"
             v-model="currentWebhook.main_repo.branch"
-            placeholder="请输入正则表达式配置"
+            :placeholder="$t(`workflow.inputRegExpressionConfiguration`)"
             size="small"
           ></el-input>
 
@@ -189,7 +189,7 @@
           <el-switch
             v-if="currentWebhook.repo.source!=='gerrit'"
             v-model="currentWebhook.main_repo.is_regular"
-            active-text="正则表达式配置"
+            :active-text="$t(`workflow.regularExpressionConfiguration`)"
             @change="currentWebhook.main_repo.branch = '';matchedBranchNames=null;"
           ></el-switch>
           <div v-show="currentWebhook.main_repo.is_regular">
@@ -197,7 +197,7 @@
             <span style="display: inline-block; padding-right: 10px;" v-for="branch in matchedBranchNames" :key="branch">{{ branch }}</span>
           </div>
         </el-form-item>
-        <el-form-item v-if="currentWebhook.repo.source==='gerrit'" label="触发事件" prop="main_repo.events">
+        <el-form-item v-if="currentWebhook.repo.source==='gerrit'" :label="$t(`workflow.triggerEvents`)" prop="main_repo.events">
           <el-checkbox-group v-model="currentWebhook.main_repo.events">
             <el-checkbox style="display: block;" label="change-merged">Change merged</el-checkbox>
             <el-checkbox style="display: block;" label="patchset-created">
@@ -209,12 +209,12 @@
             </el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item v-else-if="currentWebhook.repo.source!=='gerrit'" label="触发事件" prop="main_repo.events">
+        <el-form-item v-else-if="currentWebhook.repo.source!=='gerrit'" :label="$t(`workflow.triggerEvents`)" prop="main_repo.events">
           <el-checkbox-group v-model="currentWebhook.main_repo.events">
             <el-checkbox v-for="tri in triggerMethods.git" :key="tri.value" :label="tri.value">{{ tri.label }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="触发策略" prop="auto_cancel">
+        <el-form-item :label="$t(`workflow.triggerStrategy`)" prop="auto_cancel">
           <el-checkbox v-model="currentWebhook.auto_cancel">
             <span>自动取消</span>
             <el-tooltip effect="dark" content="如果您希望只构建最新的提交，则使用这个选项会自动取消队列中的任务" placement="top">
@@ -229,7 +229,7 @@
           </el-checkbox>
         </el-form-item>
         <template v-if="currentWebhook.main_repo.source!=='gerrit'">
-          <el-form-item label="文件目录" prop="main_repo.match_folders">
+          <el-form-item :label="$t(`global.fileDirectory`)" prop="main_repo.match_folders">
             <el-input
               :autosize="{ minRows: 4, maxRows: 10}"
               type="textarea"
@@ -245,7 +245,7 @@
         </template>
       </el-form>
       <div>
-        <span>工作流执行变量</span>
+        <span>{{$t(`workflow.workflowExecutionVariables`)}}</span>
         <WebhookRunConfig
           :workflowName="workflowName"
           :projectName="projectName"
@@ -254,27 +254,27 @@
         />
       </div>
       <div slot="footer">
-        <el-button @click="webhookDialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveWebhook" size="small">确 定</el-button>
+        <el-button @click="webhookDialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveWebhook" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
 
     <el-dialog
-      :title="timerEditMode?'修改定时器配置':'添加定时器'"
+      :title="timerEditMode?$t(`workflow.editTimer`):$t(`workflow.addTimer`)"
       :visible.sync="timerDialogVisible"
       width="700px"
       :close-on-click-modal="false"
       append-to-body
     >
       <el-form :model="currentTimer" ref="timerForm" :rules="timerRules" label-width="100px" label-position="left">
-        <el-form-item label="触发方式" prop="job_type">
+        <el-form-item :label="$t(`workflow.triggerWay`)" prop="job_type">
           <el-radio-group v-model="currentTimer.job_type" @change="changeTimerType">
-            <el-radio label="timing">定时循环</el-radio>
-            <el-radio label="gap">间隔循环</el-radio>
-            <el-radio label="crontab">Cron 表达式</el-radio>
+            <el-radio label="timing">{{$t(`triggerWay.timingCycle`)}}</el-radio>
+            <el-radio label="gap">{{$t(`triggerWay.gapCycle`)}}</el-radio>
+            <el-radio label="crontab">{{$t(`triggerWay.cronExpression`)}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="时间配置">
+        <el-form-item :label="$t(`workflow.timeConfig`)">
           <div v-if="currentTimer.job_type === 'timing'" class="inline-show">
             <!--定时-->
             <el-form-item prop="frequency">
@@ -331,32 +331,32 @@
         </el-table>
       </div>
       <div style="margin: 10px 0;">
-        <span style="display: inline-block; margin-bottom: 10px;">工作流执行变量</span>
+        <span style="display: inline-block; margin-bottom: 10px;">{{$t(`workflow.workflowExecutionVariables`)}}</span>
         <WebhookRunConfig :workflowName="workflowName" :projectName="projectName" :cloneWorkflow="currentTimer.workflow_v4_args" />
       </div>
       <div slot="footer">
-        <el-button @click="timerDialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveTimer" size="small">确 定</el-button>
+        <el-button @click="timerDialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveTimer" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
 
     <el-dialog
       :visible.sync="triggerTypeDialogVisible"
-      title="添加触发器"
+      :title="$t(`workflow.addTrigger`)"
       width="400px"
       :close-on-click-modal="false"
       custom-class="trigger-types-dialog"
       append-to-body
     >
       <div class="trigger-types-container">
-        <span>选择触发器类型</span>
+        <span>{{$t(`workflow.selectTriggerType`)}}</span>
         <div class="trigger-item" @click="triggerTypeDialogVisible = false;addWebhook()">
           <div class="icon">
             <span class="iconfont iconvery-master"></span>
           </div>
           <div class="detail">
-            <h4 class="trigger-title">Git 触发器</h4>
-            <span class="trigger-desc">代码变更触发</span>
+            <h4 class="trigger-title">{{$t(`workflow.gitTrigger`)}}</h4>
+            <span class="trigger-desc">{{$t(`workflow.codeChangeTrigger`)}}</span>
           </div>
         </div>
         <div class="trigger-item" @click="triggerTypeDialogVisible = false;addTimer()">
@@ -364,14 +364,14 @@
             <span class="iconfont iconvery-time"></span>
           </div>
           <div class="detail">
-            <h4 class="trigger-title">定时器</h4>
-            <span class="trigger-desc">定时触发</span>
+            <h4 class="trigger-title">{{$t(`workflow.timer`)}}</h4>
+            <span class="trigger-desc">{{$t(`workflow.timedTrigger`)}}</span>
           </div>
         </div>
       </div>
       <div slot="footer">
-        <el-button @click="triggerTypeDialogVisible = false" size="small">取 消</el-button>
-        <!-- <el-button type="primary" @click="triggerTypeDialogVisible = false" size="small">确 定</el-button> -->
+        <el-button @click="triggerTypeDialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <!-- <el-button type="primary" @click="triggerTypeDialogVisible = false" size="small">{{$t(`global.confirm`)}}</el-button> -->
       </div>
     </el-dialog>
   </div>
@@ -863,21 +863,27 @@ export default {
                   delete job.pickedTargets
                 } else {
                   // fromjob
-                  payload.workflow_arg.fromJobInfo.pickedTargets.forEach(item => {
-                    if (item.update_tag && !item.target_tag) {
-                      this.$message.error(`请填写 ${item.service_name} 中的目标镜像版本`)
-                      throw Error()
+                  payload.workflow_arg.fromJobInfo.pickedTargets.forEach(
+                    item => {
+                      if (item.update_tag && !item.target_tag) {
+                        this.$message.error(
+                          this.$t(`workflow.inputTargetImage`, { serviceName: item.service_name })
+                        )
+                        throw Error()
+                      }
                     }
-                  })
-                  job.spec.targets = payload.workflow_arg.fromJobInfo.pickedTargets.map(item => {
-                    return {
-                      service_name: item.service_name,
-                      service_module: item.service_module,
-                      source_tag: item.source_tag,
-                      target_tag: item.target_tag,
-                      update_tag: item.update_tag
+                  )
+                  job.spec.targets = payload.workflow_arg.fromJobInfo.pickedTargets.map(
+                    item => {
+                      return {
+                        service_name: item.service_name,
+                        service_module: item.service_module,
+                        source_tag: item.source_tag,
+                        target_tag: item.target_tag,
+                        update_tag: item.update_tag
+                      }
                     }
-                  })
+                  )
                   delete payload.workflow_arg.fromJobInfo
                 }
               }
@@ -1087,9 +1093,9 @@ export default {
     },
     checkingBuildStageChanged (newConfig, oldConfig) {
       if (!isEqual(newConfig, oldConfig)) {
-        this.$confirm('保存当前工作流配置后才可配置触发器?', '确认', {
-          confirmButtonText: '保存',
-          cancelButtonText: '取消',
+        this.$confirm(this.$t(`workflow.pleaseSaveTrigger`), '确认', {
+          confirmButtonText: this.$t(`global.save`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         })
           .then(() => {
@@ -1114,11 +1120,15 @@ export default {
       async handler (newValue, oldValue) {
         if (newValue) {
           if (!this.isEdit) {
-            this.$confirm('保存当前工作流配置后才可配置触发器?', '确认', {
-              confirmButtonText: '保存',
-              cancelButtonText: '取消',
-              type: 'warning'
-            })
+            this.$confirm(
+              this.$t(`workflow.pleaseSaveTrigger`),
+              this.$t(`global.confirmation`),
+              {
+                confirmButtonText: this.$t(`global.save`),
+                cancelButtonText: this.$t(`global.cancel`),
+                type: 'warning'
+              }
+            )
               .then(() => {
                 this.$emit('closeDrawer')
                 this.$emit('saveWorkflow')

@@ -2,9 +2,9 @@
   <div class="global-env">
     <el-form ref="buildEnvRef" :inline="true" :model="preEnvs" class="variable-form" label-position="top" label-width="80px">
       <el-row :gutter="2" class="th">
-        <el-col :span="6" class="th-title">类型</el-col>
-        <el-col :span="6" class="th-title">键</el-col>
-        <el-col :span="6" class="th-title">值</el-col>
+        <el-col :span="6" class="th-title">{{$t(`global.type`)}}</el-col>
+        <el-col :span="6" class="th-title">{{$t(`global.key`)}}</el-col>
+        <el-col :span="6" class="th-title">{{$t(`global.value`)}}</el-col>
       </el-row>
       <el-button
         v-if="preEnvs.params && preEnvs.params.length===0"
@@ -13,13 +13,13 @@
         size="mini"
         plain
         class="mg-b16"
-      >+ 添加</el-button>
+      >+ {{$t(`global.add`)}}</el-button>
       <el-row v-for="(app,build_env_index) in preEnvs.params" :key="build_env_index" :gutter="2">
         <el-col :span="6">
           <el-form-item class="display-flex">
             <el-select
               v-model="preEnvs.params[build_env_index].type"
-              placeholder="类型"
+              :placeholder="$t(`global.type`)"
               size="small"
               :class="{'partial-width': preEnvs.params[build_env_index].type === 'choice'}"
               style="margin-right: 6px;"
@@ -39,15 +39,15 @@
         <el-col :span="6">
           <el-form-item
             :prop="'params.' + build_env_index + '.name'"
-            :rules="{required: true, message: '键 不能为空', trigger: ['blur','change']}"
+            :rules="{required: true, message: $t(`global.inputKey`), trigger: ['blur','change']}"
           >
-            <el-input placeholder="键" v-model="preEnvs.params[build_env_index].name" size="small" @input="updateKeyParams(build_env_index)"></el-input>
+            <el-input :placeholder="$t(`global.key`)" v-model="preEnvs.params[build_env_index].name" size="small" @input="updateKeyParams(build_env_index)"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
           <el-form-item
             :prop="'params.' + build_env_index + '.value'"
-            :rules="{required: true, message: '值 不能为空', trigger: ['blur','change']}"
+            :rules="{required: true, message: $t(`global.inputValue`), trigger: ['blur','change']}"
           >
             <el-select
               v-if="preEnvs.params[build_env_index].type==='choice'"
@@ -61,7 +61,7 @@
             <el-input
               v-if="preEnvs.params[build_env_index].type==='string'"
               :disabled="preEnvs.params[build_env_index].auto_generate"
-              placeholder="值"
+              :placeholder="$t(`global.value`)"
               @input="updateKeyParams(build_env_index)"
               v-model="preEnvs.params[build_env_index].value"
               size="small"
@@ -70,7 +70,7 @@
               v-if="preEnvs.params[build_env_index].type==='text'"
               type="textarea"
               :disabled="preEnvs.params[build_env_index].auto_generate"
-              placeholder="值"
+              :placeholder="$t(`global.value`)"
               @input="updateKeyParams(build_env_index)"
               v-model="preEnvs.params[build_env_index].value"
               size="small"
@@ -118,8 +118,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveVariable" size="small">确 定</el-button>
+        <el-button @click="dialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveVariable" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
   </div>

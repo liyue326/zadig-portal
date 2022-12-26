@@ -59,7 +59,7 @@
             </el-radio-group>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column :label="$t(`global.operation`)">
           <template slot-scope="{ row }">
             <el-popover ref="workflowPopoverRef" placement="right" trigger="click">
               <div class="auth-list">
@@ -126,7 +126,7 @@
             </el-radio-group>
           </template>
         </el-table-column>
-        <el-table-column prop="prop" label="操作">
+        <el-table-column prop="prop" :label="$t(`global.operation`)">
           <template slot-scope="{ row }">
             <el-popover ref="envPopoverRef" placement="right" trigger="click">
               <div class="auth-list">
@@ -179,7 +179,7 @@
     </div>
 
     <div class="bottom">
-      <el-button type="primary" size="small" @click="handleCollaboration" :disabled="saveDisabled">保存</el-button>
+      <el-button type="primary" size="small" @click="handleCollaboration" :disabled="saveDisabled">{{$t(`global.save`)}}</el-button>
     </div>
     <PolicyDialog
       :changedInfo="changedInfo"

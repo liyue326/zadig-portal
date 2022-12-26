@@ -1,18 +1,18 @@
 <template>
   <el-dialog
-    :title=" isEdit ? '编辑':'新增' "
+    :title=" isEdit ? this.$t('global.edit'):this.$t('global.add') "
     custom-class="create-user-dialog"
     :close-on-click-modal="false"
     :visible.sync="isShowDialogRoleVisible"
   >
-    <el-form :model="form" @submit.native.prevent ref="roleForm" label-position="left" label-width="120px" class="primary-form">
-      <el-form-item label="角色名称" prop="name" :rules="{ required: true, trigger: 'change', validator: validateRoleName }">
+    <el-form :model="form" @submit.native.prevent ref="roleForm" :rules="rules" label-position="left" label-width="125px" class="primary-form">
+      <el-form-item :label="$t('sysSetting.users.roleName')" prop="name">
         <el-input size="small" v-model="form.name" :disabled="isEdit"></el-input>
       </el-form-item>
-      <el-form-item label="描述信息" prop="account">
+      <el-form-item :label="$t('sysSetting.users.roleDesc')" prop="account">
         <el-input size="small" v-model="form.desc"></el-input>
       </el-form-item>
-      <el-form-item label="权限列表" prop="permissions" label-width="100px">
+      <el-form-item :label="$t('sysSetting.users.permissionList')" prop="permissions" label-width="125px">
         <div class="permissions-group" v-for="(group,group_index) in permissionGroups" :key="group_index">
           <el-checkbox
             :label="group.resource"
@@ -23,7 +23,7 @@
           >{{group.alias}}</el-checkbox>
           <div class="sub-permissions">
             <el-checkbox-group v-model="form.permissions">
-              <span  v-for="(subPermission,sub_index) in   group.rules" :key="sub_index" >
+              <span  v-for="(subPermission,sub_index) in group.rules" :key="sub_index" >
                 <span style="margin-left: 20px; font-size: 14px;" v-if="subPermission.parent">{{subPermission.parent}}</span>
                 <el-checkbox
                   class="sub-permissions-checkbox"
@@ -37,8 +37,8 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" size="small" @click="submit" class="start-create">确定</el-button>
-      <el-button plain native-type="submit" size="small" @click="isShowDialogRoleVisible = false">取消</el-button>
+      <el-button type="primary" size="small" @click="submit" class="start-create">{{$t(`global.confirm`)}}</el-button>
+      <el-button plain native-type="submit" size="small" @click="isShowDialogRoleVisible = false">{{$t(`global.cancel`)}}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -57,17 +57,6 @@ const initFormData = {
   name: '',
   desc: '',
   permissions: []
-}
-const validateRoleName = (rule, value, callback) => {
-  if (typeof value === 'undefined' || value === '') {
-    callback(new Error('填写角色名称'))
-  } else {
-    if (!/^[a-z0-9-]+$/.test(value)) {
-      callback(new Error('角色名称只支持小写字母和数字，特殊字符只支持中划线'))
-    } else {
-      callback()
-    }
-  }
 }
 export default {
   name: 'RoleOperate',
@@ -94,8 +83,25 @@ export default {
         desc: '',
         permissions: [],
         isPublic: false
-      },
-      validateRoleName
+      }
+    }
+  },
+  computed: {
+    rules () {
+      const validateRoleName = (rule, value, callback) => {
+        if (typeof value === 'undefined' || value === '') {
+          callback(new Error(this.$t('sysSetting.users.inputRoleName')))
+        } else {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            callback(new Error(this.$t('sysSetting.users.roleNameCheck')))
+          } else {
+            callback()
+          }
+        }
+      }
+      return {
+        name: { required: true, trigger: 'change', validator: validateRoleName }
+      }
     }
   },
   mounted () {
@@ -214,7 +220,7 @@ export default {
             console.log(error)
           )
           if (result) {
-            this.$message.success('修改成功')
+            this.$message.success(this.$t('sysSetting.users.updateRoleSuccess'))
             this.isShowDialogRoleVisible = false
             this.$emit('refreshUserList')
           }
@@ -226,7 +232,7 @@ export default {
             rules: rules
           }).catch(error => console.log(error))
           if (result) {
-            this.$message.success('添加成功')
+            this.$message.success(this.$t('sysSetting.users.addRoleSuccess'))
             this.isShowDialogRoleVisible = false
             this.$emit('refreshUserList')
           }

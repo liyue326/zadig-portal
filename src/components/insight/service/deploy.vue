@@ -21,8 +21,9 @@ export default {
         tooltip: {
           trigger: 'axis'
         },
+        // TODO: HELP WITH THIS
         legend: {
-          data: ['成功', '失败']
+          data: [this.$t('workflowTaskStatus.passed'), this.$t('workflowTaskStatus.failed')]
         },
         grid: {
           left: '3%',
@@ -53,7 +54,7 @@ export default {
         },
         series: [
           {
-            name: '成功',
+            name: this.$t('workflowTaskStatus.passed'),
             type: 'line',
             smooth: true,
             stack: '总量',
@@ -61,7 +62,7 @@ export default {
             data: []
           },
           {
-            name: '失败',
+            name: this.$t('workflowTaskStatus.failed'),
             type: 'line',
             smooth: true,
             stack: '总量',

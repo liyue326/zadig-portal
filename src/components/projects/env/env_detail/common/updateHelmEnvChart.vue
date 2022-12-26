@@ -1,7 +1,7 @@
 <template>
   <div class="helm-chart-yaml-content">
     <template v-if="showServicesTab">
-      <el-input class="search-service" v-model="searchService" placeholder="搜索服务" suffix-icon="el-icon-search" size="small"></el-input>
+      <el-input class="search-service" v-model="searchService" :placeholder="$t('environments.helm.serviceListComp.searchService')" suffix-icon="el-icon-search" size="small"></el-input>
       <el-tabs class="service-list" tab-position="left" type="border-card" v-model="selectedChart" :before-leave="switchTabs">
         <el-tab-pane :name="name.serviceName" v-for="name in filteredServiceNames" :key="name.serviceName" :disabled="name.type==='delete'">
           <template slot="label">
@@ -24,17 +24,17 @@
         </el-tabs>
         <div v-if="showCheckResource" class="release-check">
           <el-radio-group v-model="usedChartNameInfo.deploy_strategy">
-            <el-radio label="import" :disabled="!usedChartNameInfo.deployed">仅导入服务</el-radio>
-            <el-radio label="deploy">执行部署</el-radio>
+            <el-radio label="import" :disabled="!usedChartNameInfo.deployed">{{$t('environments.helm.serviceListComp.onlyImport')}}</el-radio>
+            <el-radio label="deploy">{{$t('environments.helm.serviceListComp.executeDeploy')}}</el-radio>
           </el-radio-group>
           <span v-show="usedChartNameInfo.deployed" class="tooltip">
             <i class="el-icon-warning-outline"></i>
-            release 名称在命名空间已存在
+            {{$t('environments.helm.serviceListComp.resourceDetectionTip')}}
           </span>
         </div>
         <div class="v-content" v-if="usedChartNameInfo" :class="{hidden: usedChartNameInfo.deploy_strategy === 'import'}">
           <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
-            <el-button type="text" @click="usedChartNameInfo.yamlSource = 'customEdit'">添加 values 文件</el-button>
+            <el-button type="text" @click="usedChartNameInfo.yamlSource = 'customEdit'">{{$t('environments.helm.serviceListComp.addValuesFile')}}</el-button>
           </div>
           <ImportValues
             v-show="usedChartNameInfo.yamlSource !== 'default'"
@@ -53,10 +53,10 @@
           <section class="review-content">
             <div class="review-title">
               <el-button type="text" @click="getReviewValuesFile">
-                预览最终 values 文件
+                {{$t('environments.helm.serviceListComp.previewValues')}}
                 <i style="margin-left: 8px;" :class="{'el-icon-arrow-down': showReview, 'el-icon-arrow-right': !showReview}"></i>
               </el-button>
-              <el-button type="text" v-show="showReview" @click="getCalculatedValuesYaml(false)">刷新</el-button>
+              <el-button type="text" v-show="showReview" @click="getCalculatedValuesYaml(false)">{{$t(`global.refresh`)}}</el-button>
             </div>
             <Codemirror class="codemirror" ref="codemirror" v-if="showReview" :value="usedChartNameInfo.yamlContent" :cmOption="cmOption" />
           </section>

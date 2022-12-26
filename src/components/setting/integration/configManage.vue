@@ -10,11 +10,11 @@
           :href="`https://docs.koderover.com/zadig/settings/configsystem/apollo`"
           :underline="false"
           target="_blank"
-        >帮助文档</el-link>
+        >{{$t(`global.helpDoc`)}}</el-link>
       </el-alert>
 
       <div class="sync-container">
-        <el-button type="primary" size="small" @click="handleConfig('add')" plain>添加</el-button>
+        <el-button type="primary" size="small" @click="handleConfig('add')" plain>{{$t(`global.add`)}}</el-button>
       </div>
       <el-table :data="configList" style="width: 100%;">
         <el-table-column label="访问地址">
@@ -26,10 +26,10 @@
         <el-table-column label="最后更新">
           <template slot-scope="{ row }">{{$utils.convertTimestamp(row.update_time)}}</template>
         </el-table-column>
-        <el-table-column label="操作" width="160">
+        <el-table-column :label="$t(`global.operation`)" width="160">
           <template slot-scope="{ row }">
-            <el-button type="primary" size="mini" plain @click="handleConfig('edit', row)">编辑</el-button>
-            <el-button type="danger" size="mini" @click="handleConfigDelete(row)" plain>删除</el-button>
+            <el-button type="primary" size="mini" plain @click="handleConfig('edit', row)">{{$t(`global.edit`)}}</el-button>
+            <el-button type="danger" size="mini" @click="handleConfigDelete(row)" plain>{{$t(`global.delete`)}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -58,8 +58,8 @@ export default {
     },
     handleConfigDelete (data) {
       this.$confirm(`确定要删除这个配置吗？`, '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         deleteConfigManageAPI(data.id).then(res => {

@@ -4,7 +4,7 @@
     <div class='support-doc'>
       <a :href="urlAssign()"
          target="_blank"
-         class="btn btn-xs btn-success btn-emphasis">帮助</a>
+         class="btn btn-xs btn-success btn-emphasis">{{$t('global.help')}}</a>
     </div>
   </div>
 </template>

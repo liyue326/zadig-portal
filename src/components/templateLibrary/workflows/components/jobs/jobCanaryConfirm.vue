@@ -1,7 +1,7 @@
 <template>
   <div class="build-env">
     <el-form label-width="120px" :model="job" ref="ruleForm" class="mg-t24 mg-b24" label-position="left">
-      <el-form-item label="任务名称" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
       <el-form-item
@@ -15,7 +15,7 @@
           <el-option v-for="(item,index) in allJobList" :key="index" :label="item.name" :value="item.name">{{item.name}}</el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="spec.release_timeout" label="超时时间">
+      <el-form-item prop="spec.release_timeout" :label="$t(`global.timeout`)">
         <el-input-number size="mini" :min="1" v-model="job.spec.release_timeout"></el-input-number>
         <span>分钟</span>
       </el-form-item>

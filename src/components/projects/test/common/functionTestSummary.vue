@@ -55,8 +55,10 @@ export default {
             return '-'
           }
         },
+        // TODO: this part cannot be finished in computed field, need further
         series: [
           {
+            // TODO: field key: this.$t(`testing.taskDetails.cases.result`)
             name: '测试结果',
             type: 'pie',
             radius: ['40%', '50%'],
@@ -150,10 +152,10 @@ export default {
     total: {
       handler (val, old_val) {
         this.option.series[0].data = [
-          { name: '成功', value: this.success },
-          { name: '失败', value: this.failure },
-          { name: '错误', value: this.error },
-          { name: '未执行', value: this.skip }
+          { name: this.$t(`testing.status.success`), value: this.success },
+          { name: this.$t(`testing.status.fail`), value: this.failure },
+          { name: this.$t(`testing.status.error`), value: this.error },
+          { name: this.$t(`testing.status.unstart`), value: this.skip }
         ]
       }
     }

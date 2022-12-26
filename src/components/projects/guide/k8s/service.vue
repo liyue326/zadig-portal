@@ -6,11 +6,11 @@
       <add-code @cancel="integrationCodeDrawer = false"></add-code>
     </el-drawer>
     <div class="guide-container">
-      <Step :activeStep="1"/>
+      <Step :thirdStepTitle="$t('environments.common.envCreation')" :activeStep="1"/>
       <div class="current-step-container">
         <div class="title-container">
-          <span class="first">第二步</span>
-          <span class="second">创建服务模板，后续均可在项目中重新配置</span>
+          <span class="first">{{$t('project.onboardingComp.secondStep')}}</span>
+          <span class="second">{{$t('project.onboardingComp.secondStepTip')}}</span>
         </div>
       </div>
     </div>
@@ -44,7 +44,7 @@ export default {
 
   },
   mounted () {
-    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: '项目', url: '/v1/projects' }, { title: this.projectName, isProjectName: true, url: '' }] })
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' }, { title: this.projectName, isProjectName: true, url: '' }] })
   },
   components: {
     Step,

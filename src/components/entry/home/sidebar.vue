@@ -27,7 +27,7 @@
     <div class="nav grow-all main-menu">
       <div v-for="(item,index) in navList" :key="index" class="category-wrapper">
         <h4 v-if="navList[index].items.length > 0" class="category-name" :class="{ opened: !showSidebar }">
-          {{item.category_name}}
+          <span v-if="item.category_name">{{$t(`sidebarMenu.${item.category_name}`) }}</span>
           <span v-if="item.new_feature" class="new-feature">New</span>
         </h4>
         <div class="nav__new-wrapper" v-for="(nav,nav_index) in navList[index].items" :key="nav_index">
@@ -38,18 +38,18 @@
               </div>
               <a href="javascript:void(0)">
                 <div class="nav-item-label">
-                  {{nav.name}}
+                  {{$t(`sidebarMenu.${nav.name}`) }}
                   <i v-if="nav.isOpened" class="el-icon-arrow-up arrow"></i>
                   <i v-else-if="!nav.isOpened" class="el-icon-arrow-down arrow"></i>
                 </div>
               </a>
             </div>
-            <el-tooltip v-else effect="dark" :content="nav.name" placement="right" :disabled="showSidebar">
+            <el-tooltip v-else effect="dark" :content="$t(`sidebarMenu.${nav.name}`)" placement="right" :disabled="showSidebar">
               <router-link class="nav-item" active-class="active" :to="`/v1/${nav.url}`">
                 <div class="nav-item-icon">
                   <i :class="nav.icon"></i>
                 </div>
-                <div v-show="showSidebar" class="nav-item-label">{{nav.name}}</div>
+                <div v-show="showSidebar" class="nav-item-label">{{$t(`sidebarMenu.${nav.name}`)}}</div>
               </router-link>
             </el-tooltip>
             <ul v-if="nav.hasSubItem && nav.isOpened" class="sub-menu" style="overflow: hidden;">
@@ -91,12 +91,12 @@ export default {
         {
           items: [
             {
-              name: '账号信息',
+              name: 'profile',
               icon: 'iconfont iconfenzucopy',
               url: 'profile/info'
             },
             {
-              name: '偏好设置',
+              name: 'preference',
               icon: 'iconfont iconxitong-system',
               url: 'profile/preference'
             }
@@ -107,12 +107,12 @@ export default {
         {
           items: [
             {
-              name: '企业信息',
+              name: 'enterpriseInfo',
               icon: 'iconfont iconcompany-info',
               url: 'enterprise/info'
             },
             {
-              name: '许可证',
+              name: 'license',
               icon: 'iconfont iconxukezheng',
               url: 'enterprise/license'
             }
@@ -121,81 +121,81 @@ export default {
       ],
       systemMenu: [
         {
-          category_name: '集成管理',
+          category_name: 'integration',
           items: [
             {
-              name: '系统集成',
+              name: 'systemIntegration',
               icon: 'iconfont iconicon_jichengguanli',
               url: 'system/integration'
             },
             {
-              name: '软件包管理',
+              name: 'packages',
               icon: 'iconfont iconyingyongshezhi',
               url: 'system/apps'
             },
             {
-              name: '自定义镜像管理',
+              name: 'images',
               icon: 'iconfont iconjingxiang',
               url: 'system/imgs'
             },
             {
-              name: '工作流任务',
+              name: 'plugins',
               icon: 'iconfont el-icon-sell',
               url: 'system/plugins'
             }
           ]
         },
         {
-          category_name: '基础设施',
+          category_name: 'infraIntegration',
           items: [
             {
-              name: '镜像仓库',
+              name: 'dockerRegistry',
               icon: 'iconfont icondocker',
               url: 'system/registry'
             },
             {
-              name: '对象存储',
+              name: 'objectStorage',
               icon: 'iconfont iconduixiangcunchu',
               url: 'system/storage'
             },
             {
-              name: 'HELM 仓库',
+              name: 'helmRepo',
               icon: 'iconfont iconhelmrepo',
               url: 'system/helm',
               features: 'helm'
             },
             {
-              name: '集群管理',
+              name: 'clusters',
               icon: 'iconfont iconjiqun',
               url: 'system/cluster'
             },
             {
-              name: '主机管理',
+              name: 'hosts',
               icon: 'iconfont iconzhuji',
               url: 'system/host'
             }
           ]
         },
         {
-          category_name: '系统',
+          category_name: 'system',
           items: [
             {
-              name: '系统配置',
+              name: 'settings',
               icon: 'iconfont iconfuwupeizhi',
               url: 'system/config'
             },
             {
-              name: '用户管理',
+              name: 'users',
               icon: 'iconfont icongeren',
               url: 'system/users'
             },
             {
-              name: '公告管理',
+              name: 'announcement',
               icon: 'iconfont icongonggao',
               url: 'system/announcement'
             },
             {
-              name: '操作日志',
+              name: 'auditLog',
               icon: 'iconfont iconiconlog',
               url: 'system/auditlog'
             }
@@ -204,40 +204,40 @@ export default {
       ],
       defaultMenu: [
         {
-          category_name: '产品交付',
+          category_name: 'productDelivery',
           items: [
             {
-              name: '仪表盘',
+              name: 'dashboard',
               icon: 'iconfont iconyunhangzhuangtai',
               url: 'dashboard'
             },
             {
-              name: '项目',
+              name: 'projects',
               icon: 'iconfont iconxiangmuloading',
               url: 'projects'
             },
             {
-              name: '测试中心',
+              name: 'testCenter',
               url: 'tests',
               icon: 'iconfont iconvery-testing'
             },
             {
-              name: '交付中心',
+              name: 'deliveryCenter',
               url: 'delivery',
               icon: 'iconfont iconvery-deli'
             }
           ]
         },
         {
-          category_name: '数据视图',
+          category_name: 'dataViews',
           items: [
             {
-              name: '数据概览',
+              name: 'dataOverview',
               icon: 'iconfont iconvery-dataov',
               url: 'statistics'
             },
             {
-              name: '效能洞察',
+              name: 'dataInsight',
               icon: 'iconfont iconvery-datain',
               url: 'insight'
             }
@@ -246,10 +246,10 @@ export default {
       ],
       adminMenu: [
         {
-          category_name: '设置',
+          category_name: 'setting',
           items: [
             {
-              name: '系统设置',
+              name: 'sysSetting',
               icon: 'iconfont iconvery-setting',
               url: 'system'
             }
@@ -258,27 +258,27 @@ export default {
       ],
       plutusMenu: {
         delivery: {
-          category_name: '客户交付',
+          category_name: 'customerDelivery',
           items: [
             {
-              name: '交付看板',
+              name: 'deliveryBoard',
               icon: 'iconfont iconBoardList',
               url: 'plutus/deliveryBoard'
             },
             {
-              name: '版本',
+              name: 'deliveryVersion',
               icon: 'iconfont iconbanben1',
               url: 'plutus/version'
             },
             {
-              name: '客户',
+              name: 'deliveryCustomers',
               icon: 'iconfont iconCustomermanagement',
               url: 'plutus/customer'
             }
           ]
         },
         manage: {
-          name: '企业管理',
+          name: 'enterprise',
           icon: 'iconfont iconcompany-info',
           url: 'enterprise/'
         }
@@ -309,16 +309,16 @@ export default {
     showBackPath () {
       const path = this.$route.path
       if (path.includes('/v1/users')) {
-        this.backTitle = '用户管理'
+        this.backTitle = this.$t(`sidebarMenu.users`)
         return true
       } else if (path.includes('/v1/system')) {
-        this.backTitle = '系统设置'
+        this.backTitle = this.$t(`sidebarMenu.sysSetting`)
         return true
       } else if (path.includes('/v1/enterprise')) {
-        this.backTitle = '企业管理'
+        this.backTitle = this.$t(`sidebarMenu.enterprise`)
         return true
       } else if (path.includes('/v1/profile')) {
-        this.backTitle = '账号设置'
+        this.backTitle = this.$t(`sidebarMenu.profile`)
         return true
       } else {
         return false
@@ -379,11 +379,11 @@ export default {
       if (this.isAdmin && this.hasPlutus) {
         if (
           this.signatureFeatures.delivery &&
-          !defaultMenu.find(menu => menu.category_name === '客户交付')
+          !defaultMenu.find(menu => menu.category_name === 'deliveryCustomers')
         ) {
           defaultMenu.splice(1, 0, this.plutusMenu.delivery)
         }
-        if (!adminMenu[0].items.find(menu => menu.name === '企业管理')) {
+        if (!adminMenu[0].items.find(menu => menu.name === 'enterprise')) {
           adminMenu[0].items.splice(1, 0, this.plutusMenu.manage)
         }
       }
@@ -393,25 +393,25 @@ export default {
       } else {
         if (!this.showTestCenter) {
           remove(defaultMenu[0].items, item => {
-            return item.name === '测试中心'
+            return item.name === 'testCenter'
           })
         }
         if (!this.showDeliveryCenter) {
           remove(defaultMenu[0].items, item => {
-            return item.name === '交付中心'
+            return item.name === 'deliveryCenter'
           })
         }
         const dataReview = defaultMenu.find(
-          menu => menu.category_name === '数据视图'
+          menu => menu.category_name === 'dataViews'
         )
         if (!this.showDataOverview) {
           remove(dataReview.items, item => {
-            return item.name === '数据概览'
+            return item.name === 'dataOverview'
           })
         }
         if (!this.showEfficiencyInsight) {
           remove(dataReview.items, item => {
-            return item.name === '效能洞察'
+            return item.name === 'dataInsight'
           })
         }
         return defaultMenu
@@ -496,7 +496,6 @@ export default {
       font-size: 16px;
       white-space: nowrap;
       text-align: left;
-      text-transform: uppercase;
 
       i {
         position: relative;

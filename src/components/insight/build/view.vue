@@ -5,7 +5,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">构建趋势(周)</span>
+              <span class="head">{{$t('dataStatistics.insight.buildTrend')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <BuildTrend :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -16,7 +16,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">构建健康度</span>
+              <span class="head">{{$t('dataStatistics.insight.buildHealthiness')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <Health :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -27,7 +27,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">最近 10 次构建</span>
+              <span class="head">{{$t('dataStatistics.insight.lastBuilds')}}</span>
             </div>
             <RecentBuild :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
           </div>
@@ -39,7 +39,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">日构建频次</span>
+              <span class="head">{{$t('dataStatistics.insight.dailyBuildFrequency')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <DaliyBuildFeq :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -50,7 +50,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">平均构建时长</span>
+              <span class="head">{{$t('dataStatistics.insight.averageBuildDuration')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <AverageBuildDuration :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -61,7 +61,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">Top 10 耗时较长的构建</span>
+              <span class="head">{{$t('dataStatistics.insight.longestDurationBuild')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <LongestBuild :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -114,8 +114,8 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '效能洞察', url: '/v1/insight' },
-        { title: '构建效能', url: '' }
+        { title: this.$t('sidebarMenu.dataInsight'), url: '/v1/insight' },
+        { title: this.$t('dataStatistics.insight.buildInsight'), url: '' }
       ]
     })
   }

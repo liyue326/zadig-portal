@@ -1,46 +1,46 @@
 <template>
   <div v-loading="loading"
-       element-loading-text="加载中..."
+       :element-loading-text="$t(`global.loading`)"
        element-loading-spinner="iconfont iconfont-loading icongonggao"
        class="setting-anno-container">
     <!--announcement-create-dialog-->
-    <el-dialog title='新建'
+    <el-dialog :title="$t('sysSetting.announcement.addAnnouncement')"
                :visible.sync="dialogAnnouncementCreateFormVisible">
       <el-form ref="announcement"
                :rules="rules"
                :model="announcement"
                label-position="left"
-               label-width="90px">
-        <el-form-item label="标题"
+               label-width="110px">
+        <el-form-item :label="$t('sysSetting.announcement.title')"
                       prop="content.title">
           <el-input style="width: 100%;" size="small" v-model="announcement.content.title"></el-input>
         </el-form-item>
-        <el-form-item label="优先级"
+        <el-form-item :label="$t('sysSetting.announcement.priority')"
                       prop="content.priority">
           <el-select size="small"
                      style="width: 100%;"
                      v-model="announcement.content.priority"
-                     placeholder="请选择优先级">
-            <el-option label="高"
+                     :placeholder="$t('sysSetting.announcement.selectPriority')">
+            <el-option :label="$t('sysSetting.announcement.high')"
                        :value="1"></el-option>
-            <el-option label="中"
+            <el-option :label="$t('sysSetting.announcement.medium')"
                        :value="2"></el-option>
-            <el-option label="低"
+            <el-option :label="$t('sysSetting.announcement.low')"
                        :value="3"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="时间范围"
+        <el-form-item :label="$t('sysSetting.announcement.timeRange')"
                       prop="duration">
           <el-date-picker style="width: 100%;"
                           size="small"
                           v-model="announcement.duration"
                           type="datetimerange"
-                          range-separator="至"
-                          start-placeholder="开始日期"
-                          end-placeholder="结束日期">
+                          :range-separator="$t('sysSetting.announcement.timeTo')"
+                          :start-placeholder="$t('sysSetting.announcement.startTime')"
+                          :end-placeholder="$t('sysSetting.announcement.endTime')">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="内容"
+        <el-form-item :label="$t('sysSetting.announcement.content')"
                       prop="content.content">
           <el-input size="small"
                     :autosize="{ minRows: 4}"
@@ -51,53 +51,53 @@
       <div slot="footer"
            class="dialog-footer">
         <el-button size="small"
-                   @click="dialogAnnouncementCreateFormVisible = false">取 消</el-button>
+                   @click="dialogAnnouncementCreateFormVisible = false">{{$t(`global.cancel`)}}</el-button>
         <el-button :plain="true"
                    type="success"
                    size="small"
-                   @click="announcementOperation('add')">保存</el-button>
+                   @click="announcementOperation('add')">{{$t(`global.save`)}}</el-button>
       </div>
     </el-dialog>
     <!--announcement-create-dialog-->
 
     <!--announcement-edit-dialog-->
-    <el-dialog title='修改公告'
+    <el-dialog :title="$t('sysSetting.announcement.editAnnouncement')"
                :visible.sync="dialogAnnouncementEditFormVisible">
       <el-form ref="swapAnnouncement"
                :rules="rules"
                :model="swapAnnouncement"
                label-position="left"
-               label-width="90px">
-        <el-form-item label="标题"
+               label-width="110px">
+        <el-form-item :label="$t('sysSetting.announcement.title')"
                       prop="content.title">
           <el-input style="width: 100%;" size="small" v-model="swapAnnouncement.content.title"></el-input>
         </el-form-item>
-        <el-form-item label="优先级"
+        <el-form-item :label="$t('sysSetting.announcement.priority')"
                       prop="content.priority">
           <el-select style="width: 100%;"
                      size="small"
                      v-model="swapAnnouncement.content.priority"
-                     placeholder="请选择优先级">
-            <el-option label="高"
+                     :placeholder="$t('sysSetting.announcement.selectPriority')">
+            <el-option :label="$t('sysSetting.announcement.high')"
                        :value="1"></el-option>
-            <el-option label="中"
+            <el-option :label="$t('sysSetting.announcement.medium')"
                        :value="2"></el-option>
-            <el-option label="低"
+            <el-option :label="$t('sysSetting.announcement.low')"
                        :value="3"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="时间范围"
+        <el-form-item :label="$t('sysSetting.announcement.timeRange')"
                       prop="duration">
           <el-date-picker style="width: 100%;"
                           size="small"
                           v-model="swapAnnouncement.duration"
                           type="datetimerange"
-                          range-separator="至"
-                          start-placeholder="开始日期"
-                          end-placeholder="结束日期">
+                          :range-separator="$t('sysSetting.announcement.timeTo')"
+                          :start-placeholder="$t('sysSetting.announcement.startTime')"
+                          :end-placeholder="$t('sysSetting.announcement.endTime')">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="内容"
+        <el-form-item :label="$t('sysSetting.announcement.content')"
                       prop="content.content">
           <el-input style="width: 100%;"
                     size="small"
@@ -109,11 +109,11 @@
       <div slot="footer"
            class="dialog-footer">
         <el-button size="small"
-                   @click="dialogAnnouncementEditFormVisible = false">取 消</el-button>
+                   @click="dialogAnnouncementEditFormVisible = false">{{$t(`global.cancel`)}}</el-button>
         <el-button size="small"
                    :plain="true"
                    type="success"
-                   @click="announcementOperation('update')">保存</el-button>
+                   @click="announcementOperation('update')">{{$t(`global.save`)}}</el-button>
       </div>
     </el-dialog>
     <div class="section">
@@ -121,13 +121,13 @@
         <el-button :plain="true"
                    size="small"
                    @click="dialogAnnouncementCreateFormVisible=true"
-                   type="success">新建</el-button>
+                   type="success">{{$t('global.add')}}</el-button>
       </div>
       <div class="announcement-list">
         <template>
           <el-table :data="allAnnouncements"
                     style="width: 100%;">
-            <el-table-column label="标题">
+            <el-table-column :label="$t('sysSetting.announcement.title')">
               <template slot-scope="scope">
                 <div class="indicator-container">
                   <span>{{scope.row.content.title}}</span>
@@ -136,30 +136,30 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column label="优先级">
+            <el-table-column :label="$t('sysSetting.announcement.priority')">
               <template slot-scope="scope">
                 <el-tag v-if="scope.row.content.priority===1"
                         size="mini"
                         effect="dark"
-                        type="danger">高</el-tag>
+                        type="danger">{{$t('sysSetting.announcement.high')}}</el-tag>
                 <el-tag v-if="scope.row.content.priority===2"
                         size="mini"
                         effect="dark"
-                        type="warning">中</el-tag>
+                        type="warning">{{$t('sysSetting.announcement.medium')}}</el-tag>
                 <el-tag v-if="scope.row.content.priority===3"
                         size="mini"
                         effect="dark"
-                        type="info">低</el-tag>
+                        type="info">{{$t('sysSetting.announcement.low')}}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="开始时间">
+            <el-table-column :label="$t('sysSetting.announcement.startTime')">
               <template slot-scope="scope">
                 <i class="el-icon-time"></i>
                 <span style="margin-left: 10px;">{{
                   $utils.convertTimestamp(scope.row.content.start_time) }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="结束时间">
+            <el-table-column :label="$t('sysSetting.announcement.endTime')">
               <template slot-scope="scope">
                 <i class="el-icon-time"></i>
                 <span style="margin-left: 10px;">{{
@@ -167,13 +167,13 @@
               </template>
             </el-table-column>
 
-            <el-table-column label="操作">
+            <el-table-column :label="$t(`global.operation`)">
               <template slot-scope="scope">
                 <el-button @click="announcementOperation('edit',scope.row)"
-                           size="mini" type="primary" plain>编辑</el-button>
+                           size="mini" type="primary" plain>{{$t(`global.edit`)}}</el-button>
                 <el-button @click="announcementOperation('delete',scope.row)"
                            size="mini"
-                           type="danger" plain>删除</el-button>
+                           type="danger" plain>{{$t(`global.delete`)}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -211,20 +211,24 @@ export default {
       dialogAnnouncementCreateFormVisible: false,
       dialogAnnouncementEditFormVisible: false,
       allAnnouncements: [],
-      rules: {
-        'content.title': [{ required: true, message: '请输入公告标题', trigger: ['blur', 'change'] }],
-        'content.priority': [{ required: true, message: '请选择优先级', trigger: ['blur', 'change'] }],
-        'content.content': [{ required: true, message: '请填写公告内容', trigger: ['blur', 'change'] }],
+      loading: true
+    }
+  },
+  computed: {
+    rules () {
+      return {
+        'content.title': [{ required: true, message: this.$t('sysSetting.announcement.inputTitle'), trigger: ['blur', 'change'] }],
+        'content.priority': [{ required: true, message: this.$t('sysSetting.announcement.selectPriority'), trigger: ['blur', 'change'] }],
+        'content.content': [{ required: true, message: this.$t('sysSetting.announcement.inputContent'), trigger: ['blur', 'change'] }],
         duration: [
           {
             type: 'array',
             required: true,
-            message: '请选择起止时间',
+            message: this.$t('sysSetting.announcement.selectStartTimeAndEndTime'),
             trigger: 'change'
           }
         ]
-      },
-      loading: true
+      }
     }
   },
   methods: {
@@ -267,7 +271,7 @@ export default {
         deleteAnnouncementAPI(current_announcement.id).then(
           response => {
             this.$message({
-              message: '公告已删除',
+              message: this.$t('sysSetting.announcement.announcementHasBeenDeleted'),
               type: 'success'
             })
             this.getAnnouncements()
@@ -293,7 +297,7 @@ export default {
       createAnnouncementAPI(data).then(
         response => {
           this.$message({
-            message: '新增公告成功',
+            message: this.$t('sysSetting.announcement.addAnnouncementSuccess'),
             type: 'success'
           })
           this.getAnnouncements()
@@ -309,7 +313,7 @@ export default {
         },
         response => {
           this.$message({
-            message: '新增公告失败',
+            message: this.$t('sysSetting.announcement.addAnnouncementFailed'),
             type: 'error'
           })
         }
@@ -319,14 +323,14 @@ export default {
       updateAnnouncementAPI(data).then(
         response => {
           this.$message({
-            message: '修改公告成功',
+            message: this.$t('sysSetting.announcement.editAnnouncementSuccess'),
             type: 'success'
           })
           this.getAnnouncements()
         },
         response => {
           this.$message({
-            message: '修改公告失败',
+            message: this.$t('sysSetting.announcement.editAnnouncementFailed'),
             type: 'error'
           })
         }
@@ -343,7 +347,7 @@ export default {
     }
   },
   created () {
-    bus.$emit(`set-topbar-title`, { title: '公告管理', breadcrumb: [] })
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t(`sidebarMenu.announcement`), url: '' }] })
     this.getAnnouncements()
   }
 }

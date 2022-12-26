@@ -1,13 +1,13 @@
 <template>
   <div class="project-rbac-container">
     <el-tabs v-model="activeTab" :tab-position="tabPosition" type="card" class="permission-tabs">
-      <el-tab-pane name="member" label="成员管理">
+      <el-tab-pane name="member" :label="$t('project.rbac.membersManagement')">
         <Member v-if="activeTab==='member'" :projectName="projectName" />
       </el-tab-pane>
-      <el-tab-pane name="role" label="角色管理">
+      <el-tab-pane name="role" :label="$t('project.rbac.rolesManagement')">
         <Role v-if="activeTab==='role'" :projectName="projectName" />
       </el-tab-pane>
-      <el-tab-pane name="policy" label="策略管理">
+      <el-tab-pane name="policy" :label="$t('project.rbac.policyManagement')">
         <Policy v-if="activeTab==='policy'" :projectName="projectName" />
       </el-tab-pane>
     </el-tabs>

@@ -2,55 +2,55 @@
   <div class="side-menu">
     <ul>
       <li>
-        <span class="title">基本信息</span>
+        <span class="title">{{$t(`productWorkflowSideBar.base`)}}</span>
         <span class="operation"></span>
       </li>
       <li>
         <a @click="addModule('buildDeploy')"
            href="javascript:"
-           class="title">构建部署
+           class="title">{{$t(`productWorkflowSideBar.build`)}}
           <i class="operation el-icon-circle-plus-outline"></i>
         </a>
       </li>
       <li>
         <a @click="addModule('artifactDeploy')"
            href="javascript:"
-           class="title">交付物部署
+           class="title">{{$t(`productWorkflowSideBar.artifact`)}}
           <i class="operation el-icon-circle-plus-outline"></i>
         </a>
       </li>
       <li>
         <a @click="addModule('test')"
            href="javascript:"
-           class="title">测试
+           class="title">{{$t(`productWorkflowSideBar.test`)}}
           <i class="operation el-icon-circle-plus-outline"></i>
         </a>
       </li>
       <li>
         <a @click="addModule('distribute')"
            href="javascript:"
-           class="title">分发部署
+           class="title">{{$t(`productWorkflowSideBar.distribute`)}}
           <i class="operation el-icon-circle-plus-outline"></i>
         </a>
       </li>
        <li>
         <a @click="addModule('extension')"
            href="javascript:"
-           class="title">扩展
+           class="title">{{$t(`productWorkflowSideBar.expand`)}}
           <i class="operation el-icon-circle-plus-outline"></i>
         </a>
       </li>
       <li>
         <a @click="addModule('trigger')"
            href="javascript:"
-           class="title">触发器
+           class="title">{{$t(`productWorkflowSideBar.trigger`)}}
           <i class="operation el-icon-circle-plus-outline"></i>
         </a>
       </li>
       <li>
         <a @click="addModule('notify')"
            href="javascript:"
-           class="title">通知
+           class="title">{{$t(`productWorkflowSideBar.notify`)}}
           <i class="operation el-icon-circle-plus-outline"></i>
         </a>
       </li>

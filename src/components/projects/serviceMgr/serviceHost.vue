@@ -1,13 +1,13 @@
 <template>
   <div class="tab">
     <div class="policy">
-      <el-button type="primary" size="small" @click="showPolicyDrawer = true" plain>策略</el-button>
+      <el-button type="primary" size="small" @click="showPolicyDrawer = true" plain>{{$t('services.common.policySection')}}</el-button>
     </div>
     <el-tabs type="card" :value="envName" @tab-click="tabChange">
       <el-tab-pane v-for="item in envNameList" :key="item.envName" :label="item.envName" :name="item.envName"></el-tab-pane>
     </el-tabs>
     <ServiceBuild v-if="envName" :envName="envName" :serviceName="serviceName" class="serviceBuild" />
-    <el-drawer title="策略" custom-class="policy-drawer" :visible.sync="showPolicyDrawer" direction="rtl" size="600px" destroy-on-close>
+    <el-drawer :title="$t('services.common.policySection')" custom-class="policy-drawer" :visible.sync="showPolicyDrawer" direction="rtl" size="600px" destroy-on-close>
       <Policy @closeDrawer="showPolicyDrawer=false" />
     </el-drawer>
   </div>
@@ -67,7 +67,7 @@ export default {
     text-align: right;
 
     /deep/.el-button {
-      width: 30px;
+      writing-mode: vertical-rl;
       margin-bottom: -12px;
       padding: 12px 5px;
       white-space: initial;

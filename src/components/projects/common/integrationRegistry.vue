@@ -71,9 +71,9 @@
         <el-button :plain="true"
                    type="success"
                    size="small"
-                   @click="registryOperation">保存</el-button>
+                   @click="registryOperation">{{$t(`global.save`)}}</el-button>
         <el-button @click="$emit('cancel')"
-                   size="small">取 消</el-button>
+                   size="small">{{$t(`global.cancel`)}}</el-button>
       </div>
     </div>
   </div>

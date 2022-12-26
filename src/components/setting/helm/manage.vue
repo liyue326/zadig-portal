@@ -1,100 +1,100 @@
 <template>
   <div
     v-loading="loading"
-    element-loading-text="加载中..."
+    :element-loading-text="$t(`global.loading`)"
     element-loading-spinner="iconfont iconfont-loading iconhelmrepo"
     class="setting-helm-container"
   >
     <!--helm-create-dialog-->
     <el-dialog
-      title="添加 HELM Chart 仓库"
+      :title="$t(`sysSetting.helmRepo.addHelmChartRepo`)"
       :visible.sync="dialogHelmCreateFormVisible"
       :close-on-click-modal="false"
       custom-class="dialog-style"
       width="35%"
     >
-      <el-form ref="helm" :rules="rules" label-width="90px" label-position="left" tab-position="left" :model="helm">
+      <el-form ref="helm" :rules="rules" label-width="110px" label-position="left" tab-position="left" :model="helm">
         <el-form-item label="URL" prop="url">
-          <el-input size="small" placeholder="请输入 http/https/acr 开头的 URL" v-model.trim="helm.url"></el-input>
+          <el-input size="small" :placeholder="$t(`sysSetting.helmRepo.urlPlaceholder`)" v-model.trim="helm.url"></el-input>
         </el-form-item>
-        <el-form-item label="仓库名称" prop="repo_name">
-          <el-input size="small" placeholder="请输入仓库名称" v-model="helm.repo_name"></el-input>
+        <el-form-item :label="$t(`sysSetting.helmRepo.repoName`)" prop="repo_name">
+          <el-input size="small" :placeholder="$t(`sysSetting.helmRepo.inputRepoName`)" v-model="helm.repo_name"></el-input>
         </el-form-item>
-        <el-form-item label="用户名" prop="username">
-          <el-input size="small" placeholder="请输入用户名" v-model="helm.username"></el-input>
+        <el-form-item :label="$t(`sysSetting.helmRepo.username`)" prop="username">
+          <el-input size="small" :placeholder="$t(`sysSetting.helmRepo.inputUsername`)" v-model="helm.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input size="small" type="passsword" v-if="dialogHelmCreateFormVisible" show-password  placeholder="请输入密码" v-model="helm.password"></el-input>
+        <el-form-item :label="$t(`sysSetting.helmRepo.password`)" prop="password">
+          <el-input size="small" type="passsword" v-if="dialogHelmCreateFormVisible" show-password  :placeholder="$t(`sysSetting.helmRepo.inputPassword`)" v-model="helm.password"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="small" @click="dialogHelmCreateFormVisible = false">取 消</el-button>
-        <el-button :plain="true" type="success" size="small" @click="repoOperation('add')">保存</el-button>
+        <el-button size="small" @click="dialogHelmCreateFormVisible = false">{{$t(`global.cancel`)}}</el-button>
+        <el-button :plain="true" type="success" size="small" @click="repoOperation('add')">{{$t(`global.save`)}}</el-button>
       </div>
     </el-dialog>
     <!--helm-create-dialog-->
 
     <!--helm-edit-dialog-->
     <el-dialog
-      title="编辑 HELM Chart 仓库"
+      :title="$t(`sysSetting.helmRepo.editHelmChartRepo`)"
       :visible.sync="dialogHelmEditFormVisible"
       :close-on-click-modal="false"
       custom-class="dialog-style"
       width="35%"
     >
-      <el-form ref="swapHelm" :rules="rules" label-position="left" label-width="90px" tab-position="left" :model="swapHelm">
+      <el-form ref="swapHelm" :rules="rules" label-position="left" label-width="110px" tab-position="left" :model="swapHelm">
         <el-form-item label="URL" prop="url">
-          <el-input size="small" placeholder="请输入 http/https/acr 开头的 URL" v-model="swapHelm.url"></el-input>
+          <el-input size="small" :placeholder="$t(`sysSetting.helmRepo.urlPlaceholder`)" v-model="swapHelm.url"></el-input>
         </el-form-item>
-        <el-form-item label="仓库名称" prop="repo_name">
-          <el-input size="small" placeholder="请输入仓库名称" v-model="swapHelm.repo_name"></el-input>
+        <el-form-item :label="$t(`sysSetting.helmRepo.repoName`)" prop="repo_name">
+          <el-input size="small" :placeholder="$t(`sysSetting.helmRepo.inputRepoName`)" v-model="swapHelm.repo_name"></el-input>
         </el-form-item>
-        <el-form-item label="用户名" prop="username">
-          <el-input size="small" placeholder="请输入用户名" v-model="swapHelm.username"></el-input>
+        <el-form-item :label="$t(`sysSetting.helmRepo.username`)" prop="username">
+          <el-input size="small" :placeholder="$t(`sysSetting.helmRepo.inputUsername`)" v-model="swapHelm.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item :label="$t(`sysSetting.helmRepo.password`)" prop="password">
           <el-input size="small"  type="passsword"
-                    show-password  placeholder="请输入密码" v-model="swapHelm.password"></el-input>
+                    show-password :placeholder="$t(`sysSetting.helmRepo.inputPassword`)" v-model="swapHelm.password"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="small" @click="dialogHelmEditFormVisible = false">取 消</el-button>
-        <el-button :plain="true" type="success" size="small" @click="repoOperation('update')">保存</el-button>
+        <el-button size="small" @click="dialogHelmEditFormVisible = false">{{$t(`global.cancel`)}}</el-button>
+        <el-button :plain="true" type="success" size="small" @click="repoOperation('update')">{{$t(`global.save`)}}</el-button>
       </div>
     </el-dialog>
     <!--helm-edit-dialog-->
     <div class="section">
       <el-alert type="info" :closable="false">
         <template>
-          支持集成自建 Harbor 仓库及阿里、腾讯、华为等云厂商提供的 Chart 仓库，详情可参考
+          {{$t(`sysSetting.helmRepo.referToDoc`)}}
           <el-link
             style="font-size: 14px; vertical-align: baseline;"
             type="primary"
             :href="`https://docs.koderover.com/zadig/settings/helm/`"
             :underline="false"
             target="_blank"
-          >帮助文档</el-link>
+          >{{$t(`global.helpDoc`)}}</el-link>
         </template>
       </el-alert>
       <div class="sync-container">
-        <el-button :plain="true" @click="dialogHelmCreateFormVisible=true" size="small" type="success">新建</el-button>
+        <el-button :plain="true" @click="dialogHelmCreateFormVisible=true" size="small" type="success">{{$t('global.add')}}</el-button>
       </div>
       <div class="helm-list">
         <template>
           <el-table :data="allHelmRepos" style="width: 100%;">
             <el-table-column label="URL" prop="url"></el-table-column>
-            <el-table-column label="仓库名称" prop="repo_name"></el-table-column>
-            <el-table-column label="用户名" prop="username"></el-table-column>
-            <el-table-column label="最后修改">
+            <el-table-column :label="$t(`sysSetting.helmRepo.repoName`)" prop="repo_name"></el-table-column>
+            <el-table-column :label="$t(`sysSetting.helmRepo.username`)" prop="username"></el-table-column>
+            <el-table-column :label="$t(`sysSetting.helmRepo.lastModified`)">
               <template slot-scope="scope">
                 <span>{{ $utils.convertTimestamp(scope.row.updated_at) }}</span>
                 <span>{{ scope.row.update_by }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作">
+            <el-table-column :label="$t(`global.operation`)">
               <template slot-scope="scope">
-                <el-button @click="repoOperation('edit',scope.row)" type="primary" size="mini" plain>编辑</el-button>
-                <el-button @click="repoOperation('delete',scope.row)" size="mini" type="danger" plain>删除</el-button>
+                <el-button @click="repoOperation('edit',scope.row)" type="primary" size="mini" plain>{{$t(`global.edit`)}}</el-button>
+                <el-button @click="repoOperation('delete',scope.row)" size="mini" type="danger" plain>{{$t(`global.delete`)}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -115,14 +115,6 @@ import bus from '@utils/eventBus'
 
 export default {
   data () {
-    const protocolValid = (rule, value, callback) => {
-      if (!/^(http|https|acr):\/\//.test(value.trim())) {
-        callback(new Error('请确保协议以 http/https/acr 开头'))
-      } else {
-        callback()
-      }
-    }
-
     return {
       allHelmRepos: [],
       helm: {
@@ -139,12 +131,23 @@ export default {
       },
       dialogHelmCreateFormVisible: false,
       dialogHelmEditFormVisible: false,
-      loading: false,
-      rules: {
+      loading: false
+    }
+  },
+  computed: {
+    rules () {
+      const protocolValid = (rule, value, callback) => {
+        if (!/^(http|https|acr):\/\//.test(value.trim())) {
+          callback(new Error(this.$t('sysSetting.helmRepo.protocolCheck')))
+        } else {
+          callback()
+        }
+      }
+      return {
         url: [
           {
             required: true,
-            message: '请输入 URL',
+            message: this.$t('sysSetting.helmRepo.inputUrl'),
             trigger: 'blur'
           },
           {
@@ -152,11 +155,11 @@ export default {
             trigger: ['blur', 'change']
           }
         ],
-        repo_name: [{ required: true, message: '请输入仓库名称', trigger: 'blur' }],
+        repo_name: [{ required: true, message: this.$t('sysSetting.helmRepo.inputRepoName'), trigger: 'blur' }],
         username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
+          { required: true, message: this.$t('sysSetting.helmRepo.inputUsername'), trigger: 'blur' }
         ],
-        password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+        password: [{ required: true, message: this.$t('sysSetting.helmRepo.inputPassword'), trigger: 'blur' }]
       }
     }
   },
@@ -188,15 +191,15 @@ export default {
         })
       } else if (operate === 'delete') {
         const id = current_repo.id
-        this.$confirm(`确定要删除 ${current_repo.repo_name} 仓库?`, '确认', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm(this.$t('sysSetting.helmRepo.deleteTip', { repoName: current_repo.repo_name }), this.$t('sysSetting.helmRepo.confirm'), {
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }).then(({ value }) => {
           deleteHelmAPI(id).then(res => {
             this.getHelmRepo()
             this.$message({
-              message: '删除成功',
+              message: this.$t('sysSetting.helmRepo.repoHasBeenDeleted'),
               type: 'success'
             })
           })
@@ -209,7 +212,7 @@ export default {
         this.getHelmRepo()
         this.$message({
           type: 'success',
-          message: '新增成功'
+          message: this.$t('sysSetting.helmRepo.addRepoSuccess')
         })
       })
     },
@@ -219,7 +222,7 @@ export default {
         this.getHelmRepo()
         this.$message({
           type: 'success',
-          message: '更新成功'
+          message: this.$t('sysSetting.helmRepo.updateRepoSucces')
         })
       })
     },
@@ -235,10 +238,8 @@ export default {
       })
     }
   },
-  computed: {},
   mounted () {
-    bus.$emit(`set-topbar-title`, { title: 'HELM 仓库', breadcrumb: [] })
-
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t(`sidebarMenu.helmRepo`), url: '' }] })
     this.getHelmRepo()
   }
 }

@@ -2,8 +2,8 @@
   <div class="workflow-template-container">
     <div class="wrap">
       <el-tabs v-model="activeTab" type="card" @tab-click="changeTab" class="workflow-type-tab">
-        <el-tab-pane label="自定义工作流" name="custom"></el-tab-pane>
-        <el-tab-pane label="发布工作流" name="release"></el-tab-pane>
+        <el-tab-pane :label="$t(`workflow.customWorkflow`)" name="custom"></el-tab-pane>
+        <el-tab-pane :label="$t(`workflow.releaseWorkflow`)" name="release"></el-tab-pane>
         <div v-if="workflowTemplates.length > 0">
           <div v-for="item in workflowTemplates" :key="item.name">
             <Item :modelInfo="item" :type="activeTab" @success="getWorkflowTemplates(activeTab)" />

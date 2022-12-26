@@ -5,7 +5,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">微服务健康度</span>
+              <span class="head">{{$t('dataStatistics.insight.serviceHealthiness')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <Health :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -16,7 +16,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">微服务周部署频次</span>
+              <span class="head">{{$t('dataStatistics.insight.frequencyOfWeeklyDeployments')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <Deploy :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -29,7 +29,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">Top 5 微服务部署统计</span>
+              <span class="head">{{$t('dataStatistics.insight.serviceDeploymentStatistics')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <DeploySummary :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -40,7 +40,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">Top 5 微服务部署失败统计</span>
+              <span class="head">{{$t('dataStatistics.insight.serviceDeploymentFailedStatistics')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <ServiceFailure :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -84,8 +84,9 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '效能洞察', url: '/v1/insight' },
-        { title: '部署效能', url: '' }
+        { title: this.$t('sidebarMenu.dataInsight'), url: '/v1/insight' },
+        { title: this.$t('dataStatistics.insight.deployInsight'), url: '' }
+
       ]
     })
   }

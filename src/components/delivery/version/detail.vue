@@ -33,13 +33,13 @@ export default {
       bus.$emit(`set-topbar-title`, {
         title: '',
         breadcrumb: [
-          { title: '项目', url: `/v1/projects` },
+          { title: this.$t('subTopbarMenu.projects'), url: `/v1/projects` },
           {
             title: this.projectName,
             isProjectName: true,
             url: `/v1/projects/detail/${this.projectName}/detail`
           },
-          { title: '版本管理', url: `/v1/projects/detail/${this.projectName}/version` },
+          { title: this.$t('subTopbarMenu.versions'), url: `/v1/projects/detail/${this.projectName}/version` },
           { title: version, url: `` }
         ]
       })
@@ -47,8 +47,8 @@ export default {
       bus.$emit(`set-topbar-title`, {
         title: '',
         breadcrumb: [
-          { title: '交付中心', url: `/v1/delivery/artifacts` },
-          { title: '版本管理', url: `/v1/delivery/version` },
+          { title: this.$t('sidebarMenu.deliveryCenter'), url: `/v1/delivery/artifacts` },
+          { title: this.$t('subTopbarMenu.versions'), url: `/v1/delivery/version` },
           { title: version, url: `` }
         ]
       })

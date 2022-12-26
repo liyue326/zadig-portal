@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" element-loading-text="正在获取配置" element-loading-spinner="el-icon-loading" class="config-overview-container">
+  <div v-loading="loading" :element-loading-text="$t('global.loading')" element-loading-spinner="el-icon-loading" class="config-overview-container">
     <div v-if="configMaps.length === 0" class="no-config">
       <h3>暂无配置</h3>
     </div>
@@ -14,7 +14,7 @@
         </el-table-column>
         <el-table-column width="300">
           <template slot-scope="{ row }">
-            <el-button @click="jumpEnvConfig('edit', row)" size="mini" icon="el-icon-edit">编辑</el-button>
+            <el-button @click="jumpEnvConfig('edit', row)" size="mini" icon="el-icon-edit">{{$t(`global.edit`)}}</el-button>
             <el-button @click="jumpEnvConfig('history', row)" size="mini" icon="el-icon-notebook-2">历史版本</el-button>
           </template>
         </el-table-column>
@@ -71,14 +71,14 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: '环境',
+          title: this.$t('subTopbarMenu.environments'),
           url: `/v1/projects/detail/${this.projectName}/envs/detail?envName=${this.envName}`
         },
         {

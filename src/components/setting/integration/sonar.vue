@@ -10,7 +10,7 @@
                  type="primary"
                  :href="`https://docs.koderover.com/zadig/settings/sonar/`"
                  :underline="false"
-                 target="_blank">帮助文档</el-link> 。
+                 target="_blank">{{$t(`global.helpDoc`)}}</el-link> 。
       </template>
     </el-alert>
     <div class="btn">
@@ -20,7 +20,7 @@
         type="primary"
         plain
         @click="handleSonarAdd"
-        >添加</el-button
+        >{{$t(`global.add`)}}</el-button
       >
     </div>
     <div class="jeknins-container">
@@ -71,8 +71,8 @@ export default {
   methods: {
     async handleSonarDelete (data) {
       this.$confirm('确定要删除这个配置吗？', '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         deleteSonarAPI(data).then(() => {

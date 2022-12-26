@@ -44,7 +44,7 @@ export default {
         },
         series: [
           {
-            name: '任务状态',
+            name: this.$t('dataStatistics.insight.taskStatus'),
             type: 'pie',
             radius: ['50%', '70%'],
             avoidLabelOverlap: false,
@@ -84,8 +84,8 @@ export default {
               }
             },
             data: [
-              { value: 0, name: '失败' },
-              { value: 0, name: '成功' }
+              { value: 0, name: this.$t('workflowTaskStatus.failed') },
+              { value: 0, name: this.$t('workflowTaskStatus.passed') }
             ]
           }
         ]
@@ -105,9 +105,12 @@ export default {
         this.option.series[0].data = [
           {
             value: res.totalFailure,
-            name: '失败'
+            name: this.$t('workflowTaskStatus.failed')
           },
-          { value: res.totalSuccess, name: '成功' }
+          {
+            value: res.totalSuccess,
+            name: this.$t('workflowTaskStatus.passed')
+          }
         ]
       })
     }

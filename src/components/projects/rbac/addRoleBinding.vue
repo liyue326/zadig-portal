@@ -1,10 +1,10 @@
 <template>
-  <el-dialog class="form" title="添加成员" width="550px" :visible.sync="addUserFormVisible">
+  <el-dialog class="form" :title="$t('project.rbac.addMember')" width="550px" :visible.sync="addUserFormVisible">
     <el-form :model="form" ref="form" :rules="formRules" label-position="left" label-width="100px">
-      <el-form-item label="用户名称" prop="uids">
-        <el-select class="select" v-model="form.uids" filterable multiple remote :remote-method="remoteMethod" :loading="userSearchLoading" size="small" placeholder="请输入用户名称进行搜索">
-          <el-option label="所有用户" value="*">
-            <span>所有用户</span>
+      <el-form-item :label="$t('project.rbac.username')" prop="uids">
+        <el-select class="select" v-model="form.uids" filterable multiple remote :remote-method="remoteMethod" :loading="userSearchLoading" size="small" :placeholder="$t('project.rbac.inputUsernameToSearch')">
+          <el-option :label="$t('project.rbac.allUsers')" value="*">
+            <span>{{$t('project.rbac.allUsers')}}</span>
           </el-option>
           <el-option
             v-for="user in users"
@@ -19,20 +19,20 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="角色名称" prop="name">
-        <el-select class="select" v-model="form.name" filterable size="small" placeholder="请输入角色名称进行搜索">
+      <el-form-item :label="$t('project.rbac.roleName')" prop="name">
+        <el-select class="select" v-model="form.name" filterable size="small" :placeholder="$t('project.rbac.inputRoleNameToSearch')">
           <el-option
             v-for="item in rolesFiltered"
             :key="item.name"
             :label="item.name"
             :value="item.name"
-          >{{item.name}} {{item.isPublic ? '(系统内置)': ''}}</el-option>
+          >{{item.name}} {{item.isPublic ?$t('project.rbac.systemBuiltIn'): ''}}</el-option>
         </el-select>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button size="small" @click="addUserFormVisible = false">取 消</el-button>
-      <el-button size="small" @click="submit()" type="primary">确 定</el-button>
+      <el-button size="small" @click="addUserFormVisible = false">{{$t(`global.cancel`)}}</el-button>
+      <el-button size="small" @click="submit()" type="primary">{{$t(`global.confirm`)}}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -53,13 +53,17 @@ export default {
       form: {
         uids: [],
         name: 'read-project-only'
-      },
-      formRules: {
+      }
+    }
+  },
+  computed: {
+    formRules () {
+      return {
         uids: [
           {
             type: 'array',
             required: true,
-            message: '请选择用户',
+            message: this.$t('project.rbac.selectUser'),
             trigger: 'change'
           }
         ],
@@ -67,7 +71,7 @@ export default {
           {
             type: 'string',
             required: true,
-            message: '请选择角色',
+            message: this.$t('project.rbac.selectRole'),
             trigger: 'change'
           }
         ]

@@ -1,16 +1,16 @@
 <template>
   <div class="module-use">
-    <header>引用列表</header>
+    <header>{{$t(`templates.helmChart.referenceList`)}}</header>
     <section>
       <el-table :data="chartReference" style="width: 100%;">
-        <el-table-column prop="project_name" label="项目"></el-table-column>
-        <el-table-column prop="service_name" label="服务名称">
+        <el-table-column prop="project_name" :label="$t(`global.project`)"></el-table-column>
+        <el-table-column prop="service_name" :label="$t(`global.serviceName`)">
           <template slot-scope="scope">
             <router-link
               v-if="scope.row.service_name"
               :to="`/v1/projects/detail/${scope.row.project_name}/services?service_name=${scope.row.service_name}&rightbar=var`"
             >{{scope.row.service_name}}</router-link>
-            <span v-else>空</span>
+            <span v-else>{{$t(`templates.helmChart.noneVariable`)}}</span>
           </template>
         </el-table-column>
       </el-table>

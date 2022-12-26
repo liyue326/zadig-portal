@@ -1,13 +1,13 @@
 <template>
   <div
     v-loading="loading"
-    element-loading-text="加载中..."
+    :element-loading-text="$t(`global.loading`)"
     element-loading-spinner="iconfont iconfont-loading iconvery-scanner"
     class="code-scanner-list-container"
   >
     <div v-if="scannerList.length > 0" class="tab-container">
       <div class="scanner-container">
-        <el-input v-model="selectKey" placeholder="搜索代码扫描" class="search-scanner" prefix-icon="el-icon-search" clearable></el-input>
+        <el-input v-model="selectKey" :placeholder="$t(`scanning.prompt.searchForScanning`)" class="search-scanner" prefix-icon="el-icon-search" clearable></el-input>
       </div>
       <ul class="scanner-content">
         <ScannerRow
@@ -21,7 +21,7 @@
     </div>
     <div v-if="scannerList.length === 0 && !loading" class="no-product">
       <img src="@assets/icons/illustration/test.svg" alt />
-      <p>暂无可展示的代码扫描，请手动新建代码扫描</p>
+      <p>{{$t(`scanning.prompt.noScanning`)}}</p>
     </div>
     <RunScannerTask :dialogVisible.sync="runScanner" :scannerInfo="currentScannerInfo" :projectName="projectName" />
   </div>
@@ -64,13 +64,13 @@ export default {
       this.runScanner = true
     },
     removeCodeScanner ({ name, id }) {
-      this.$confirm(`确定要删除 ${name} 这个配置吗？`, '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      this.$confirm(this.$t(`scanning.prompt.deleteConfirmation`, { scanningName: name }), this.$t(`global.confirm`), {
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         deleteCodeScannerAPI(id, this.projectName).then(() => {
-          this.$message.success('删除成功')
+          this.$message.success(this.$t(`scanning.prompt.deleted`))
           this.fetchScannerList()
         })
       })
@@ -80,13 +80,13 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t(`subTopbarMenu.projects`), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
-        { title: '代码扫描', url: '' }
+        { title: this.$t(`subTopbarMenu.scannings`), url: '' }
       ]
     })
     this.fetchScannerList()

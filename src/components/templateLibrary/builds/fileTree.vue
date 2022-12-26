@@ -6,7 +6,7 @@
                 class="text-right">
           <div style="line-height: 32px;">
             <el-tooltip effect="dark"
-                        content="创建模板"
+                        :content="$t(`templates.build.createTemplate`)"
                         placement="top">
               <el-button v-hasPermi="{type: 'system', action: 'create_template',isBtn:true}"
                          size="mini"
@@ -82,7 +82,7 @@
                       ref="serviceNamedRef"
                       @blur="inputFileNameDoneWhenBlur"
                       @keyup.enter.native="inputFileNameDoneWhenBlur"
-                      placeholder="请输入模板名称"></el-input>
+                      :placeholder="$t(`templates.build.inputTemplateName`)"></el-input>
           </el-form-item>
 
         </el-form>
@@ -91,7 +91,7 @@
     <div
          class="search-container">
 
-      <el-input placeholder="搜索模板"
+      <el-input :placeholder="$t(`templates.build.searchTemplate`)"
                 size="small"
                 clearable
                 suffix-icon="el-icon-search"
@@ -140,9 +140,9 @@ export default {
   methods: {
     validateFileName (rule, value, callback) {
       if (value === '') {
-        callback(new Error('请输入模板名称'))
+        callback(new Error(this.$t(`templates.build.inputTemplateName`)))
       } else if (this.selectFiles.map(ser => ser.name).includes(value)) {
-        callback(new Error('模板名称与现有名称重复'))
+        callback(new Error(this.$t(`templates.build.templateNameIsDuplicated`)))
       } else {
         callback()
       }
@@ -206,15 +206,15 @@ export default {
         this.files.splice(index, 1)
       } else {
         let deleteText = ''
-        const title = '确认'
-        deleteText = `确定要删除 ${data.name} 这个模板吗？`
+        const title = this.$t(`global.confirmation`)
+        deleteText = this.$t(`templates.build.deleteConfirmation`, { name: data.name })
         this.$confirm(`${deleteText}`, `${title}`, {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }).then(() => {
           deleteBuildTemplateAPI(data.id).then(() => {
-            this.$message.success('删除成功')
+            this.$message.success(this.$t(`templates.build.templateDeleted`))
             this.$emit('onRefreshTemplates')
             const parent = node.parent
             const children = parent.data.children || parent.data
@@ -225,10 +225,10 @@ export default {
       }
     },
     askSaveYamlConfig (switchNode = false) {
-      return this.$confirm('构建配置未保存，是否保存？', '提示', {
+      return this.$confirm(this.$t(`templates.build.confirmToSaveTemplate`), this.$t(`global.tips`), {
         distinguishCancelAndClose: true,
-        confirmButtonText: '保存',
-        cancelButtonText: '放弃',
+        confirmButtonText: this.$t(`global.save`),
+        cancelButtonText: this.$t(`templates.build.deleteChange`),
         type: 'warning'
       }).then(() => {
         this.$emit('updateTemplate', switchNode)

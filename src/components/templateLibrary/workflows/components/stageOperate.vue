@@ -9,46 +9,51 @@
       @keydown.enter.native="$emit('submitEvent')"
       @submit.native.prevent
     >
-      <el-form-item label="阶段名称" prop="name">
+      <el-form-item :label="$t(`workflow.stageName`)" prop="name">
         <el-input v-model="form.name" size="small"></el-input>
       </el-form-item>
-      <el-form-item label="并发执行" prop="parallel">
+      <el-form-item :label="$t(`workflow.concurrentExecution`)" prop="parallel">
         <el-switch v-model="form.parallel" size="small"></el-switch>
       </el-form-item>
-      <el-form-item label="前置步骤"></el-form-item>
-      <el-form-item label="人工审批" prop="approval.enabled" v-if="form.approval">
+      <el-form-item :label="$t(`workflow.preStep`)"></el-form-item>
+      <el-form-item :label="$t(`workflow.manualApproval`)" prop="approval.enabled" v-if="form.approval">
         <el-switch v-model="form.approval.enabled" size="small"></el-switch>
       </el-form-item>
       <div v-if="form.approval.enabled">
-        <el-form-item label="超时时间" prop="approval.timeout">
-          <el-input v-model.number="form.approval.timeout" size="small" type="number" :min="0">
+        <el-form-item :label="$t(`global.timeout`)" prop="approval.lark_approval.timeout" v-if="form.approval.type==='lark'">
+          <el-input v-model.number="form.approval.lark_approval.timeout" size="small" type="number" :min="0">
             <span slot="suffix">分钟</span>
           </el-input>
         </el-form-item>
-        <el-form-item label="审批方式" prop="approval.type">
-          <el-radio-group v-model="form.approval.type" @change="handleTypeChange">
+        <el-form-item :label="$t(`global.timeout`)" prop="approval.native_approval.timeout" v-if="form.approval.type==='native'">
+          <el-input v-model.number="form.approval.native_approval.timeout" size="small" type="number" :min="0">
+            <span slot="suffix">分钟</span>
+          </el-input>
+        </el-form-item>
+        <el-form-item :label="$t(`workflow.approvalWay`)" prop="approval.type">
+          <el-radio-group v-model="form.approval.type" >
             <el-radio label="native">Zadig</el-radio>
             <el-radio label="lark">飞书</el-radio>
             <!-- <el-radio disabled>钉钉</el-radio> -->
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="审批应用" v-if="form.approval.type==='lark'">
+        <el-form-item :label="$t(`workflow.approvalApplication`)" v-if="form.approval.type==='lark'">
           <el-select
             size="small"
-            v-model="form.approval.approval_id"
+            v-model="form.approval.lark_approval.approval_id"
             filterable
             remote
             reserve-keyword
-            placeholder="审批应用"
+            :placeholder="$t(`workflow.approvalApplication`)"
             style="width: 100%;"
           >
             <el-option v-for="app in appList" :key="app.id" :value="app.id" :label="app.name"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="审批人" v-if="form.approval.type==='native'">
+        <el-form-item :label="$t(`workflow.reviewer`)" v-if="form.approval.type==='native'">
           <el-select
             size="small"
-            v-model="form.approval.approve_users"
+            v-model="form.approval.native_approval.approve_users"
             multiple
             filterable
             remote
@@ -68,24 +73,24 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="需要审批人数" v-if="form.approval.type==='native'">
-          <el-input v-model.number="form.approval.needed_approvers" type="number" :min="0" size="small"></el-input>
+        <el-form-item :label="$t(`workflow.revieweNumber`)" v-if="form.approval.type==='native'">
+          <el-input v-model.number="form.approval.native_approval.needed_approvers" type="number" :min="0" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="审批人" v-if="form.approval.type==='lark'">
+        <el-form-item :label="$t(`workflow.reviewer`)" v-if="form.approval.type==='lark'">
           <el-button
             type="primary"
             plain
             @click="addApprovalUser"
             size="mini"
-            :disabled="!form.approval.approval_id || appList.length === 0"
-          >编辑</el-button>
+            :disabled="!form.approval.lark_approval.approval_id || appList.length === 0"
+          >{{$t(`global.edit`)}}</el-button>
           <el-tooltip effect="dark" :content="approvalUsers" placement="top">
             <div>
               <span>{{ $utils.tailCut(approvalUsers,30) }}</span>
             </div>
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item :label="$t('global.desc')">
           <el-input v-model="form.approval.description" placeholder="审批通过后才可继续执行" size="small"></el-input>
         </el-form-item>
       </div>
@@ -94,7 +99,7 @@
       :visible.sync="isShowLarkTransferDialog"
       width="40%"
       :close-on-click-modal="false"
-      title="选择审批人"
+      :title="$t(`workflow.selectApprover`)"
       custom-class="approval-dialog"
       :append-to-body="true"
     >
@@ -122,12 +127,12 @@
             </div>
           </div>
         </div>
-        <div class="right">
+        <div class="right" v-if="form.approval.type==='lark'">
           <div class="mg-b16">
             已选：
-            {{form.approval.approve_users && form.approval.approve_users.length || 0}}人
+            {{form.approval.lark_approval.approve_users && form.approval.lark_approval.approve_users.length || 0}}人
           </div>
-          <div v-for="(item,index) in form.approval.approve_users" :key="index">
+          <div v-for="(item,index) in form.approval.lark_approval.approve_users" :key="index">
             <div class="user">
               <div>
                 <img :src="item.avatar" alt="avatar" class="user-avatar" />
@@ -154,7 +159,7 @@ export default {
   name: 'StageOperate',
   data () {
     return {
-      formLabelWidth: '135px',
+      formLabelWidth: '145px',
       rules: {
         name: [
           {
@@ -175,13 +180,19 @@ export default {
         name: '',
         parallel: true,
         approval: {
-          enabled: false,
-          approve_users: [],
-          timeout: null,
-          needed_approvers: null,
-          description: '',
+          enabled: true,
           type: 'native',
-          approval_id: ''
+          description: '',
+          native_approval: {
+            approve_users: [],
+            timeout: 5,
+            needed_approvers: 1
+          },
+          lark_approval: {
+            approval_id: '',
+            approve_users: [],
+            timeout: 5
+          }
         },
         jobs: []
       },
@@ -212,12 +223,15 @@ export default {
   computed: {
     approvalUsers () {
       let users = []
-      this.form.approval.approve_users = this.form.approval.approve_users || []
+      this.form.approval.lark_approval.approve_users =
+        this.form.approval.lark_approval.approve_users || []
       if (
-        this.form.approval.approve_users &&
-        this.form.approval.approve_users.length > 0
+        this.form.approval.lark_approval.approve_users &&
+        this.form.approval.lark_approval.approve_users.length > 0
       ) {
-        users = this.form.approval.approve_users.map(item => item.name)
+        users = this.form.approval.lark_approval.approve_users.map(
+          item => item.name
+        )
       }
       return users.toString()
     }
@@ -248,11 +262,12 @@ export default {
       })
     },
     setUser (val, item, index) {
-      this.form.approval.approve_users = this.form.approval.approve_users || []
+      this.form.approval.lark_approval.approve_users =
+        this.form.approval.lark_approval.approve_users || []
       if (val) {
-        this.form.approval.approve_users.push(item)
+        this.form.approval.lark_approval.approve_users.push(item)
       } else {
-        this.form.approval.approve_users = this.form.approval.approve_users.filter(
+        this.form.approval.lark_approval.approve_users = this.form.approval.lark_approval.approve_users.filter(
           user => user.id !== item.id
         )
       }
@@ -271,16 +286,18 @@ export default {
       this.loading = true
       this.keyword = ''
       getDepartmentAPI(
-        this.form.approval.approval_id,
+        this.form.approval.lark_approval.approval_id,
         this.departmentId,
         this.projectName
       ).then(res => {
         res.user_list.forEach(item => {
           if (
-            this.form.approval.approve_users &&
-            this.form.approval.approve_users.length > 0
+            this.form.approval.lark_approval.approve_users &&
+            this.form.approval.lark_approval.approve_users.length > 0
           ) {
-            const ids = this.form.approval.approve_users.map(item => item.id)
+            const ids = this.form.approval.lark_approval.approve_users.map(
+              item => item.id
+            )
             if (ids.indexOf(item.id) > -1) {
               item.checked = true
             } else {
@@ -300,7 +317,7 @@ export default {
       this.getDepartmentInfo()
     },
     delApprovalUser (item, index) {
-      this.form.approval.approve_users.splice(index, 1)
+      this.form.approval.lark_approval.approve_users.splice(index, 1)
       this.getDepartmentInfo()
     },
     handleClick (item) {
@@ -316,9 +333,6 @@ export default {
         this.breadMenu = [{ name: '联系人', id: 'root' }]
       }
       this.getDepartmentInfo()
-    },
-    handleTypeChange (val) {
-      this.form.approval.approve_users = []
     },
     saveApprovalUser () {
       this.isShowLarkTransferDialog = false
@@ -345,12 +359,19 @@ export default {
         name: '',
         parallel: true,
         approval: {
-          enabled: false,
-          approve_users: [],
-          timeout: null,
-          needed_approvers: null,
+          enabled: true,
+          type: 'native',
           description: '',
-          type: 'native'
+          native_approval: {
+            approve_users: [],
+            timeout: 5,
+            needed_approvers: 1
+          },
+          lark_approval: {
+            approval_id: '',
+            approve_users: [],
+            timeout: 5
+          }
         },
         jobs: []
       }
@@ -366,6 +387,23 @@ export default {
           if (this.type === 'edit') {
             this.form = cloneDeep(val)
             this.originInfo = cloneDeep(val)
+            if (this.form.approval.type === 'lark') {
+              if (!this.form.approval.native_approval) {
+                this.$set(this.form.approval, 'native_approval', {
+                  approve_users: [],
+                  timeout: 5,
+                  needed_approvers: 1
+                })
+              }
+            } else {
+              if (!this.form.approval.lark_approval) {
+                this.$set(this.form.approval, 'lark_approval', {
+                  approval_id: '',
+                  approve_users: [],
+                  timeout: 5
+                })
+              }
+            }
           }
         }
       },

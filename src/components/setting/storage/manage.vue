@@ -1,6 +1,6 @@
 <template>
   <div v-loading="loading"
-       element-loading-text="加载中..."
+       :element-loading-text="$t(`global.loading`)"
        element-loading-spinner="iconfont iconfont-loading iconduixiangcunchu"
        class="setting-storage-container">
     <!--storage-create-dialog-->
@@ -103,11 +103,11 @@
       <div slot="footer"
            class="dialog-footer">
         <el-button size="small"
-                   @click="dialogStorageCreateFormVisible = false">取 消</el-button>
+                   @click="dialogStorageCreateFormVisible = false">{{$t(`global.cancel`)}}</el-button>
         <el-button size="small"
                    :plain="true"
                    type="success"
-                   @click="storageOperation('add')">保存</el-button>
+                   @click="storageOperation('add')">{{$t(`global.save`)}}</el-button>
       </div>
     </el-dialog>
     <!--storage-create-dialog-->
@@ -212,11 +212,11 @@
       <div slot="footer"
            class="dialog-footer">
         <el-button size="small"
-                   @click="dialogStorageEditFormVisible = false">取 消</el-button>
+                   @click="dialogStorageEditFormVisible = false">{{$t(`global.cancel`)}}</el-button>
         <el-button size="small"
                    :plain="true"
                    type="success"
-                   @click="storageOperation('update')">保存</el-button>
+                   @click="storageOperation('update')">{{$t(`global.save`)}}</el-button>
       </div>
     </el-dialog>
     <!--storage-edit-dialog-->
@@ -229,14 +229,14 @@
                    type="primary"
                    :href="`https://docs.koderover.com/zadig/settings/object-storage/`"
                    :underline="false"
-                   target="_blank">帮助文档</el-link>
+                   target="_blank">{{$t(`global.helpDoc`)}}</el-link>
         </template>
       </el-alert>
       <div class="sync-container">
         <el-button :plain="true"
                    size="small"
                    @click="dialogStorageCreateFormVisible=true"
-                   type="success">新建</el-button>
+                   type="success">{{$t('global.add')}}</el-button>
       </div>
       <div class="storage-list">
         <template>
@@ -288,16 +288,16 @@
             </el-table-column>
 
             <el-table-column width="180px"
-                             label="操作">
+                             :label="$t(`global.operation`)">
               <template slot-scope="scope">
                 <el-button @click="storageOperation('edit',scope.row)"
                            size="mini"
                            type="primary"
-                           plain>编辑</el-button>
+                           plain>{{$t(`global.edit`)}}</el-button>
                 <el-button @click="storageOperation('delete',scope.row)"
                            size="mini"
                            type="danger"
-                           plain>删除</el-button>
+                           plain>{{$t(`global.delete`)}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -418,8 +418,8 @@ export default {
       } else if (operate === 'delete') {
         const id = current_storage.id
         this.$confirm(`确定要删除 ${current_storage.endpoint} ?`, '确认', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }).then(({ value }) => {
           deleteStorageAPI(id).then((res) => {
@@ -473,12 +473,8 @@ export default {
       })
     }
   },
-  computed: {
-
-  },
   created () {
-    bus.$emit('set-topbar-title', { title: '对象存储', breadcrumb: [] })
-
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t(`sidebarMenu.objectStorage`), url: '' }] })
     this.getStorage()
   }
 }

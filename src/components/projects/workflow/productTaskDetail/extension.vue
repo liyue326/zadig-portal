@@ -3,10 +3,10 @@
     <div class="primary-title not-first-child">扩展</div>
     <el-alert
       v-if="extensionStage.error"
-      title="错误信息"
+      :title="$t(`global.errorMsg`)"
       :description="extensionStage.error"
       type="error"
-      close-text="知道了"
+      :close-text="$t(`global.ok`)"
       style="margin: 8px 0;"
     ></el-alert>
     <el-row :gutter="0" class="extension-content">
@@ -16,9 +16,9 @@
       <el-col
         :span="6"
         :class="colorTranslation(extensionStage.status, 'pipeline', 'task')"
-      >{{ extensionStage.status ? myTranslate(extensionStage.status) : "未运行" }}</el-col>
+      >{{ extensionStage.status?$t(`workflowTaskStatus.${extensionStage.status}`):$t(`workflowTaskStatus.notRunning`) }}</el-col>
       <el-col v-if="extensionStage.status!=='running'" :span="6">
-        <i class="iconfont iconshijian"></i> 持续时间
+        <i class="iconfont iconshijian"></i> {{$t(`workflow.duration`)}}
       </el-col>
       <el-col v-if="extensionStage.status!=='running'" :span="6">{{ extensionStage.duration }}</el-col>
     </el-row>
@@ -73,7 +73,7 @@
   </div>
 </template>
 <script>
-import { wordTranslate, colorTranslate } from '@utils/wordTranslate.js'
+import { colorTranslate } from '@utils/wordTranslate.js'
 import VueJsonPretty from 'vue-json-pretty'
 import isJSON from 'validator/lib/isJSON'
 export default {
@@ -86,9 +86,6 @@ export default {
   methods: {
     colorTranslation (word, category, subitem) {
       return colorTranslate(word, category, subitem)
-    },
-    myTranslate (word) {
-      return wordTranslate(word, 'pipeline', 'task')
     },
     checkJSON (str) {
       return isJSON(str)

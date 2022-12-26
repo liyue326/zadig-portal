@@ -1,5 +1,5 @@
 <template>
-  <div class="micro-container" v-loading="!hasMounted" element-loading-text="加载中...">
+  <div class="micro-container" v-loading="!hasMounted" :element-loading-text="$t(`global.loading`)">
     <div id="container"></div>
   </div>
 </template>

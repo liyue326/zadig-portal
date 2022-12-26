@@ -4,30 +4,30 @@
       <div class="aside-bar">
         <div class="tabs__wrap tabs__wrap_vertical">
           <div class="tabs__item" :class="{'selected': $route.query.rightbar === 'reference'}" @click="changeRoute('reference')">
-            <span class="step-name">引用列表</span>
+            <span class="step-name">{{$t(`templates.build.referenceList`)}}</span>
           </div>
         </div>
       </div>
       <div class="aside__content">
         <div v-if="$route.query.rightbar === 'reference'" class="service-aside--variables">
           <header class="service-aside-box__header">
-            <div class="service-aside-box__title">引用列表</div>
+            <div class="service-aside-box__title">{{$t(`templates.build.referenceList`)}}</div>
           </header>
           <div class="service-aside-box__content">
             <el-table :data="buildReference" stripe style="width: 100%;">
-              <el-table-column prop="build_name" label="构建名称">
+              <el-table-column prop="build_name" :label="$t(`templates.build.buildName`)">
                 <template slot-scope="scope">
                   <router-link
                     :to="`/v1/projects/detail/${scope.row.project_name}/builds/detail/${scope.row.build_name}`"
                   >{{scope.row.build_name}}</router-link>
                 </template>
               </el-table-column>
-              <el-table-column prop="service_module" label="服务组件">
+              <el-table-column prop="service_module" :label="$t(`global.serviceModule`)">
                 <template slot-scope="scope">
                   <template v-if="scope.row.service_module.length > 0">
                     <span v-for="(item,index) in scope.row.service_module" :key="index" style="display: block;">{{item}}</span>
                   </template>
-                  <span v-else>空</span>
+                  <span v-else>{{$t(`templates.build.noneVariable`)}}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -108,24 +108,6 @@ export default {
     height: 100%;
     border-left: 1px solid transparent;
     transition: border-color ease-in-out 200ms;
-
-    .capture-area__component {
-      position: relative;
-      top: 50%;
-      left: -6px;
-      display: inline-block;
-      height: 38px;
-      transform: translateY(-50%);
-
-      .capture-area {
-        position: absolute;
-        width: 10px;
-        height: 38px;
-        background-color: #fff;
-        border: 1px solid #dbdbdb;
-        border-radius: 5px;
-      }
-    }
   }
 
   .aside__inner {
@@ -186,7 +168,6 @@ export default {
 
         .service-aside-help__content {
           display: flex;
-          -ms-flex: 1;
           flex: 1;
           flex-direction: column;
           height: 100%;
@@ -242,6 +223,7 @@ export default {
           .step-name {
             font-weight: 500;
             font-size: 14px;
+            writing-mode: vertical-rl;
           }
         }
       }

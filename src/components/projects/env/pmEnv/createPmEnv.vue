@@ -1,13 +1,14 @@
 <template>
-  <div class="create-pm-env-container" v-loading="loading" element-loading-text="正在加载中" element-loading-spinner="el-icon-loading">
+  <div class="create-pm-env-container" v-loading="loading" :element-loading-text="$t('global.loading')" element-loading-spinner="el-icon-loading">
     <div v-if="$utils.isEmpty(this.pmServiceMap) && !loading" class="no-resources">
       <img src="@assets/icons/illustration/environment.svg" alt />
       <div class="description">
         <p>
-          该环境暂无服务，请点击
+          <span>{{$t('environments.common.environmentWithoutService')}}</span>
           <router-link :to="`/v1/projects/detail/${projectName}/services`">
-            <el-button type="primary" size="mini" round plain>服务</el-button>
-          </router-link>新建服务
+            <el-button type="primary" size="mini" round plain>{{$t('project.services')}}</el-button>
+          </router-link>
+          <span>{{$t('environments.common.toCreateService')}}</span>
         </p>
       </div>
     </div>
@@ -18,18 +19,19 @@
         label-position="left"
         ref="createEnvRef"
         :model="projectConfig"
+        :rules="rules"
         inline-message
       >
-        <el-form-item label="环境名称" prop="env_name" :rules="{ required: true, trigger: 'change', validator: validateEnvName }">
+        <el-form-item :label="$t('environments.common.envName')" prop="env_name">
           <el-input v-model="projectConfig.env_name" size="small"></el-input>
         </el-form-item>
       </el-form>
       <div class="common-parcel-block">
-        <div class="primary-title">服务列表</div>
+        <div class="primary-title">{{$t('environments.pm.serviceList')}}</div>
         <div class="box-card-service">
           <div slot="header" class="clearfix">
-            <span class="second-title">单服务或微服务(自定义脚本/Docker 部署)</span>
-            <span class="small-title">(请关联服务的主机资源，后续也可以在服务中进行配置)</span>
+            <span class="second-title">{{$t('environments.pm.secondTitle')}}</span>
+            <span class="small-title">{{$t('environments.pm.smallTitle')}}</span>
           </div>
           <el-form class="service-form-block" label-width="50%" label-position="left">
             <div class="service-item" v-for="(typeServiceMap, serviceName) in pmServiceMap" :key="serviceName">
@@ -37,15 +39,15 @@
               <div class="service-content">
                 <div v-for="service in typeServiceMap" :key="`${service.service_name}-${service.type}`" class="service-block">
                   <template v-if="service.type==='pm'" class="container-images">
-                    <el-form-item label="请关联主机资源" label-width="40%">
-                      <el-button v-if="allHost.reduce((pre, cur) => pre + cur.options.length, 0) === 0" @click="$router.push('/v1/system/host')" type="text">创建主机</el-button>
+                    <el-form-item :label="$t('environments.pm.linkToHosts')" label-width="40%">
+                      <el-button v-if="allHost.reduce((pre, cur) => pre + cur.options.length, 0) === 0" @click="$router.push('/v1/system/host')" type="text">{{$t('environments.pm.createHost')}}</el-button>
                       <el-select
                         v-else
                         v-model="service.host_with_labels"
                         filterable
                         multiple
                         @change="addHost(service)"
-                        placeholder="请选择要关联的主机"
+                        :placeholder="$t('environments.pm.selectHosts')"
                         size="small"
                       >
                         <el-option-group
@@ -70,13 +72,13 @@
       </div>
       <el-form label-width="35%" class="ops">
         <el-form-item>
-          <el-button @click="$router.back()" :loading="startDeployLoading" size="medium">取消</el-button>
-          <el-button @click="deployPmEnv" :loading="startDeployLoading" type="primary" size="medium">立即创建</el-button>
+          <el-button @click="$router.back()" :loading="startDeployLoading" size="medium">{{$t(`global.cancel`)}}</el-button>
+          <el-button @click="deployPmEnv" :loading="startDeployLoading" type="primary" size="medium">{{$t('environments.common.createEnv')}}</el-button>
         </el-form-item>
       </el-form>
       <footer v-if="startDeployLoading" class="create-footer">
         <div class="description">
-          <el-tag type="primary">正在创建环境中....</el-tag>
+          <el-tag type="primary">{{$t('environments.common.envIsCreating')}}</el-tag>
         </div>
         <div class="deploy-loading">
           <div class="spinner__item1"></div>
@@ -98,18 +100,6 @@ import {
   getHostLabelListAPI
 } from '@api'
 import bus from '@utils/eventBus'
-
-const validateEnvName = (rule, value, callback) => {
-  if (typeof value === 'undefined' || value === '') {
-    callback(new Error('填写环境名称'))
-  } else {
-    if (!/^[a-z0-9-]+$/.test(value)) {
-      callback(new Error('环境名称只支持小写字母和数字，特殊字符只支持中划线'))
-    } else {
-      callback()
-    }
-  }
-}
 export default {
   data () {
     return {
@@ -129,14 +119,27 @@ export default {
       allHost: [],
       startDeployLoading: false,
       loading: false,
-      pmServiceMap: {},
-      validateEnvName
+      pmServiceMap: {}
     }
   },
 
   computed: {
     projectName () {
       return this.$route.params.project_name
+    },
+    rules () {
+      const validateEnvName = (rule, value, callback) => {
+        if (typeof value === 'undefined' || value === '') {
+          callback(new Error(this.$t('environments.common.inputEnvName')))
+        } else {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            callback(new Error(this.$t('environments.common.checkEnvName')))
+          } else {
+            callback()
+          }
+        }
+      }
+      return { env_name: { required: true, trigger: 'change', validator: validateEnvName } }
     }
   },
   methods: {
@@ -158,11 +161,11 @@ export default {
         })
         this.allHost = [
           {
-            label: '项目资源',
+            label: this.$t('environments.pm.projectResources'),
             options: projectOptions
           },
           {
-            label: '系统资源',
+            label: this.$t('environments.pm.systemResources'),
             options: systemOptions
           }
         ]
@@ -242,7 +245,7 @@ export default {
                 const envName = payload.env_name
                 this.startDeployLoading = false
                 this.$message({
-                  message: '创建环境成功',
+                  message: this.$t('environments.common.environmentHasBeenSuccessfullyCreated'),
                   type: 'success'
                 })
                 this.$router.push(
@@ -266,7 +269,7 @@ export default {
       title: '',
       breadcrumb: [
         {
-          title: '项目',
+          title: this.$t('subTopbarMenu.projects'),
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
@@ -274,8 +277,8 @@ export default {
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
-        { title: '环境', url: '' },
-        { title: '创建', url: '' }
+        { title: this.$t('subTopbarMenu.environments'), url: '' },
+        { title: this.$t('environments.common.envCreation'), url: '' }
       ]
     })
     this.projectConfig.product_name = this.projectName

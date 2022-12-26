@@ -44,7 +44,7 @@
           ></el-option>
         </el-select>
         <span class="app-operation">
-          <el-button v-if="installApp.installs.length >= 1" @click="deleteApp(appIndex)" type="danger" size="mini" plain>删除</el-button>
+          <el-button v-if="installApp.installs.length >= 1" @click="deleteApp(appIndex)" type="danger" size="mini" plain>{{$t(`global.delete`)}}</el-button>
           <el-button v-if="appIndex===installApp.installs.length-1" @click="addApp(appIndex)" type="primary" size="mini" plain>新增</el-button>
         </span>
       </el-form-item>

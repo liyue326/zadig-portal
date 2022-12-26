@@ -25,11 +25,11 @@
         class="button-exec"
         @click="startCustomWorkflowBuild(workflow)"
       >
-        <span class="iconfont iconzhixing">&nbsp;执行</span>
+        <span class="iconfont iconzhixing">&nbsp;{{$t(`workflow.run`)}}</span>
       </el-button>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <el-button type="primary" class="button-exec permission-disabled">
-          <span class="iconfont iconzhixing">&nbsp;执行</span>
+          <span class="iconfont iconzhixing">&nbsp;{{$t(`workflow.run`)}}</span>
         </el-button>
       </el-tooltip>
       <template v-if="workflow.workflow_type === 'common_workflow'">
@@ -39,7 +39,7 @@
         >
           <span class="menu-item iconfont icondeploy"></span>
         </router-link>
-        <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+        <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
           <span class="permission-disabled menu-item iconfont icondeploy"></span>
         </el-tooltip>
       </template>
@@ -50,7 +50,7 @@
         >
           <span class="menu-item iconfont icondeploy"></span>
         </router-link>
-        <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+        <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
           <span class="permission-disabled menu-item iconfont icondeploy"></span>
         </el-tooltip>
       </template>
@@ -63,7 +63,7 @@
             v-hasPermi="{projectName: workflow.projectName, action: 'delete_workflow',resource:{type:'workflow',name:workflow.name},isBtn:true}"
             @click.native="deleteCustomWorkflow(workflow)"
           >
-            <span>删除</span>
+            <span>{{$t(`global.delete`)}}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -75,11 +75,11 @@
         class="button-exec"
         @click="startProductWorkflowBuild(workflow)"
       >
-        <span class="iconfont iconzhixing">&nbsp;执行</span>
+        <span class="iconfont iconzhixing">&nbsp;{{$t(`workflow.run`)}}</span>
       </el-button>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <el-button type="primary" class="button-exec permission-disabled">
-          <span class="iconfont iconzhixing">&nbsp;执行</span>
+          <span class="iconfont iconzhixing">&nbsp;{{$t(`workflow.run`)}}</span>
         </el-button>
       </el-tooltip>
       <router-link
@@ -88,7 +88,7 @@
       >
         <span class="menu-item iconfont icondeploy"></span>
       </router-link>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <span class="permission-disabled menu-item iconfont icondeploy"></span>
       </el-tooltip>
       <el-dropdown @visible-change="(status) => fnShowTimer(status, index, workflow)">
@@ -100,37 +100,37 @@
             v-hasPermi="{projectName: workflow.projectName, action: 'edit_workflow',resource:{type:'workflow',name:workflow.name},isBtn:true}"
             @click.native="changeSchedule(workflow.projectName)"
           >
-            <span>{{workflow.schedulerEnabled ? '关闭': '打开'}}定时器</span>
+            <span>{{workflow.schedulerEnabled ? this.$t(`workflow.close`): this.$t(`workflow.open`)}} {{this.$t(`workflow.timer`)}}</span>
           </el-dropdown-item>
           <el-dropdown-item
             v-hasPermi="{projectName: workflow.projectName, action: 'create_workflow',resource:{type:'workflow',name:workflow.name},isBtn:true}"
             @click.native="copyProductWorkflow(workflow)"
           >
-            <span>复制</span>
+            <span>{{$t(`global.copy`)}}</span>
           </el-dropdown-item>
           <el-dropdown-item
             v-hasPermi="{projectName: workflow.projectName, action: 'delete_workflow',resource:{type:'workflow',name:workflow.name},isBtn:true}"
             @click.native="deleteProductWorkflow(workflow)"
           >
-            <span>删除</span>
+            <span>{{$t(`global.delete`)}}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <el-dialog :visible.sync="isShowCopyDialog" title="复制工作流" width="40%">
-        <el-form :model="copyWorkflowInfo" @submit.native.prevent ref="copyForm" :rules="rules" label-position="left" label-width="120px">
-          <el-form-item label="新工作流名称" prop="display_name">
-            <el-input v-model="copyWorkflowInfo.display_name" placeholder="新工作流名称" size="small"></el-input>
+      <el-dialog :visible.sync="isShowCopyDialog" :title="$t(`workflow.copyWorkflow`)" width="40%">
+        <el-form :model="copyWorkflowInfo" @submit.native.prevent ref="copyForm" :rules="rules" label-position="left" label-width="160px">
+          <el-form-item :label="$t(`workflow.newWorkflowName`)" prop="display_name">
+            <el-input v-model="copyWorkflowInfo.display_name" :placeholder="$t(`workflow.newWorkflowName`)" size="small"></el-input>
           </el-form-item>
-          <el-form-item label="新工作流标识" prop="name">
-            <el-input v-model="copyWorkflowInfo.name" :disabled="!editProjectName" placeholder="新工作流标识" size="small" class="name"></el-input>
+          <el-form-item :label="$t(`workflow.newWorkflowID`)" prop="name">
+            <el-input v-model="copyWorkflowInfo.name" :disabled="!editProjectName" :placeholder="$t(`workflow.newWorkflowID`)" size="small" class="name"></el-input>
             <span @click="editProjectName = editProjectName ? false : true" class="edit-btn">
               <i :class="[editProjectName ? 'el-icon-finished' : 'el-icon-edit-outline']"></i>
             </span>
           </el-form-item>
         </el-form>
         <span slot="footer">
-          <el-button type="primary" size="small" @click="submitForm('copyForm')">确定</el-button>
-          <el-button size="small" @click="resetForm('copyForm')">取消</el-button>
+          <el-button type="primary" size="small" @click="submitForm('copyForm')">{{$t(`global.confirm`)}}</el-button>
+          <el-button size="small" @click="resetForm('copyForm')">{{$t(`global.cancel`)}}</el-button>
         </span>
       </el-dialog>
     </template>
@@ -166,7 +166,7 @@ export default {
             type: 'string',
             required: true,
             trigger: ['blur', 'change'],
-            message: '请输入工作流名称'
+            message: this.$t(`workflow.inputWorkflowName`)
           }
         ],
         name: [
@@ -215,7 +215,7 @@ export default {
       } else {
         stages = this.workflow.enabledStages
           ? this.workflow.enabledStages.map(stage => {
-            return this.wordTranslation(stage, 'workflowStage')
+            return this.$t(`productWorkflowSideBar.${stage}`)
           })
           : []
       }
@@ -239,7 +239,7 @@ export default {
       copyProductWorkflowAPI(projectName, oldName, newName, newDisplay).then(
         () => {
           this.$message({
-            message: '复制流水线成功',
+            message: this.$t(`workflow.copyWorkflowSuccess`),
             type: 'success'
           })
           this.refreshWorkflow(this.projectName)
@@ -324,9 +324,9 @@ export default {
       )
       if (res) {
         if (workflowInfo.schedule_enabled) {
-          this.$message.success('定时器开启成功')
+          this.$message.success(this.$t(`workflow.timerOpenSuccess`))
         } else {
-          this.$message.success('定时器关闭成功')
+          this.$message.success(this.$t(`workflow.timerCloseSuccess`))
         }
         this.refreshWorkflow(projectName)
       }

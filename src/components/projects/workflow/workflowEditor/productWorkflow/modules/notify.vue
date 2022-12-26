@@ -1,9 +1,9 @@
 <template>
   <div :class="{'notify': fromWorkflow || notify.length > 0}">
     <div class="script dashed-container" v-if="showTitle">
-      <span class="title">通知</span>
+      <span class="title">{{$t(`productWorkflowSideBar.notify`)}}</span>
     </div>
-    <el-button v-if="fromWorkflow" @click="addNotifyItem()" size="mini" icon="el-icon-plus" plain>添加配置</el-button>
+    <el-button v-if="fromWorkflow" @click="addNotifyItem()" size="mini" icon="el-icon-plus" plain>{{$t(`global.addConfig`)}}</el-button>
     <div class="dashed-container" v-if='notify.length > 0'>
       <div class="notify-container" v-for="(item,index) in notify" :key="index">
         <NotifyItem :notify="item" :validObj="validObj" ref="notifys" :curIndex="index" :fromWorkflow="fromWorkflow" @update="delNotify" />

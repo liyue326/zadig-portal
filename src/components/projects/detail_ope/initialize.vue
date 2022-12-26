@@ -22,7 +22,7 @@
         </div>
       </article>
       <footer>
-        <el-button type="primary" size="small" icon="confirm-icon iconfont iconvery-confirm" @click="createEnvAndWorkflow" round>确认</el-button>
+        <el-button type="primary" size="small" icon="confirm-icon iconfont iconvery-confirm" @click="createEnvAndWorkflow" round>{{$t('global.confirm')}}</el-button>
       </footer>
     </section>
     <InitEnvDialog
@@ -75,7 +75,7 @@ export default {
     },
     getNewCollaboration () {
       getNewCollaborationAPI(this.projectName).then(res => {
-        res.product.forEach(product => {
+        res.product.forEach(async product => {
           if (
             product.collaboration_type === 'new' &&
             product.deploy_type === 'helm'
@@ -141,6 +141,9 @@ export default {
           }
           if (product.deploy_type !== 'helm') {
             product.deploy_type = 'k8s'
+            product.services.forEach(svc => {
+              svc.canEditYaml = !!svc.variable_yaml
+            })
           }
         })
         const fn = obj => {
@@ -174,7 +177,7 @@ export default {
     bus.$emit('set-topbar-title', {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         { title: this.projectName, isProjectName: true, url: '' },
         { title: '项目资源', url: '' }
       ]

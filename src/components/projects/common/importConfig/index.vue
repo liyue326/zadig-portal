@@ -5,7 +5,7 @@
       :style="{ 'margin-bottom': importRepoInfoUse.showParams.showImport ? '0' : '16px'}"
     >{{ importRepoInfoUse.showParams.title }}</div>
     <div class="values-yaml-content">
-      <el-button v-if="importRepoInfoUse.showParams.showImport" type="text" class="title-btn" @click="showGitImportDialog = true">从代码库导入</el-button>
+      <el-button v-if="importRepoInfoUse.showParams.showImport" type="text" class="title-btn" @click="showGitImportDialog = true">{{$t('global.importFromRepository')}}</el-button>
       <Resize class="desc mirror" @sizeChange="$refs.codemirror.refresh()">
         <codemirror ref="codemirror" v-model="importRepoInfoUse.overrideYaml" :placeholder="placeholder" :cmOption="cmOption"></codemirror>
       </Resize>
@@ -16,10 +16,10 @@
         <el-checkbox v-model="importRepoInfoUse.restart_associated_svc">重启关联服务 {{ importRepoInfoUse.services.join('、') }}</el-checkbox>
       </div>
     </div>
-    <el-dialog title="环境配置 - 从代码库导入" :visible.sync="showGitImportDialog" append-to-body>
+    <el-dialog :title="$t('environments.k8s.envConfigComp.importEnvConfigurationFromRepository')" :visible.sync="showGitImportDialog" append-to-body>
       <Repository ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig" :fileType="'k8sYaml'" showAutoSync />
       <div slot="footer">
-        <el-button @click="showGitImportDialog = false" size="small">取 消</el-button>
+        <el-button @click="showGitImportDialog = false" size="small">{{$t(`global.cancel`)}}</el-button>
         <el-button type="primary" @click="importConfigYaml" size="small" :loading="loadValueYamls">导 入</el-button>
       </div>
     </el-dialog>
@@ -44,12 +44,6 @@ const valueInfo = {
     namespace: '',
     autoSync: false
   }
-}
-
-const showParams = {
-  title: '添加环境配置',
-  showImport: true,
-  checkAssociated: false
 }
 
 export default {
@@ -77,6 +71,11 @@ export default {
   computed: {
     importRepoInfoUse: {
       get () {
+        const showParams = {
+          title: this.$t('environments.k8s.envConfigComp.addEnvConfiguration'),
+          showImport: true,
+          checkAssociated: false
+        }
         const defaultParams = {}
         if (!this.importRepoInfo.gitRepoConfig) {
           defaultParams.gitRepoConfig = cloneDeep(valueInfo.gitRepoConfig)

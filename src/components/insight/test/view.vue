@@ -5,7 +5,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">测试趋势</span>
+              <span class="head">{{$t('dataStatistics.insight.testTrend')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <Trend :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -16,7 +16,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">测试健康度</span>
+              <span class="head">{{$t('dataStatistics.insight.testHealthiness')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <Health :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -27,7 +27,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">周测试收益（执行次数 x 测试用例数）</span>
+              <span class="head">{{$t('dataStatistics.insight.testBenefits')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <TestCases :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -40,7 +40,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">平均测试时长</span>
+              <span class="head">{{$t('dataStatistics.insight.averageTestDuration')}}</span>
               <span class="duration">{{getSetTime}}</span>
             </div>
             <AverageTestDuration :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -51,7 +51,7 @@
         <div class="chart-wrapper">
           <div class="chart-container">
             <div class="chart-title">
-              <span class="head">周交付部署次数</span>
+              <span class="head">{{$t('dataStatistics.insight.deliveryDeployByWeek')}}</span>
               <span style="visibility: hidden;" class="duration">{{getSetTime}}</span>
             </div>
             <Deploy :selectedDuration="selectedDuration" :selectedProjects="selectedProjects" />
@@ -102,8 +102,8 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '效能洞察', url: '/v1/insight' },
-        { title: '测试效能', url: '' }
+        { title: this.$t('sidebarMenu.dataInsight'), url: '/v1/insight' },
+        { title: this.$t('dataStatistics.insight.testInsight'), url: '' }
       ]
     })
   }

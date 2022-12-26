@@ -14,11 +14,11 @@ const validateJobName = (rule, value, callback) => {
 }
 const tabList = [
   {
-    label: '界面化',
+    label: 'ui',
     name: 'ui'
   },
   {
-    label: 'YAML',
+    label: 'yaml',
     name: 'yaml'
   }
 ]
@@ -48,53 +48,48 @@ const jobTypeList = [
   //   name: 'custom',
   //   tip: '自定义'
   // },
+
   {
-    label: '构建',
+    label: 'build',
     name: 'zadig-build',
     type: 'zadig-build',
     is_offical: true,
-    description: '可直接引用「项目」-「构建」模块中的配置',
-    workflowType: 'custom'
+    description: '可直接引用「项目」-「构建」模块中的配置'
   },
   {
-    label: '部署',
+    label: 'deploy',
     name: 'zadig-deploy',
     type: 'zadig-deploy',
     is_offical: true,
-    description: '可更新容器形态的服务镜像',
-    workflowType: 'custom'
+    description: '可更新容器形态的服务镜像'
   },
   {
-    label: '通用任务',
+    label: 'freestyle',
     name: 'freestyle',
     type: 'freestyle',
     is_offical: true,
-    description: '支持拉取代码、执行 Shell 脚本、文件存储等功能',
-    workflowType: 'common'
+    description: '支持拉取代码、执行 Shell 脚本、文件存储等功能'
   },
   {
-    label: 'Kubernetes 部署',
+    label: 'customDeploy',
     name: 'custom-deploy',
     type: 'custom-deploy',
     is_offical: true,
-    description: '可更新 Kubernetes 中容器镜像',
-    workflowType: 'common'
+    description: '可更新 Kubernetes 中容器镜像'
   },
   {
-    label: '测试',
+    label: 'test',
     name: 'zadig-test',
     type: 'zadig-test',
     is_offical: true,
-    description: '可直接引用「项目」-「测试」模块中的测试配置',
-    workflowType: 'common'
+    description: '可直接引用「项目」-「测试」模块中的测试配置'
   },
   {
-    label: '代码扫描',
+    label: 'scan',
     name: 'zadig-scanning',
     type: 'zadig-scanning',
     is_offical: true,
-    description: '可直接引用「项目」-「代码扫描」模块中的配置。',
-    workflowType: 'custom'
+    description: '可直接引用「项目」-「代码扫描」模块中的配置。'
   },
   {
     label: '更新 K8s YAML 任务',
@@ -105,7 +100,7 @@ const jobTypeList = [
     workflowType: 'release'
   },
   {
-    label: '部署蓝绿环境',
+    label: 'blueGreenDeploy',
     name: 'blue-green-deploy',
     type: 'k8s-blue-green-deploy',
     is_offical: true,
@@ -113,7 +108,7 @@ const jobTypeList = [
     workflowType: 'release'
   },
   {
-    label: '蓝绿发布',
+    label: 'blueGreenDeploy',
     name: 'blue-green-release',
     type: 'k8s-blue-green-release',
     is_offical: true,
@@ -121,7 +116,7 @@ const jobTypeList = [
     workflowType: 'release'
   },
   {
-    label: '部署金丝雀',
+    label: 'canaryDeploy',
     name: 'canary-deploy',
     type: 'k8s-canary-deploy',
     is_offical: true,
@@ -129,7 +124,7 @@ const jobTypeList = [
     workflowType: 'release'
   },
   {
-    label: '金丝雀发布',
+    label: 'canaryConfirm',
     name: 'canary-confirm',
     type: 'k8s-canary-release',
     is_offical: true,
@@ -137,7 +132,7 @@ const jobTypeList = [
     workflowType: 'release'
   },
   {
-    label: '灰度回滚',
+    label: 'grayDeploy',
     name: 'gray-deploy',
     type: 'k8s-gray-rollback',
     is_offical: true,
@@ -145,7 +140,7 @@ const jobTypeList = [
     workflowType: 'release'
   },
   {
-    label: '灰度发布',
+    label: 'canaryDeploy',
     name: 'gray-deploy',
     type: 'k8s-gray-release',
     is_offical: true,
@@ -153,7 +148,7 @@ const jobTypeList = [
     workflowType: 'release'
   },
   {
-    label: '镜像分发',
+    label: 'distribute',
     name: 'zadig-distribute-image',
     type: 'zadig-distribute-image',
     is_offical: true,
@@ -163,11 +158,11 @@ const jobTypeList = [
 ]
 const configList = [
   {
-    label: '变量',
+    label: 'var',
     value: 'env'
   },
   {
-    label: '高级配置',
+    label: 'advancedSettings',
     value: 'high'
   }
 ]
@@ -268,32 +263,36 @@ const globalConstEnvs = [
 ]
 const notifyType = [
   {
+    label: 'created',
+    desc: '任务开始'
+  },
+  {
     label: 'passed',
-    desc: '任务成功'
+    desc: 'passed'
   },
   {
     label: 'failed',
-    desc: '任务失败'
+    desc: 'failed'
   },
   {
     label: 'timeout',
-    desc: '任务超时'
+    desc: 'timeout'
   },
   {
     label: 'cancelled',
-    desc: '任务取消'
+    desc: 'cancelled'
   },
   {
     label: 'changed',
-    desc: '状态变更'
+    desc: 'changed'
   },
   {
     label: 'reject',
-    desc: '任务拒绝'
+    desc: 'reject'
   },
   {
     label: 'waitforapprove',
-    desc: '等待人工审批'
+    desc: 'waitforapprove'
   }
 ]
 const notifyPlatform = [

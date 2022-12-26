@@ -1,13 +1,13 @@
 <template>
   <div v-loading="loading" class="version-detail-container">
-    <el-dialog :visible.sync="exportModal.visible" width="65%" title="服务配置查看" class="export-dialog">
-      <span v-if="exportModal.textObjects.length === 0" class="nothing">{{'没有找到数据'}}</span>
+    <el-dialog :visible.sync="exportModal.visible" width="65%" :title="$t('deliveryCenter.viewServiceConfiguration')" class="export-dialog">
+      <span v-if="exportModal.textObjects.length === 0" class="nothing">{{ $t('global.emptyText')}}</span>
       <template v-else>
         <div v-for="(obj, i) of exportModal.textObjects" :key="obj.originalText" class="config-viewer">
           <div>
             <div :class="{'op-row': true, expanded: obj.expanded}">
-              <el-button @click="toggleYAML(obj)" type="text" icon="el-icon-caret-bottom">{{ obj.expanded ? '收起' : '展开' }}</el-button>
-              <el-button @click="copyYAML(obj, i)" type="primary" plain size="small" class="at-right">复制</el-button>
+              <el-button @click="toggleYAML(obj)" type="text" icon="el-icon-caret-bottom">{{ obj.expanded ? $t('global.collapse') : $t('global.expand') }}</el-button>
+              <el-button @click="copyYAML(obj, i)" type="primary" plain size="small" class="at-right">{{$t(`global.copy`)}}</el-button>
             </div>
             <Editor
               v-show="obj.expanded"
@@ -40,24 +40,24 @@
       </div>
     </el-dialog>
     <el-tabs type="border-card">
-      <el-tab-pane label="版本信息">
+      <el-tab-pane :label="$t('deliveryCenter.versionInfo')">
         <div class="el-card box-card task-process is-always-shadow">
           <div class="el-card__header">
             <div class="clearfix">
-              <span>基本信息</span>
+              <span>{{$t('global.basicInfo')}}</span>
             </div>
           </div>
           <div class="el-card__body">
             <div class="text item">
               <div class="el-row">
                 <div class="el-col el-col-6">
-                  <div class="item-title">版本</div>
+                  <div class="item-title">{{$t('deliveryCenter.versionName')}}</div>
                 </div>
                 <div class="el-col el-col-6">
                   <div class="item-desc">{{currentVersionDetail.versionInfo.version}}</div>
                 </div>
                 <div class="el-col el-col-6">
-                  <div class="item-title">所属项目</div>
+                  <div class="item-title">{{$t('deliveryCenter.originProject')}}</div>
                 </div>
                 <div class="el-col el-col-6">
                   <div class="item-desc">
@@ -67,7 +67,7 @@
               </div>
               <div class="el-row">
                 <div class="el-col el-col-6">
-                  <div class="item-title">工作流详情</div>
+                  <div class="item-title"> {{$t('project.workflows')}}</div>
                 </div>
                 <div class="el-col el-col-6">
                   <div class="item-desc">
@@ -82,7 +82,7 @@
                   </div>
                 </div>
                 <div class="el-col el-col-6">
-                  <div class="item-title">描述</div>
+                  <div class="item-title">{{$t('global.desc')}}</div>
                 </div>
                 <div class="el-col el-col-6">
                   <div class="item-desc">{{currentVersionDetail.versionInfo.desc}}</div>
@@ -90,13 +90,13 @@
               </div>
               <div class="el-row">
                 <div class="el-col el-col-6">
-                  <div class="item-title">创建人</div>
+                  <div class="item-title">{{$t('global.creator')}}</div>
                 </div>
                 <div class="el-col el-col-6">
                   <div class="item-desc">{{currentVersionDetail.versionInfo.createdBy}}</div>
                 </div>
                 <div class="el-col el-col-6">
-                  <div class="item-title">创建时间</div>
+                  <div class="item-title"> {{$t('deliveryCenter.creationTime')}}</div>
                 </div>
                 <div class="el-col el-col-6">
                   <div class="item-desc">{{$utils.convertTimestamp(currentVersionDetail.versionInfo.created_at)}}</div>
@@ -104,7 +104,7 @@
               </div>
               <div class="el-row">
                 <div class="el-col el-col-6">
-                  <div class="item-title">标签</div>
+                  <div class="item-title"> {{$t('deliveryCenter.versionTag')}}</div>
                 </div>
                 <div class="el-col el-col-6">
                   <div class="item-desc">
@@ -120,18 +120,18 @@
         <div class="el-card box-card task-process is-always-shadow">
           <div class="el-card__header">
             <div class="clearfix">
-              <span>交付内容</span>
+              <span>{{$t('deliveryCenter.deliveryContent')}}</span>
             </div>
           </div>
           <div v-if="jiraIssues.length > 0" class="el-card__body">
             <div class="text item">
-              <div class="section-head">Jira 问题关联</div>
+              <div class="section-head">{{$t('deliveryCenter.jiraInfo')}}</div>
               <el-table :data="jiraIssues" style="width: 100%;">
-                <el-table-column label="服务名">
+                <el-table-column :label="$t(`global.serviceName`)">
                   <template slot-scope="scope">{{scope.row.service_name}}</template>
                 </el-table-column>
 
-                <el-table-column label="关联问题">
+                <el-table-column :label="$t('deliveryCenter.jiraIssues')">
                   <template slot-scope="scope">
                     <el-popover
                       v-for="(issue,index) in scope.row.issues"
@@ -140,9 +140,9 @@
                       placement="top"
                       popper-class="issue-popper"
                     >
-                      <p>报告人: {{issue.reporter?issue.reporter:'*'}}</p>
-                      <p>分配给: {{issue.assignee?issue.assignee:'*'}}</p>
-                      <p>优先级: {{issue.priority?issue.priority:'*'}}</p>
+                      <p>{{$t('deliveryCenter.issueReporter')}}: {{issue.reporter?issue.reporter:'*'}}</p>
+                      <p>{{$t('deliveryCenter.issueAssignee')}}: {{issue.assignee?issue.assignee:'*'}}</p>
+                      <p>{{$t('deliveryCenter.issuePriority')}}: {{issue.priority?issue.priority:'*'}}</p>
                       <span slot="reference" class="issue-name-wrapper text-center">
                         <a :href="issue.url" target="_blank">{{`${issue.key} ${issue.summary}`}}</a>
                       </span>
@@ -154,21 +154,21 @@
           </div>
           <div v-if="imagesAndConfigs.length > 0" class="el-card__body">
             <div class="text item">
-              <div class="section-head">镜像和配置信息</div>
+              <div class="section-head">{{$t('deliveryCenter.imageAndServiceConfiguration')}}</div>
               <el-table :data="imagesAndConfigs" style="width: 100%;">
-                <el-table-column label="服务组件(服务名称)">
+                <el-table-column :label="$t('deliveryCenter.serviceAndServiceModule')">
                   <template slot-scope="scope">{{$utils.showServiceName(scope.row.containerName)}}</template>
                 </el-table-column>
-                <el-table-column label="镜像">
+                <el-table-column :label="$t('deliveryCenter.imageName')">
                   <template slot-scope="scope">
                     <router-link :to="`/v1/delivery/artifacts?image=${scope.row.registryName}`">
                       <span class="img-link">{{scope.row.registryName}}</span>
                     </router-link>
                   </template>
                 </el-table-column>
-                <el-table-column label="服务配置" width="130px">
+                <el-table-column :label="$t('deliveryCenter.serviceConfiguration')" width="130px">
                   <template slot-scope="scope">
-                    <el-button type="text" @click="showConfig(scope.row.yamlContents)">查看</el-button>
+                    <el-button type="text" @click="showConfig(scope.row.yamlContents)">{{$t('global.view')}}</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -177,12 +177,12 @@
 
           <div v-if="packages.length > 0" class="el-card__body">
             <div class="text item">
-              <div class="section-head">包信息</div>
+              <div class="section-head">{{$t('deliveryCenter.packageInfo')}}</div>
               <el-table :data="packages" style="width: 100%;">
-                <el-table-column label="服务名">
+                <el-table-column :label="$t(`global.serviceName`)">
                   <template slot-scope="scope">{{scope.row.serviceName}}</template>
                 </el-table-column>
-                <el-table-column label="包文件名">
+                <el-table-column :label="$t('deliveryCenter.packageFileName')">
                   <template slot-scope="scope">{{scope.row.packageFile}}</template>
                 </el-table-column>
               </el-table>
@@ -190,12 +190,12 @@
           </div>
           <div v-if="orderedServices.length > 0" class="el-card__body">
             <div class="text item">
-              <div class="section-head">服务启动顺序</div>
+              <div class="section-head">{{$t('deliveryCenter.serviceStartupSequence')}}</div>
               <el-table :data="orderedServices" style="width: 100%;">
-                <el-table-column label="启动顺序">
+                <el-table-column :label="$t('deliveryCenter.startupSequence')">
                   <template slot-scope="scope">{{scope.$index}}</template>
                 </el-table-column>
-                <el-table-column label="服务名">
+                <el-table-column :label="$t(`global.serviceName`)">
                   <template slot-scope="scope">{{scope.row.join(' , ')}}</template>
                 </el-table-column>
               </el-table>
@@ -211,11 +211,11 @@
           slot="label"
           size="mini"
           type="text"
-        >版本发布</el-button>
+        >{{$t('deliveryCenter.releaseCurrentVersion')}}</el-button>
         <template v-else slot="label">
           <div>
-            <el-tooltip effect="dark" content="无权限操作" placement="top">
-              <el-button size="mini" type="text" icon="el-icon-upload2" class="permission-disable">版本发布</el-button>
+            <el-tooltip effect="dark" :content="$t('permission.lackPermission')" placement="top">
+              <el-button size="mini" type="text" icon="el-icon-upload2" class="permission-disable">{{$t('deliveryCenter.releaseCurrentVersion')}}</el-button>
             </el-tooltip>
           </div>
         </template>

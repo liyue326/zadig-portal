@@ -10,11 +10,11 @@
       <template v-if="testEnabled">
         <el-table :data="testConfigs">
           <el-table-column prop="name"
-                           label="测试名称"></el-table-column>
+                           :label="$t(`global.testName`)"></el-table-column>
           <el-table-column prop="product_name"
-                           label="项目名称"></el-table-column>
+                           :label="$t(`workflow.projectName`)"></el-table-column>
           <el-table-column prop="desc"
-                           label="描述"></el-table-column>
+                           :label="$t('global.desc')"></el-table-column>
           <el-table-column label="变量">
             <template slot-scope="{ row }">
               <el-popover placement="left"
@@ -45,13 +45,13 @@
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column label="操作"
+          <el-table-column :label="$t(`global.operation`)"
                            width="100px">
             <template slot-scope="scope">
               <el-button @click="removeTest(scope.$index)"
                          type="danger"
                          icon="el-icon-delete"
-                         size="mini">删除</el-button>
+                         size="mini">{{$t(`global.delete`)}}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -68,7 +68,7 @@
           <el-button @click="addTestConfig"
                      type="default"
                      size="small"
-                     icon="el-icon-plus">添加测试</el-button>
+                     icon="el-icon-plus">{{$t(`workflow.addTest`)}}</el-button>
         </div>
 
       </template>

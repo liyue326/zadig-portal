@@ -1,7 +1,7 @@
 <template>
   <div class="env-config-container">
     <div class="primary-title" :style="{ 'margin-bottom' : showConfig ? '14px' : '0'}">
-      <span>环境配置</span>
+      <span>{{$t('environments.k8s.envConfigComp.envConfiguration')}}</span>
       <i
         style="margin-left: 10px; cursor: pointer;"
         :class="[showConfig ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"
@@ -10,23 +10,23 @@
     </div>
     <div v-if="showConfig">
       <el-table v-show="curConfigInfo.length" :data="curConfigInfo" style="width: 90%; max-width: 800px; margin-bottom: 18px;">
-        <el-table-column prop="name" label="名称"></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column prop="name" :label="$t(`global.name`)"></el-table-column>
+        <el-table-column :label="$t(`global.operation`)">
           <template slot-scope="{ row, $index }">
-            <el-button type="text" @click="editConfig(row)">编辑</el-button>
-            <el-button type="text" @click="curConfigInfo.splice($index, 1)">删除</el-button>
+            <el-button type="text" @click="editConfig(row)">{{$t(`global.edit`)}}</el-button>
+            <el-button type="text" @click="curConfigInfo.splice($index, 1)">{{$t(`global.delete`)}}</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div>
-        <el-button type="primary" size="small" @click="addEnvConfig" plain>添加</el-button>
+        <el-button type="primary" size="small" @click="addEnvConfig" plain>{{$t(`global.add`)}}</el-button>
       </div>
     </div>
     <el-dialog :visible.sync="dialogVisible" width="60%" custom-class="env-config-dialog" append-to-body>
-      <ImportConfig :importRepoInfo="repoConfig" />
+      <ImportConfig :importRepoInfo="repoConfig" :placeholder="$t('environments.k8s.envConfigComp.addEnvConfigurationPlaceholder')" />
       <div slot="footer">
-        <el-button size="small" @click="handleConfig(false)">取 消</el-button>
-        <el-button size="small" type="primary" @click="handleConfig(true)">确 定</el-button>
+        <el-button size="small" @click="handleConfig(false)">{{$t(`global.cancel`)}}</el-button>
+        <el-button size="small" type="primary" @click="handleConfig(true)">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -73,7 +73,7 @@ export default {
     addEnvConfig () {
       const index = this.curConfigInfo.index || 1
       const next = {
-        name: `配置 ${index}`,
+        name: `${this.$t('environments.k8s.envConfigComp.configuration')} ${index}`,
         overrideYaml: '',
         initYaml: ''
       }

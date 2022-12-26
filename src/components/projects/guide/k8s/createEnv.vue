@@ -9,24 +9,24 @@
       :rules="rules"
       inline-message
     >
-      <el-form-item label="K8s 集群" prop="cluster_id">
+      <el-form-item :label="$t('environments.common.k8sCluster')"  prop="cluster_id">
         <el-select
           class="select"
           filterable
           @change="changeCluster"
           v-model="projectConfig.cluster_id"
           size="small"
-          placeholder="请选择 K8s 集群"
+          :placeholder="$t('environments.common.selectK8sCluster')"
         >
           <el-option v-for="cluster in allCluster" :key="cluster.id" :label="$utils.showClusterName(cluster)" :value="cluster.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="K8s 命名空间" prop="namespace">
+      <el-form-item :label="$t('environments.common.k8sNamespace')" prop="namespace">
         <el-select
           v-model="projectConfig.namespace"
           :disabled="editButtonDisabled"
           size="small"
-          placeholder="选择或自定义命名空间"
+          :placeholder="$t('environments.common.selectK8sNamespace')"
           filterable
           allow-create
           clearable
@@ -37,14 +37,14 @@
         <span class="editButton" @click="editButtonDisabled = !editButtonDisabled">
           <i :class="[editButtonDisabled ? 'el-icon-edit-outline': 'el-icon-finished' ]"></i>
         </span>
-        <span class="ns-desc" v-show="nsIsExisted">Zadig 中定义的服务将覆盖所选命名空间中的同名服务，请谨慎操作！</span>
+        <span class="ns-desc" v-show="nsIsExisted">{{$t('environments.common.namespaceAlreadyExistsTip')}}</span>
       </el-form-item>
-      <el-form-item label="镜像仓库">
+      <el-form-item :label="$t(`status.imageRepo`)">
         <el-select
           class="select"
           filterable
           v-model.trim="projectConfig.registry_id"
-          placeholder="请选择镜像仓库"
+          :placeholder="$t('environments.common.selectImageRepository')"
           size="small"
           @change="getImages"
         >
@@ -56,12 +56,12 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="服务选择" prop="selectedService">
+      <el-form-item :label="$t(`workflow.selectService`)" prop="selectedService">
         <div class="select-service">
-          <el-select v-model="projectConfig.selectedService" size="small" placeholder="选择服务" filterable clearable multiple collapse-tags>
+          <el-select v-model="projectConfig.selectedService" size="small" :placeholder="$t('environments.common.selectServices')" filterable clearable multiple collapse-tags>
             <el-option
               disabled
-              label="全选"
+              :label="$t('environments.common.checkAllServices')"
               value="ALL"
               :class="{selected: projectConfig.selectedService.length === serviceNames.length}"
               style="color: #606266;"
@@ -69,37 +69,33 @@
               <span
                 style=" display: inline-block; width: 100%; font-weight: normal; cursor: pointer;"
                 @click="projectConfig.selectedService = serviceNames"
-              >全选</span>
+              >{{$t('environments.common.checkAllServices')}}</span>
             </el-option>
             <el-option v-for="serviceName in serviceNames" :key="serviceName" :label="serviceName" :value="serviceName"></el-option>
           </el-select>
-          <el-button size="mini" plain @click="projectConfig.selectedService = []">清空</el-button>
+          <el-button size="mini" plain @click="projectConfig.selectedService = []">{{$t('environments.common.clearServices')}}</el-button>
         </div>
       </el-form-item>
     </el-form>
     <EnvConfig class="common-parcel-block" ref="envConfigRef" :envName="currentEnv" />
-    <div v-if="variables.length" class="common-parcel-block box-card-service">
-      <div class="primary-title">
-        变量列表
-        <VariablePreviewEditor :services="previewServices" :projectName="projectConfig.product_name" :variables="variables" />
-      </div>
-      <VarList :variables="variables" />
-    </div>
-    <K8sServiceList ref="k8sServiceListRef" :selectedContainerMap="selectedContainerMap" :registryId="projectConfig.registry_id" />
+
+    <VarYaml class="common-parcel-block box-card-service" ref="varYamlRef" v-model="projectConfig.default_values" />
+
+    <K8sServiceList ref="k8sServiceListRef" :selectedContainerMap="selectedContainerMap" :registryId="projectConfig.registry_id" :checkCurSvcResource="checkSvcResource" />
   </div>
 </template>
 
 <script>
 import EnvConfig from '../../env/env_detail/common/envConfig.vue'
 import K8sServiceList from '../../env/k8sPmEnv/k8sServiceList.vue'
-import VarList from '../../env/k8sPmEnv/varList.vue'
+import VarYaml from '../../env/k8sPmEnv/varYaml.vue'
 import {
   productHostingNamespaceAPI,
   initProjectEnvAPI,
   getClusterListAPI,
   getRegistryWhenBuildAPI
 } from '@api'
-import { uniq, cloneDeep, intersection, debounce } from 'lodash'
+import { uniq, cloneDeep, debounce, flatten } from 'lodash'
 
 const projectConfig = {
   product_name: '',
@@ -107,7 +103,7 @@ const projectConfig = {
   env_name: '',
   source: 'system',
   namespace: '',
-  vars: [],
+  default_values: '',
   revision: null,
   isPublic: true,
   roleIds: [],
@@ -129,20 +125,6 @@ export default {
       hostingNamespace: {},
       allCluster: [],
       serviceNames: [],
-      rules: {
-        cluster_id: [
-          { required: true, trigger: 'change', message: '请选择 K8s 集群' }
-        ],
-        namespace: [
-          { required: true, trigger: 'change', message: '命名空间不能为空' }
-        ],
-        selectedService: {
-          type: 'array',
-          required: true,
-          message: '请选择服务',
-          trigger: 'change'
-        }
-      },
       imageRegistry: [],
       containerNames: [],
       defaultResource: {
@@ -181,18 +163,6 @@ export default {
         return { service_name: item }
       })
     },
-    variables () {
-      const services = this.projectConfig.selectedService
-      const currentVars = this.projectConfig.vars.filter(
-        item => intersection(item.services, services).length
-      )
-      currentVars.forEach(item => {
-        item.allServices = item.services
-        item.services = intersection(item.services, services)
-      })
-      this.projectConfig.curVars = currentVars
-      return currentVars
-    },
     selectedContainerMap () {
       // Filtered Container Services
       const containerMap = {}
@@ -201,6 +171,22 @@ export default {
         containerMap[service] = svcMap[service]
       })
       return containerMap
+    },
+    rules () {
+      return {
+        cluster_id: [
+          { required: true, trigger: 'change', message: this.$t('environments.common.selectK8sCluster') }
+        ],
+        namespace: [
+          { required: true, trigger: 'change', message: this.$t('environments.common.selectK8sNamespace') }
+        ],
+        selectedService: {
+          type: 'array',
+          required: true,
+          message: this.$t('environments.common.selectServices'),
+          trigger: 'change'
+        }
+      }
     }
   },
   methods: {
@@ -261,8 +247,6 @@ export default {
       const template = await initProjectEnvAPI(projectName)
       this.projectConfigInit.product_name = projectName
       this.projectConfigInit.revision = template.revision
-      this.projectConfigInit.vars = template.vars || []
-      this.projectConfigInit.curVars = template.vars || []
       this.projectConfigInit.source = 'system'
 
       const servicesMap = {}
@@ -282,6 +266,8 @@ export default {
             servicesMap[ser.service_name] = ser
             ser.picked = true
             ser.deploy_strategy = 'deploy'
+            ser.variable_yaml = ser.variable_yaml || ''
+            ser.canEditYaml = !!ser.variable_yaml
             const containers = ser.containers
             if (containers) {
               for (const con of containers) {
@@ -297,6 +283,7 @@ export default {
       this.serviceNames = Object.keys(servicesMap)
       this.containerNames = uniq(containerNames)
       this.projectConfigInit.selectedService = Object.keys(servicesMap)
+      // todo: this.checkSvcResource()
     },
     async getImages (
       registry_id = this.projectConfig.registry_id,
@@ -342,7 +329,7 @@ export default {
                 }
                 for (const con of ser.containers) {
                   if (!con.image) {
-                    this.$message.warning(`${con.name}未选择镜像`)
+                    this.$message.warning(this.$t('environments.k8s.servicewithoutImage', { serviceName: con.name }))
                     return
                   }
                 }
@@ -352,18 +339,10 @@ export default {
           }
           const curPayload = cloneDeep(projectConfig)
           curPayload.services = selectedServices
-
-          curPayload.vars = curPayload.curVars.map(vars => {
-            delete vars.allServices
-            return vars
-          })
           curPayload.source = 'spock'
           curPayload.env_configs = envConfigs[envInfo.initName] || []
-
           delete curPayload.selectedService
-          delete curPayload.curVars
           delete curPayload.servicesMap
-
           payload.push(curPayload)
         })
 
@@ -372,30 +351,37 @@ export default {
         console.log('not-valid')
       })
     },
-    checkSvcResource: debounce(function ({
+    checkSvcResource: debounce(function (payload = {}) {
+      this.checkSvcResourceSimple(payload)
+    }, 300),
+    checkSvcResourceSimple ({
       env_name = this.projectConfig.env_name,
       namespace = this.projectConfig.namespace,
       cluster_id = this.projectConfig.cluster_id,
-      vars = this.projectConfig.vars
-    }) {
+      default_values = this.projectConfig.default_values,
+      services = flatten(this.projectConfig.services)
+    } = {}) {
       const payload = {
         env_name,
         namespace,
         cluster_id,
-        vars: vars.map(va => ({ alias: va.alias, key: va.key, value: va.value }))
+        default_values,
+        services: services.map(va => ({ service_name: va.service_name, variable_yaml: va.variable_yaml || '' }))
       }
-      if (this.$refs.k8sServiceListRef && env_name && namespace && cluster_id) {
+      if (this.$refs.k8sServiceListRef && env_name && namespace && cluster_id && services.length) {
         this.$refs.k8sServiceListRef
           .checkSvcResource(this.projectName, payload)
           .then(res => {
             this.serviceNames.forEach(name => {
-              this.projectConfig.servicesMap[name].deploy_strategy = res[name]
-                ? 'import'
-                : 'deploy'
+              if (typeof res[name] !== 'undefined') {
+                this.projectConfig.servicesMap[name].deploy_strategy = res[name]
+                  ? 'import'
+                  : 'deploy'
+              }
             })
           }).catch((err) => console.log(err))
       }
-    }, 300)
+    }
   },
   watch: {
     'projectConfig.namespace' (val) {
@@ -404,18 +390,18 @@ export default {
     'projectConfig.cluster_id' (val) {
       this.checkSvcResource({ cluster_id: val })
     },
-    variables: {
-      handler (val) {
-        this.checkSvcResource({ vars: val })
-      },
-      deep: true
+    'projectConfig.default_values' (val) {
+      this.checkSvcResource({ default_values: val })
+    },
+    'projectConfig.env_name' (val) {
+      this.checkSvcResourceSimple({ env_name: val })
     }
   },
   created () {
     this.initProjectInfo()
   },
   components: {
-    VarList,
+    VarYaml,
     EnvConfig,
     K8sServiceList
   }

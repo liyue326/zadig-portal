@@ -39,11 +39,11 @@
           <div v-else class="no-content">
             <img src="@assets/icons/illustration/editorNoService.svg" alt />
             <p v-if="files.length === 0">
-              暂无模板，点击
-              <el-button v-hasPermi="{type: 'system', action: 'create_template'}" size="mini" icon="el-icon-plus" @click="createFile()" plain circle></el-button>创建模板
+              {{$t('templates.k8sYaml.noTemplate')}}
+              <el-button v-hasPermi="{type: 'system', action: 'create_template'}" size="mini" icon="el-icon-plus" @click="createFile()" plain circle></el-button>{{$t('templates.k8sYaml.createTemplate')}}
             </p>
-            <p v-else-if="file.name==='模板列表' && files.length >0">请在左侧选择需要编辑的模板</p>
-            <p v-else-if="!file.name && files.length >0">请在左侧选择需要编辑的模板</p>
+            <p v-else-if="file.name==='模板列表' && files.length >0">{{$t('templates.k8sYaml.selectTemplateToEdit')}}</p>
+            <p v-else-if="!file.name && files.length >0">{{$t('templates.k8sYaml.selectTemplateToEdit')}}</p>
           </div>
         </multipane>
       </div>
@@ -101,6 +101,15 @@ export default {
           console.log(err)
         })
         if (res) {
+          if (res.variable_kvs && res.service_vars) {
+            res.variable_kvs.forEach(element => {
+              if (res.service_vars.includes(element.key)) {
+                element.show = true
+              } else {
+                element.show = false
+              }
+            })
+          }
           res.status = 'added'
           this.fileContent = res
           this.initFileContent = res.content
@@ -164,7 +173,7 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '模板库', url: '/v1/template' },
+        { title: this.$t('project.templates'), url: '/v1/template' },
         { title: 'K8s YAML', url: '' }
       ]
     })

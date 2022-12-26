@@ -1,6 +1,6 @@
 <template>
   <el-form class="mobile-run-workflow" label-position="top" label-width="90px">
-    <el-form-item prop="productName" label="环境">
+    <el-form-item prop="productName" :label="$t(`project.environments`)">
       <span slot="label">
         <span>环境</span>
         <el-tooltip v-if="specificEnv" effect="dark" content="该工作流已指定环境运行，可通过修改 工作流->基本信息 来解除指定环境绑定" placement="top">
@@ -38,7 +38,7 @@
     </el-form-item>
 
     <div v-if="buildDeployEnabled" v-loading="precreateLoading">
-      <el-form-item label="服务">
+      <el-form-item :label="$t(`project.services`)">
         <el-select
           v-model="pickedBuildTargetNames"
           filterable
@@ -128,7 +128,7 @@
         size="small"
         round
         block
-      >{{ startTaskLoading?'启动中':'启动任务' }}</van-button>
+      >{{ startTaskLoading?$t(`workflow.starting`):$t(`workflow.run`) }}</van-button>
     </div>
   </el-form>
 </template>

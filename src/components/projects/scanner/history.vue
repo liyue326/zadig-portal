@@ -8,7 +8,7 @@
         @click="runTask"
         class="left"
       >
-        <span class="iconfont iconzhixing">&nbsp;执行</span>
+        <span class="iconfont iconzhixing">&nbsp;{{$t(`global.execute`)}}</span>
       </el-button>
       <router-link
         v-if="checkPermissionSyncMixin({projectName: projectName, action: 'edit_scan'})"
@@ -17,25 +17,25 @@
       >
         <span class="iconfont icondeploy edit-setting"></span>
       </router-link>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <span class="middle">
           <span class="permission-disabled iconfont icondeploy edit-setting"></span>
         </span>
       </el-tooltip>
       <div class="right">
         <span class="item">
-          <span class="item left">修改人</span>
+          <span class="item left">{{$t(`workflow.updateBy`)}}</span>
           {{ scannerInfo.editor || '*' }}
         </span>
         <span class="item">
-          <span class="item left">最后修改时间</span>
+          <span class="item left">{{$t(`workflow.lastModify`)}}</span>
           {{ $utils.convertTimestamp(scannerInfo.updated_at) }}
         </span>
       </div>
     </el-card>
 
     <el-card class="box-card" :body-style="{ padding: '0px', margin: '15px 0 30px 0' }">
-      <div slot="header" class="block-title">历史任务</div>
+      <div slot="header" class="block-title">{{$t(`workflow.historyTask`)}}</div>
       <TaskList
         :taskList="scannerTasks"
         :total="total"
@@ -130,14 +130,14 @@ export default {
     bus.$emit('set-topbar-title', {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t(`subTopbarMenu.projects`), url: '/v1/projects' },
         {
           title: projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${projectName}/detail`
         },
         {
-          title: '代码扫描',
+          title: this.$t(`subTopbarMenu.scannings`),
           url: `/v1/projects/detail/${projectName}/scanner`
         },
         { title: this.scannerName, url: '' }

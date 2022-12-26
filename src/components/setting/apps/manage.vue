@@ -1,10 +1,10 @@
 <template>
     <div v-loading="loading"
-         element-loading-text="加载中..."
+         :element-loading-text="$t(`global.loading`)"
          element-loading-spinner="iconfont iconfont-loading iconyingyongshezhi"
          class="setting-app-container">
       <!--apps-create-dialog-->
-      <el-dialog title='新建'
+      <el-dialog :title="$t('sysSetting.packages.addPackage')"
                  width="55%"
                  :close-on-click-modal="false"
                  custom-class="create-app-dialog"
@@ -13,16 +13,16 @@
                  :rules="rules"
                  :model="createApp"
                  label-position="left"
-                 label-width="100px">
-          <el-form-item label="名称"
+                 label-width="135px">
+          <el-form-item :label="$t(`global.name`)"
                         prop="name">
             <el-input size="small"
                       v-model="createApp.name"></el-input>
           </el-form-item>
-          <el-form-item label="版本"
+          <el-form-item :label="$t('sysSetting.packages.version')"
                         prop="version">
             <el-input size="small"
-                      placeholder="例如 1.0.0"
+                      :placeholder="$t('sysSetting.packages.versionExample')"
                       v-model="createApp.version"></el-input>
           </el-form-item>
           <el-form-item label="Bin Path"
@@ -33,18 +33,18 @@
           </el-form-item>
           <el-form-item class="label-icon">
             <template #label>
-              <span>启用</span>
-              <el-tooltip content="控制软件包列表中是否展示，正在使用中的不受影响"
+              <span>{{$t('sysSetting.packages.enable')}}</span>
+              <el-tooltip :content="$t('sysSetting.packages.enableTooltip')"
                           placement="top">
                 <i class="el-icon-question"></i>
               </el-tooltip>
             </template>
-            <el-checkbox v-model="createApp.enabled">启用该软件包</el-checkbox>
+            <el-checkbox v-model="createApp.enabled">{{$t('sysSetting.packages.enableCurrentPackage')}}</el-checkbox>
           </el-form-item>
           <el-form-item prop="download_path" class="label-icon">
             <template #label>
-              <span>安装包地址</span>
-              <el-tooltip content="系统自动从配置地址下载安装包并做缓存，安装包可通过 ${FILEPATH} 变量获取"
+              <span>{{$t('sysSetting.packages.packageAddress')}}</span>
+              <el-tooltip :content="$t('sysSetting.packages.packageAddressTooltip')"
                           placement="top">
                 <i class="el-icon-question"></i>
               </el-tooltip>
@@ -53,29 +53,29 @@
                       placeholder="http://domain/install_pkg.tar.gz"
                       v-model.trim="createApp.download_path"></el-input>
           </el-form-item>
-          <el-form-item label="安装脚本"
+          <el-form-item :label="$t('sysSetting.packages.installScript')"
                         prop="scripts">
             <Editor v-model="createApp.scripts"
                     lang="sh"
                     theme="monokai"
                     width="100%"
-                    height="220"></Editor>
+                    height="220"/>
           </el-form-item>
         </el-form>
         <div slot="footer"
              class="dialog-footer">
           <el-button size="small"
-                     @click="dialogAppCreateFormVisible = false">取 消</el-button>
+                     @click="dialogAppCreateFormVisible = false">{{$t(`global.cancel`)}}</el-button>
           <el-button :plain="true"
                      type="success"
                      size="small"
-                     @click="appOperation('add')">保存</el-button>
+                     @click="appOperation('add')">{{$t(`global.save`)}}</el-button>
         </div>
       </el-dialog>
       <!--apps-create-dialog-->
 
       <!--apps-edit-dialog-->
-      <el-dialog :title='`修改软件包-${swapApp.name} ${swapApp.version}`'
+      <el-dialog :title="$t('sysSetting.packages.editPackage',{name:swapApp.name,version:swapApp.version})"
                  width="55%"
                  custom-class="create-app-dialog"
                  :close-on-click-modal="false"
@@ -84,7 +84,7 @@
                  :rules="rules"
                  :model="swapApp"
                  label-position="left"
-                 label-width="100px">
+                 label-width="135px">
           <el-form-item v-if="(typeof swapApp.bin_path)!=='undefined'"
                         label="Bin Path"
                         prop="bin_path">
@@ -93,20 +93,20 @@
           </el-form-item>
           <el-form-item v-if="(typeof swapApp.enabled)!=='undefined'" class="label-icon">
             <template #label>
-              <span>启用</span>
-              <el-tooltip content="控制软件包列表中是否展示，正在使用中的不受影响"
+              <span>{{$t('sysSetting.packages.enable')}}</span>
+              <el-tooltip :content="$t('sysSetting.packages.enableTooltip')"
                           placement="top">
                 <i class="el-icon-question"></i>
               </el-tooltip>
             </template>
-            <el-checkbox v-model="swapApp.enabled">启用该软件包</el-checkbox>
+            <el-checkbox v-model="swapApp.enabled">{{$t('sysSetting.packages.enableCurrentPackage')}}</el-checkbox>
           </el-form-item>
           <el-form-item v-if="(typeof swapApp.download_path)!=='undefined'"
                         prop="download_path"
                         class="label-icon">
             <template #label>
-              <span>安装包地址</span>
-              <el-tooltip content="系统自动从配置地址下载安装包并做缓存，安装包可通过 ${FILEPATH} 变量获取"
+              <span>{{$t('sysSetting.packages.packageAddress')}}</span>
+              <el-tooltip :content="$t('sysSetting.packages.packageAddressTooltip')"
                           placement="top">
                 <i class="el-icon-question"></i>
               </el-tooltip>
@@ -114,7 +114,7 @@
             <el-input size="small"
                       v-model.trim="swapApp.download_path"></el-input>
           </el-form-item>
-          <el-form-item label="安装脚本"
+          <el-form-item :label="$t('sysSetting.packages.installScript')"
                         prop="scripts">
             <Editor v-model="swapApp.scripts"
                     lang="sh"
@@ -126,11 +126,11 @@
         <div slot="footer"
              class="dialog-footer">
           <el-button size="small"
-                     @click="dialogAppEditFormVisible = false">取 消</el-button>
+                     @click="dialogAppEditFormVisible = false">{{$t(`global.cancel`)}}</el-button>
           <el-button size="small"
                      :plain="true"
                      type="success"
-                     @click="appOperation('update')">保存</el-button>
+                     @click="appOperation('update')">{{$t(`global.save`)}}</el-button>
         </div>
       </el-dialog>
       <!--apps-edit-dialog-->
@@ -138,21 +138,21 @@
         <el-alert type="info"
                   :closable="false">
           <template>
-            运行构建及测试步骤时，根据实际业务去安装必要的软件包，详情可参考
+            {{$t('sysSetting.packages.referToDoc')}}
             <el-link style="font-size: 14px; vertical-align: baseline;"
                      type="primary"
                      :href="`https://docs.koderover.com/zadig/settings/app/`"
                      :underline="false"
-                     target="_blank">帮助文档</el-link>
+                     target="_blank">{{$t(`global.helpDoc`)}}</el-link>
           </template>
         </el-alert>
         <div class="sync-container">
           <el-button :plain="true"
                      @click="dialogAppCreateFormVisible=true"
                      size="small"
-                     type="success">新建</el-button>
+                     type="success">{{$t('global.add')}}</el-button>
           <span class="switch-span"
-                :style="{color: proxyInfo.enable_application_proxy?'#0066ff':'#303133'}">启用代理</span>
+                :style="{color: proxyInfo.enable_application_proxy?'#0066ff':'#303133'}">{{$t('sysSetting.packages.enableProxy')}}</span>
           <el-switch size="small"
                      :value="proxyInfo.enable_application_proxy"
                      @change="changeProxy"></el-switch>
@@ -165,36 +165,36 @@
               </template>
               <el-table v-if="app.length > 0" :data="app"
                         style="width: 100%;">
-                <el-table-column label="版本">
+                <el-table-column :label="$t('sysSetting.packages.version')">
                   <template slot-scope="scope">
                     <span>{{scope.row.version}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column label="启用">
+                <el-table-column :label="$t('sysSetting.packages.enable')">
                   <template slot-scope="scope">
                     <i v-if="scope.row.enabled" style="color: #67c23a;" class="el-icon-circle-check"></i>
                     <i v-else style="color: #f56c6c;" class="el-icon-circle-close"></i>
                   </template>
                 </el-table-column>
-                <el-table-column label="更新时间">
+                <el-table-column :label="$t('sysSetting.packages.updateTime')">
                   <template slot-scope="scope">
                     <i class="el-icon-time"></i>
                     <span style="margin-left: 5px;">{{$utils.convertTimestamp(scope.row.update_time)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column label="更新人">
+                <el-table-column :label="$t('sysSetting.packages.updator')">
                   <template slot-scope="scope">
                     <span>{{scope.row.update_by }}</span>
                   </template>
                 </el-table-column>
-                <el-table-column label="操作">
+                <el-table-column :label="$t(`global.operation`)">
                   <template slot-scope="scope">
                     <el-button @click="appOperation('edit',scope.row)"
                                type="primary"
-                               size="mini" plain>编辑</el-button>
+                               size="mini" plain>{{$t(`global.edit`)}}</el-button>
                     <el-button size="mini"
                                @click="deleteApp(scope.row)"
-                               type="danger" plain>删除</el-button>
+                               type="danger" plain>{{$t(`global.delete`)}}</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -249,12 +249,16 @@ export default {
       dialogAppDelVisible: false,
       loading: true,
       availableApps: [],
-      activeApps: [],
-      rules: {
-        name: [{ required: true, message: '请填写软件包名称', trigger: 'blur' }],
-        version: [{ required: true, message: '请填写软件包版本', trigger: 'blur' }],
-        scripts: [{ required: true, message: '请填写安装脚本', trigger: 'blur' }],
-        bin_path: [{ required: true, message: '请填写软件包 Bin Path', trigger: 'blur' }]
+      activeApps: []
+    }
+  },
+  computed: {
+    rules () {
+      return {
+        name: [{ required: true, message: this.$t('sysSetting.packages.inputPackageName'), trigger: 'blur' }],
+        version: [{ required: true, message: this.$t('sysSetting.packages.inputPackageVersion'), trigger: 'blur' }],
+        scripts: [{ required: true, message: this.$t('sysSetting.packages.inputInstallScript'), trigger: 'blur' }],
+        bin_path: [{ required: true, message: this.$t('sysSetting.packages.inputPackageBinPath'), trigger: 'blur' }]
       }
     }
   },
@@ -294,7 +298,7 @@ export default {
     addApp (data) {
       createAppAPI(data).then(res => {
         this.$message({
-          message: '新增软件包成功',
+          message: this.$t('sysSetting.packages.addPackageSuccess'),
           type: 'success'
         })
         this.getApps()
@@ -309,7 +313,7 @@ export default {
         }
       }).catch(() => {
         this.$message({
-          message: '新增软件包失败',
+          message: this.$t('sysSetting.packages.addPackageFailed'),
           type: 'error'
         })
       }).then(() => {
@@ -319,13 +323,13 @@ export default {
     updateApp (data) {
       updateAppAPI(data).then(response => {
         this.$message({
-          message: '更新软件包成功',
+          message: this.$t('sysSetting.packages.updatePackageSuccess'),
           type: 'success'
         })
         this.getApps()
       }).catch(response => {
         this.$message({
-          message: '更新软件包失败',
+          message: this.$t('sysSetting.packages.updatePackageFailed'),
           type: 'error'
         })
       }).then(() => {
@@ -333,15 +337,15 @@ export default {
       })
     },
     deleteApp (data) {
-      this.$confirm(`软件包删除可能会影响正在使用的工作流，确定删除 ${data.name} 的 ${data.version} 版本吗？`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      this.$confirm(this.$t('sysSetting.packages.deleteTip', { name: data.name, version: data.version }), this.$t('global.tips'), {
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         deleteAppAPI(data).then(response => {
           this.getApps()
           this.$message({
-            message: '软件包已删除',
+            message: this.$t('sysSetting.packages.packageHasBeenDeleted'),
             type: 'success'
           })
         })
@@ -349,7 +353,7 @@ export default {
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: '已取消删除'
+          message: this.$t('sysSetting.packages.cancelDelete')
         })
       })
     },
@@ -388,13 +392,13 @@ export default {
     changeProxy (value) {
       if (!this.proxyInfo.id || this.proxyInfo.type === 'no') {
         this.proxyInfo.enable_application_proxy = false
-        this.$message.error('未配置代理，请前往「系统配置」->「代理配置」配置代理！')
+        this.$message.error(this.$t('sysSetting.packages.noProxy'))
         return
       }
       this.proxyInfo.enable_application_proxy = value
       updateProxyConfigAPI(this.proxyInfo.id, this.proxyInfo).then(response => {
         if (response.message === 'success') {
-          const mess = value ? '启用代理成功！' : '成功关闭代理！'
+          const mess = value ? this.$t('sysSetting.packages.proxyIsEnabled') : this.$t('sysSetting.packages.proxyIsDisabled')
           this.$message({
             message: `${mess}`,
             type: 'success'
@@ -402,9 +406,9 @@ export default {
         } else {
           this.$message.error(response.message)
         }
-      }).catch(err => {
+      }).catch(error => {
         this.proxyInfo.enable_application_proxy = !value
-        this.$message.error(`修改配置失败：${err}`)
+        this.$message.error(this.$t('sysSetting.packages.changeProxyFailed', { error: error }))
       })
     },
     getProxyConfig () {
@@ -413,12 +417,12 @@ export default {
           this.proxyInfo = Object.assign({}, this.proxyInfo, response[0])
         }
       }).catch(error => {
-        this.$message.error(`获取代理配置失败：${error}`)
+        this.$message.error(this.$t('sysSetting.packages.getProxyConfigurationFailed', { error: error }))
       })
     }
   },
   created () {
-    bus.$emit('set-topbar-title', { title: '软件包管理', breadcrumb: [] })
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t(`sidebarMenu.packages`), url: '' }] })
     this.getProxyConfig()
     this.getApps()
   },

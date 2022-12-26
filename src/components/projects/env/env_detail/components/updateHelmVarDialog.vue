@@ -5,7 +5,7 @@
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" type="primary" :loading="updateHelmEnvVarLoading" @click="updateHelmEnvVar()">更新</el-button>
-      <el-button size="small" @click="cancelUpdateHelmEnvVar()">取 消</el-button>
+      <el-button size="small" @click="cancelUpdateHelmEnvVar()">{{$t(`global.cancel`)}}</el-button>
     </span>
   </el-dialog>
 </template>

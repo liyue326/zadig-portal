@@ -2,7 +2,7 @@
   <div class="common-parcel-block update-template-container">
     <div class="template-block">
       <div class="primary-title template-title" @click="showGlobalVariable = !showGlobalVariable">
-        全局服务变量
+        {{$t('environments.helm.variableListComp.globalServiceVariables')}}
         <i :class="[showGlobalVariable ?  'el-icon-arrow-up' : 'el-icon-arrow-down' ]"></i>
       </div>
       <EnvValues
@@ -14,7 +14,7 @@
     </div>
     <div class="template-block">
       <div class="primary-title not-first-child template-title" @click="showServiceVariable = !showServiceVariable">
-        服务变量
+        {{$t('environments.helm.variableListComp.serviceVariables')}}
         <i :class="[showServiceVariable ?  'el-icon-arrow-up' : 'el-icon-arrow-down' ]"></i>
       </div>
       <ChartValues

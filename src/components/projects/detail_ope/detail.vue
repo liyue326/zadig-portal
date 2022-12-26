@@ -2,7 +2,7 @@
   <div
     class="projects-detail-container"
     v-loading="detailLoading"
-    element-loading-text="加载中..."
+    :element-loading-text="$t(`global.loading`)"
     element-loading-spinner="iconfont iconfont-loading iconxiangmuloading"
   >
     <div class="project-header"></div>
@@ -10,22 +10,22 @@
       <div class="env">
         <h4 class="section-title">
           <i class="icon iconfont iconhuanjing"></i>
-          环境信息
+          {{$t('project.environmentsList')}}
         </h4>
         <el-table :data="envList" stripe style="width: 100%;">
-          <el-table-column label="名称">
+          <el-table-column :label="$t(`global.name`)">
             <template slot-scope="{ row }">
               <router-link :to="`/v1/projects/detail/${row.projectName}/envs/detail?envName=${row.name}`">
                 <span class="env-name">{{`${row.name}`}}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column label="归属" prop="clusterName">
+          <el-table-column :label="$t('project.clusterInfo')" prop="clusterName">
             <template slot-scope="{ row }">
-              <span>{{ row.clusterName.startsWith('local-') ? '本地' : row.clusterName }}</span>
+              <span>{{ row.clusterName.startsWith('local-') ? $t('project.localCluster') : row.clusterName }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="状态">
+          <el-table-column :label="$t(`global.status`)">
             <template slot-scope="{ row }">
               <span v-if="row.status" :class="[$translate.calcEnvStatusColor(row.status)]">{{getProdStatus(row.status, row.updatable)}}</span>
               <span v-else>
@@ -33,7 +33,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column width="300" label="最后修改时间">
+          <el-table-column width="300" :label="$t(`project.updates`)">
             <template slot-scope="{ row }">
               <span class="update-time">
                 <i class="icon el-icon-time"></i>
@@ -50,35 +50,35 @@
       <div class="workflow">
         <h4 class="section-title">
           <i class="icon iconfont icongongzuoliucheng"></i>
-          工作流信息
+           {{$t('project.workflowsList')}}
         </h4>
         <el-table :data="workflows" stripe style="width: 100%;">
-          <el-table-column label="名称">
+          <el-table-column :label="$t(`global.name`)">
             <template slot-scope="{ row }">
-              <el-tag v-if="row.workflow_type === 'common_workflow'" size="mini" class="mg-r8">自定义</el-tag>
-              <el-tag v-else-if="row.workflow_type === 'release'" size="mini" class="mg-r8">发布</el-tag>
-              <el-tag v-else size="mini" class="mg-r8">产品</el-tag>
+              <el-tag v-if="row.workflow_type === 'common_workflow'" size="mini" class="mg-r8" type="plain">{{$t('workflow.customWorkflowTag')}}</el-tag>
+              <el-tag v-else-if="row.workflow_type === 'release'" size="mini" class="mg-r8"  type="plain">{{$t('workflow.releaseWorkflowTag')}}</el-tag>
+              <el-tag v-else size="mini" class="mg-r8" type="plain">{{$t('workflow.productWorkflowTag')}}</el-tag>
               <router-link
                 class="pipeline-name"
                 :to=" (row.workflow_type === 'common_workflow' || row.workflow_type === 'release')? `/v1/projects/detail/${projectName}/pipelines/custom/${row.name}?display_name=${row.display_name}`  :  `/v1/projects/detail/${projectName}/pipelines/multi/${row.name}?display_name=${row.display_name}`"
               >{{row.display_name}}</router-link>
             </template>
           </el-table-column>
-          <el-table-column label="步骤">
+          <el-table-column :label="$t('project.workflowStage')">
             <template slot-scope="{ row }">
               <CusTags :values="row.enabledStages" />
             </template>
           </el-table-column>
-          <el-table-column label="状态">
+          <el-table-column :label="$t(`global.status`)">
             <template slot-scope="{ row }">
               <span
                 v-if="row.recentTask"
                 :class="[`status-${$utils.taskElTagType(row.recentTask.status)}`]"
-              >{{ wordTranslation(row.recentTask.status,'pipeline','task')}}</span>
+              >{{ $t(`workflowTaskStatus.${row.recentTask.status}`)}}</span>
               <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column width="300" label="最后修改时间">
+          <el-table-column width="300" :label="$t(`project.updates`)">
             <template slot-scope="{ row }">
               <span class="update-time">
                 <i class="icon el-icon-time"></i>
@@ -184,7 +184,7 @@ export default {
       bus.$emit('set-topbar-title', {
         title: '',
         breadcrumb: [
-          { title: '项目', url: '/v1/projects' },
+          { title: this.$t('sidebarMenu.projects'), url: '/v1/projects' },
           { title: this.projectName, isProjectName: true, url: '' }
         ]
       })

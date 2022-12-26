@@ -5,44 +5,44 @@
       <div class="aside-bar">
         <div class="tabs__wrap tabs__wrap_vertical">
           <div class="tabs__item" :class="{'selected': selected === 'var'}" @click="changeRoute('var')">
-            <span class="step-name">镜像更新</span>
+            <span class="step-name">{{$t('services.helm.imagesSection')}}</span>
           </div>
           <div class="tabs__item" :class="{'selected': selected === 'policy'}" @click="changeRoute('policy')">
-            <span class="step-name">策略</span>
+            <span class="step-name">{{$t('services.common.policySection')}}</span>
           </div>
           <div class="tabs__item" :class="{'selected': selected === 'help'}" @click="changeRoute('help')">
-            <span class="step-name">帮助</span>
+            <span class="step-name">{{$t('services.common.helpSection')}}</span>
           </div>
         </div>
       </div>
       <div class="aside__content">
         <div v-if="selected === 'var'" class="service-aside--variables">
           <header class="service-aside-box__header">
-            <div class="service-aside-box__title">镜像更新</div>
+            <div class="service-aside-box__title">{{$t('services.helm.imagesSection')}}</div>
           </header>
           <div class="service-aside-box__content">
             <h4>
               <span>
                 <i class="iconfont iconfuwu"></i>
-              </span> 检测到的服务组件
+              </span> {{$t('services.common.detectedServiceModules')}}
               <el-tooltip effect="dark" placement="top">
-                <div slot="content">values.yaml 中可被更新的镜像</div>
+                <div slot="content">{{$t('services.helm.detectedServiceModulesTooltip')}}</div>
                 <span>
                   <i class="el-icon-question"></i>
                 </span>
               </el-tooltip>
-              <el-button type="text" size="small" @click="updateMatchRuleFlag = true" :disabled="!isProjectAdmin">更新匹配规则</el-button>
+              <el-button type="text" size="small" @click="updateMatchRuleFlag = true" :disabled="!isProjectAdmin">{{$t('services.helm.updateMatchRules')}}</el-button>
             </h4>
             <el-table :data="serviceModules" stripe style="width: 100%;">
-              <el-table-column prop="name" label="服务组件"></el-table-column>
-              <el-table-column prop="image_name" label="镜像名"></el-table-column>
-              <el-table-column prop="image" label="当前镜像版本"></el-table-column>
-              <el-table-column label="构建信息/操作">
+              <el-table-column prop="name" :label="$t('services.common.serviceModule')"></el-table-column>
+              <el-table-column prop="image_name" :label="$t('services.common.serviceImageName')"></el-table-column>
+              <el-table-column prop="image" :label="$t('services.common.serviceImageLabel')"></el-table-column>
+              <el-table-column :label="$t('services.common.buildInfoAndOperation')">
                 <template slot-scope="scope">
                   <div v-for="(buildName, index) in scope.row.build_names" :key="index">
                     <span class="build-name" @click="editBuild(scope.row.name, buildName)">{{ buildName }}</span>
                   </div>
-                  <el-button v-hasPermi="{projectName: projectName, action: 'create_build',isBtn:true}" size="small" type="text" @click="addBuild(scope.row.name, scope.row.build_names)">添加构建</el-button>
+                  <el-button v-hasPermi="{projectName: projectName, action: 'create_build',isBtn:true}" size="small" type="text" @click="addBuild(scope.row.name, scope.row.build_names)">{{$t('services.common.addServiceBuild')}}</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -51,11 +51,11 @@
             <h4>
               <span>
                 <i class="iconfont iconfuwu"></i>
-              </span> Helm Release 名称配置
+              </span> {{$t('services.helm.helmReleaseNameConfiguration')}}
             </h4>
             <div class="release-name-config">
               <span class="title">
-                Release 名称
+                {{$t('services.helm.helmReleaseName')}}
                 <el-tooltip effect="dark" placement="top">
                   <div slot="content">
                     <span>支持如下内置变量和常量：</span>
@@ -89,13 +89,13 @@
                 @input="handleInputChange"
                 placeholder="请输入 Release 名称"
               ></el-input>
-              <el-button size="mini" @click="renamingHelmRelease" :disabled="!isProjectAdmin" type="primary" plain>保存</el-button>
+              <el-button size="mini" @click="renamingHelmRelease" :disabled="!isProjectAdmin" type="primary" plain>{{$t(`global.save`)}}</el-button>
             </div>
           </div>
         </div>
         <div v-else-if="selected === 'policy'" class="service-aside--variables">
           <header class="service-aside-box__header">
-            <div class="service-aside-box__title">策略</div>
+            <div class="service-aside-box__title">{{$t('services.common.policySection')}}</div>
           </header>
           <div class="service-aside-help__content">
             <Policy />
@@ -103,7 +103,7 @@
         </div>
         <div v-else-if="selected === 'help'" class="service-aside--variables">
           <header class="service-aside-box__header">
-            <div class="service-aside-box__title">帮助</div>
+            <div class="service-aside-box__title">{{$t('services.common.helpSection')}}</div>
           </header>
           <div class="service-aside-help__content">
             <Help />
@@ -190,8 +190,8 @@ export default {
         this.isGuide ? '确认修改 Helm Release 名称？' : '修改后服务会在已部署的环境中重建，请确认?',
         '修改 Helm Release 名称',
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }
       )
@@ -343,25 +343,6 @@ export default {
     height: 100%;
     border-left: 1px solid transparent;
     transition: border-color ease-in-out 200ms;
-
-    .capture-area__component {
-      position: relative;
-      top: 50%;
-      left: -6px;
-      display: inline-block;
-      height: 38px;
-      -webkit-transform: translateY(-50%);
-      transform: translateY(-50%);
-
-      .capture-area {
-        position: absolute;
-        width: 10px;
-        height: 38px;
-        background-color: #fff;
-        border: 1px solid #dbdbdb;
-        border-radius: 5px;
-      }
-    }
   }
 
   .aside__inner {
@@ -520,6 +501,7 @@ export default {
           .step-name {
             font-weight: 500;
             font-size: 14px;
+            writing-mode: vertical-rl;
           }
         }
       }

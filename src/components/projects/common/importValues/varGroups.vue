@@ -10,9 +10,9 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="autoSync" label="自动同步" :show-message="false">
+        <el-form-item prop="autoSync" :label="$t('global.autoSync')" :show-message="false">
           <span slot="label">
-            <span>自动同步</span>
+            <span>{{$t('global.autoSync')}}</span>
             <el-tooltip effect="dark" content="当变量组发生变更时，会自动同步并更新到环境中" placement="top">
               <i class="pointer el-icon-question"></i>
             </el-tooltip>
@@ -22,8 +22,8 @@
       </el-form>
     </div>
     <div slot="footer">
-      <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-      <el-button type="primary" @click="handleOpe" size="small">确 定</el-button>
+      <el-button @click="dialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+      <el-button type="primary" @click="handleOpe" size="small">{{$t(`global.confirm`)}}</el-button>
     </div>
   </el-dialog>
 </template>

@@ -90,8 +90,8 @@ export default {
 
   &:not(.none)::after {
     position: absolute;
-    right: -2px;
-    bottom: -2px;
+    right: -4px;
+    bottom: -4px;
     width: 5px;
     height: 5px;
     border-top: 4px double transparent;

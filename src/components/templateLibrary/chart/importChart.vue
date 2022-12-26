@@ -1,8 +1,8 @@
 <template>
   <div class="import-chart-container">
     <el-form ref="gitForm" :model="template" label-position="left" label-width="140px" :rules="rules">
-      <el-form-item label="模板名称" prop="name">
-        <el-input v-model="template.name" placeholder="请输入模板名称" size="small" :disabled="isUpdate"></el-input>
+      <el-form-item :label="$t(`templates.helmChart.templateName`)" prop="name">
+        <el-input v-model="template.name" :placeholder="$t(`templates.helmChart.inputTemplateName`)" size="small" :disabled="isUpdate"></el-input>
       </el-form-item>
       <el-form-item label-width="0">
         <GitRepo
@@ -23,7 +23,7 @@
           :disabled="!template.name || disabled"
           size="small"
           :loading="loading"
-        >{{isUpdate? '更新':'加载'}}</el-button>
+        >{{isUpdate? $t(`templates.helmChart.update`):$t(`templates.helmChart.load`)}}</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -46,9 +46,6 @@ export default {
       },
       disabled: true,
       loading: false,
-      rules: {
-        name: [{ required: true, message: '请输入模板名称', trigger: 'blur' }]
-      },
       currentService: null,
       isUpdate: false
     }
@@ -56,6 +53,13 @@ export default {
   props: {
     value: Boolean,
     chartCurrentService: Object
+  },
+  computed: {
+    rules () {
+      return {
+        name: [{ required: true, message: this.$t(`templates.helmChart.inputTemplateName`), trigger: 'blur' }]
+      }
+    }
   },
   methods: {
     selectedPath (emitParams) {
@@ -97,7 +101,7 @@ export default {
 
       if (res) {
         this.$message.success(
-          `${this.isUpdate ? '更新' : '导入'}模板 ${this.template.name} 成功`
+          `${this.isUpdate ? this.$t(`templates.helmChart.updateSuccess`, { name: this.template.name }) : this.$t(`templates.helmChart.loadSuccess`, { name: this.template.name })}`
         )
         this.loading = false
         this.resetField()

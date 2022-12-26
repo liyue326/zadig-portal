@@ -6,7 +6,7 @@
          <div class="label">{{customerImage[key].label}}</div>
          <el-input class="input1" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$\{}]/g,'')" v-model="customerImage[key].service" size="small" :placeholder="`{{.IMAGE_NAME}}`" clearable  ></el-input> &nbsp;:&nbsp;
          <el-input class="input2" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$\{}]/g,'')" v-model="customerImage[key].value" size="small" :placeholder="customerImage[key].placeholder" clearable></el-input>
-         <span class="reset" @click="resetFiled('customerImage',key)">重置</span>
+         <span class="reset" @click="resetFiled('customerImage',key)">{{$t('global.reset')}}</span>
      </div>
     </div>
     <div class="tar-content">
@@ -14,7 +14,7 @@
       <div class="item" v-for="key of Object.keys(tar)" :key="'tar'+key">
           <div class="label">{{tar[key].label}}</div>
           <el-input class="input3" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$\{}]/g,'')" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder" clearable></el-input>
-          <span class="reset" @click="resetFiled('tar',key)">重置</span>
+          <span class="reset" @click="resetFiled('tar',key)">{{$t('global.reset')}}</span>
       </div>
     </div>
   </div>

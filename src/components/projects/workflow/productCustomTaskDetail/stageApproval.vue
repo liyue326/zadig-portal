@@ -2,10 +2,10 @@
   <div class="stage-approval-detail">
     <header class="mg-b8">
       <el-col :span="2" class>
-        <span class="type">{{approvalInfo.approval.type==='lark'?'飞书审批':'人工审批'}}</span>
+        <span class="type">{{approvalInfo.approval.type==='lark'?$t(`approvalType.feishu`):$t(`approvalType.manualApproval`)}}</span>
       </el-col>
       <el-col :span="6" class="text">
-        <span>开始时间：</span>
+        <span>{{$t(`global.startTime`)}}：</span>
         <span>{{$utils.convertTimestamp(approvalInfo.start_time)}}</span>
       </el-col>
       <el-col :span="6" class="text" v-if="!isDisabled">
@@ -13,11 +13,11 @@
         <span>后审批超时</span>
       </el-col>
       <el-col :span="6" class="text" v-else>
-        <span>完成时间：</span>
+        <span>{{$t(`global.endTime`)}}：</span>
         <span>{{$utils.convertTimestamp(approvalInfo.end_time)}}</span>
         <span
           :class="[`status-${$utils.taskElTagType(approvalInfo.approval.reject_or_approve)}`]"
-        >{{ wordTranslation(approvalInfo.approval.reject_or_approve,'pipeline','task') }}</span>
+        >{{ wordTranslation(approvalInfo.approval.reject_or_approve,'approval','status') }}</span>
       </el-col>
       <el-col :span="1" class="close">
         <span @click="$emit('showFooter',false)">
@@ -31,20 +31,20 @@
         size="small"
         class="mg-t24"
       >
-        <el-table-column :prop="approvalInfo.approval.type === 'lark' ? 'name':'user_name'" label="审批人"></el-table-column>
-        <el-table-column prop="reject_or_approve" label="审批结果">
+        <el-table-column :prop="approvalInfo.approval.type === 'lark' ? 'name':'user_name'" :label="$t(`workflow.reviewer`)"></el-table-column>
+        <el-table-column prop="reject_or_approve" :label="$t(`workflow.auditResults`)">
           <template slot-scope="scope">
             <span
               :class="$translate.calcTaskStatusColor(scope.row.reject_or_approve,'approval','status')"
             >{{ wordTranslation(scope.row.reject_or_approve,'approval','status') }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="operation_time" label="审批时间">
+        <el-table-column prop="operation_time"  :label="$t(`workflow.auditTime`)">
           <template slot-scope="scope">
             <span>{{$utils.convertTimestamp(scope.row.operation_time)}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="comment" label="评论信息"></el-table-column>
+        <el-table-column prop="comment" :label="$t(`workflow.comments`)"></el-table-column>
       </el-table>
       <el-row class="mg-t24" v-if="approvalInfo.approval.type === 'native'">
         <el-button type="warning" size="small" @click="isShowCommentDialog=true" :disabled="isDisabled">审批</el-button>

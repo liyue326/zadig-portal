@@ -25,11 +25,11 @@ const validateWorkflowName = (rule, value, callback) => {
 }
 const tabList = [
   {
-    label: '界面化',
+    label: 'ui',
     name: 'ui'
   },
   {
-    label: 'YAML',
+    label: 'yaml',
     name: 'yaml'
   }
 ]
@@ -55,91 +55,91 @@ const jobTabList = [
 ]
 const jobTypeList = [
   {
-    label: 'Kubernetes 部署',
+    label: 'customDeploy',
     name: 'custom-deploy',
     type: 'custom-deploy',
     is_offical: true,
     description: '可更新 Kubernetes 中容器镜像'
   },
   {
-    label: '通用任务',
+    label: 'freestyle',
     name: 'freestyle',
     type: 'freestyle',
     is_offical: true,
     description: '支持拉取代码、执行 Shell 脚本、文件存储等功能'
   },
   {
-    label: '更新 K8s YAML 任务',
+    label: 'k8sResourcePatch',
     name: 'update-k8s-resource',
     type: 'k8s-resource-patch',
     is_offical: true,
     description: '使用原生 Kubernetes Patch 能力更新 YAML'
   },
   {
-    label: '测试',
+    label: 'test',
     name: 'zadig-test',
     type: 'zadig-test',
     is_offical: true,
     description: '可直接引用「项目」-「测试」模块中的测试配置'
   },
   {
-    label: '部署蓝绿环境',
+    label: 'blueGreenDeploy',
     name: 'blue-green-deploy',
     type: 'k8s-blue-green-deploy',
     is_offical: true,
     description: '基于 Kubernetes 原生的能力创建蓝绿环境'
   },
   {
-    label: '蓝绿发布',
+    label: 'blueGreenDeploy',
     name: 'blue-green-release',
     type: 'k8s-blue-green-release',
     is_offical: true,
     description: '结合前置的 [部署蓝绿环境] 任务，执行蓝绿发布'
   },
   {
-    label: '部署金丝雀',
+    label: 'canaryDeploy',
     name: 'canary-deploy',
     type: 'k8s-canary-deploy',
     is_offical: true,
     description: '基于 Kubernetes 原生的能力部署金丝雀'
   },
   {
-    label: '金丝雀发布',
+    label: 'canaryConfirm',
     name: 'canary-confirm',
     type: 'k8s-canary-release',
     is_offical: true,
     description: '结合前置的 [部署金丝雀] 任务执行金丝雀发布'
   },
   {
-    label: '灰度回滚',
+    label: 'grayDeploy',
     name: 'gray-deploy',
     type: 'k8s-gray-rollback',
     is_offical: true,
     description: '基于 Kubernetes 原生的能力执行回滚任务，滚动升级到灰度之前状态'
   },
   {
-    label: '灰度发布',
+    label: 'grayDeploy',
     name: 'gray-deploy',
     type: 'k8s-gray-release',
     is_offical: true,
     description: '基于 Kubernetes 原生的能力执行灰度发布'
   },
   {
-    label: '镜像分发',
+    label: 'distribute',
     name: 'zadig-distribute-image',
     type: 'zadig-distribute-image',
     is_offical: true,
     description: '可将镜像 Retag 后推送到镜像仓库'
   },
   {
-    label: 'Istio 发布',
+    label: 'istioRelease',
     name: 'istio-release',
     type: 'istio-release',
     is_offical: true,
     description: '基于 Istio 执行发布过程'
   },
   {
-    label: 'Istio 发布回滚',
+    label: 'istioRollback',
     name: 'istio-rollback',
     type: 'istio-rollback',
     is_offical: true,
@@ -148,11 +148,11 @@ const jobTypeList = [
 ]
 const configList = [
   {
-    label: '变量',
+    label: 'var',
     value: 'env'
   },
   {
-    label: '触发器',
+    label: 'trigger',
     value: 'webhook',
     drawerSize: '70%',
     drawerConfirmText: '保存',
@@ -160,11 +160,11 @@ const configList = [
     drawerHideButton: true
   },
   {
-    label: '通知',
+    label: 'notify',
     value: 'notify'
   },
   {
-    label: '高级配置',
+    label: 'advancedSettings',
     value: 'high'
   }
 ]
@@ -279,32 +279,36 @@ const globalConstEnvs = [
 ]
 const notifyType = [
   {
+    label: 'created',
+    desc: '任务开始'
+  },
+  {
     label: 'passed',
-    desc: '任务成功'
+    desc: 'passed'
   },
   {
     label: 'failed',
-    desc: '任务失败'
+    desc: 'failed'
   },
   {
     label: 'timeout',
-    desc: '任务超时'
+    desc: 'timeout'
   },
   {
     label: 'cancelled',
-    desc: '任务取消'
+    desc: 'cancelled'
   },
   {
     label: 'changed',
-    desc: '状态变更'
+    desc: 'changed'
   },
   {
     label: 'reject',
-    desc: '任务拒绝'
+    desc: 'reject'
   },
   {
     label: 'waitforapprove',
-    desc: '等待人工审批'
+    desc: 'waitforapprove'
   }
 ]
 const notifyPlatform = [

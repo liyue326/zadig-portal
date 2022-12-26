@@ -37,8 +37,8 @@
             </el-select>
         </el-form-item>
         <div class="footer">
-          <el-button size="small" @click="$store.commit('SERVICE_DIALOG_VISIBLE', false)" plain>取消</el-button>
-          <el-button size="small" type="primary" :loading="importLoading"  @click="importChartRepo">{{ isUpdate?'更新':'新建' }}</el-button>
+          <el-button size="small" @click="$store.commit('SERVICE_DIALOG_VISIBLE', false)" plain>{{$t(`global.cancel`)}}</el-button>
+          <el-button size="small" type="primary" :loading="importLoading"  @click="importChartRepo">{{ isUpdate?$t('global.update'):$t('global.add') }}</el-button>
         </div>
 
     </el-form>

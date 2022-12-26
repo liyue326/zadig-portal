@@ -7,7 +7,7 @@
       </el-col>
       <el-col v-if="jobInfo.status!=='running'" :span="2">
         <div class="item-desc">
-          <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?buildOverallStatusZh:"未运行"}}</a>
+          <a :class="buildOverallColor" href="#buildv4-log">{{jobInfo.status?$t(`workflowTaskStatus.${jobInfo.status}`):$t(`workflowTaskStatus.notRunning`)}}</a>
         </div>
       </el-col>
       <el-col v-if="jobInfo.status!=='running'" :span="2">
@@ -21,11 +21,11 @@
     </header>
     <main>
       <div class="error-wrapper">
-        <el-alert v-if="jobInfo.error" title="错误信息" :description="jobInfo.error" type="error" close-text="知道了"></el-alert>
+        <el-alert v-if="jobInfo.error" :title="$t(`global.errorMsg`)" :description="jobInfo.error" type="error" :close-text="$t(`global.ok`)"></el-alert>
       </div>
       <el-row class="item" :gutter="0">
         <el-col :span="4">
-          <div class="item-title">容器名称</div>
+          <div class="item-title">{{$t(`workflow.containerName`)}}</div>
         </el-col>
         <el-col :span="8">
           <span class="item-desc">{{jobInfo.spec.workload_type}}/{{jobInfo.spec.workload_name}}</span>
@@ -39,13 +39,13 @@
       </el-row>
       <el-row class="item" :span="24">
         <el-col :span="4">
-          <div class="item-title">集群</div>
+          <div class="item-title">{{$t(`workflow.cluster`)}}</div>
         </el-col>
         <el-col :span="8">
           <div class="item-desc">{{jobInfo.spec.cluster_name}}</div>
         </el-col>
         <el-col :span="4">
-          <div class="item-title">命名空间</div>
+          <div class="item-title">{{$t(`workflow.namespace`)}}</div>
         </el-col>
         <el-col :span="8">
           <div class="item-desc">{{jobInfo.spec.namespace.toString()}}</div>
@@ -53,7 +53,7 @@
       </el-row>
       <el-row class="item">
         <el-col :span="4">
-          <div class="item-title">镜像名称</div>
+          <div class="item-title">{{$t(`workflow.imageName`)}}</div>
         </el-col>
         <el-col :span="8">
           <el-tooltip effect="dark" :content="jobInfo.spec.image" placement="top">
@@ -63,7 +63,7 @@
       </el-row>
       <el-table :data="jobInfo.spec.events" size="small" class="mg-t24">
         <el-table-column label="时间" prop="time"></el-table-column>
-        <el-table-column label="类型" prop="event_type"></el-table-column>
+        <el-table-column :label="$t(`global.type`)" prop="event_type"></el-table-column>
         <el-table-column label="信息" prop="message"></el-table-column>
       </el-table>
     </main>
@@ -100,7 +100,7 @@ export default {
       return this.$utils.calcOverallBuildStatus(this.jobInfo, {})
     },
     buildOverallStatusZh () {
-      return this.$translate.translateTaskStatus(this.buildOverallStatus)
+      return this.$t(`workflowTaskStatus.${this.buildOverallStatus}`)
     },
     buildOverallColor () {
       return this.$translate.calcTaskStatusColor(this.buildOverallStatus)

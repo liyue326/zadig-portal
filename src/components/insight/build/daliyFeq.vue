@@ -26,7 +26,7 @@ export default {
           }
         },
         legend: {
-          data: ['成功', '失败', '超时', '取消']
+          data: [this.$t('workflowTaskStatus.passed'), this.$t('workflowTaskStatus.failed'), this.$t('workflowTaskStatus.timeout'), this.$t('workflowTaskStatus.cancelled')]
         },
         toolbox: {
           feature: {
@@ -66,7 +66,7 @@ export default {
         ],
         series: [
           {
-            name: '成功',
+            name: this.$t('workflowTaskStatus.passed'),
             type: 'line',
             smooth: true,
             stack: '总量',
@@ -74,7 +74,7 @@ export default {
             data: []
           },
           {
-            name: '失败',
+            name: this.$t('workflowTaskStatus.failed'),
             type: 'line',
             smooth: true,
             stack: '总量',

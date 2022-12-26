@@ -2,16 +2,16 @@
   <div class="system-statistics-container">
     <section class="overview">
       <div>
-        <h3>概览</h3>
+        <h3>{{$t('dataStatistics.overview.overview')}}</h3>
         <el-row class="number-container">
           <el-col class="container-block" :span="4">
             <div>
               <h2>
                 <ICountUp :delay="delay" :endVal="overview.cluster_count" class="counter-number" :options="options" />
               </h2>
-              <p>个</p>
+              <p>{{$t('dataStatistics.overview.clustersUnit')}}</p>
               <span>
-                <i class="icon iconfont iconjiqun"></i> 集群
+                <i class="icon iconfont iconjiqun"></i> {{$t('dataStatistics.overview.clusters')}}
               </span>
             </div>
           </el-col>
@@ -20,9 +20,9 @@
               <h2>
                 <ICountUp :delay="delay" :endVal="overview.project_count" class="counter-number" :options="options" />
               </h2>
-              <p>个</p>
+              <p>{{$t('dataStatistics.overview.projectsUnit')}}</p>
               <span>
-                <i class="icon iconfont iconxiangmuloading"></i> 项目
+                <i class="icon iconfont iconxiangmuloading"></i> {{$t('dataStatistics.overview.projects')}}
               </span>
             </div>
           </el-col>
@@ -31,9 +31,9 @@
               <h2>
                 <ICountUp :delay="delay" :endVal="overview.service_count" class="counter-number" :options="options" />
               </h2>
-              <p>个</p>
+              <p>{{$t('dataStatistics.overview.servicesUnit')}}</p>
               <span>
-                <i class="icon iconfont iconvery-service"></i> 服务
+                <i class="icon iconfont iconvery-service"></i> {{$t('dataStatistics.overview.services')}}
               </span>
             </div>
           </el-col>
@@ -42,9 +42,9 @@
               <h2>
                 <ICountUp :delay="delay" :endVal="overview.workflow_count" class="counter-number" :options="options" />
               </h2>
-              <p>条</p>
+              <p>{{$t('dataStatistics.overview.workflowsUnit')}}</p>
               <span>
-                <i class="icon iconfont icongongzuoliucheng"></i> 工作流
+                <i class="icon iconfont icongongzuoliucheng"></i> {{$t('dataStatistics.overview.workflows')}}
               </span>
             </div>
           </el-col>
@@ -53,9 +53,9 @@
               <h2>
                 <ICountUp :delay="delay" :endVal="overview.env_count" class="counter-number" :options="options" />
               </h2>
-              <p>个</p>
+              <p>{{$t('dataStatistics.overview.environmentsUnit')}}</p>
               <span>
-                <i class="icon iconfont iconvery-environ"></i> 环境
+                <i class="icon iconfont iconvery-environ"></i> {{$t('dataStatistics.overview.environments')}}
               </span>
             </div>
           </el-col>
@@ -64,9 +64,9 @@
               <h2>
                 <ICountUp :delay="delay" :endVal="overview.artifact_count" class="counter-number" :options="options" />
               </h2>
-              <p>个</p>
+              <p>{{$t('dataStatistics.overview.artifactsUnit')}}</p>
               <span>
-                <i class="icon iconfont iconvery-deli"></i> 交付物
+                <i class="icon iconfont iconvery-deli"></i> {{$t('dataStatistics.overview.artifacts')}}
               </span>
             </div>
           </el-col>
@@ -75,7 +75,7 @@
     </section>
     <section class="charts-container">
       <div>
-        <h3>自动化流程</h3>
+        <h3>{{$t('dataStatistics.overview.automationOfProcesses')}}</h3>
         <Build class="build-container" />
         <Deploy class="deploy-container" />
         <Test class="deploy-container" />
@@ -85,9 +85,9 @@
 </template>
 <script>
 import bus from '@utils/eventBus'
-import Build from './constainer/build'
-import Deploy from './constainer/deploy'
-import Test from './constainer/test'
+import Build from './components/build'
+import Deploy from './components/deploy'
+import Test from './components/test'
 import ICountUp from 'vue-countup-v2'
 import { getStatisticsOverviewAPI } from '@api'
 export default {
@@ -127,7 +127,7 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '数据概览', url: '' }
+        { title: this.$t('sidebarMenu.dataOverview'), url: '' }
       ]
     })
     this.getStatisticsOverview()

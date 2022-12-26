@@ -13,9 +13,9 @@
           <span v-else class="el-icon-warning"></span>
         </div>
         <div class="tag-container">
-          <el-tag v-if="workflowInfo.workflow_type === 'common_workflow'" class="workflow-tag" size="mini" effect="plain">自定义</el-tag>
-          <el-tag v-else-if="workflowInfo.workflow_type === 'release'" class="workflow-tag" size="mini" effect="plain">发布</el-tag>
-          <el-tag v-else class="workflow-tag" size="mini" effect="plain">产品</el-tag>
+          <el-tag v-if="workflowInfo.workflow_type === 'common_workflow'" class="workflow-tag" size="mini" effect="plain">{{$t(`workflow.customWorkflowTag`)}}</el-tag>
+          <el-tag v-else-if="workflowInfo.workflow_type === 'release'" class="workflow-tag" size="mini" effect="plain">{{$t(`workflow.releaseWorkflowTag`)}}</el-tag>
+          <el-tag v-else class="workflow-tag" size="mini" effect="plain">{{$t(`workflow.productWorkflowTag`)}}</el-tag>
         </div>
 
         <div class="stages-container">
@@ -45,7 +45,7 @@
 
       <section class="recent-success">
         <div class="gray-desc">
-          最近成功
+          {{$t(`workflow.recentSuccess`)}}
           <span style="display: inline-block; width: 80px;">
             <span v-if="recentSuccessID">{{$utils.convertTimestamp(workflowInfo.recentSuccessfulTask.create_time,'mm-dd-mm')}}</span>
           </span>
@@ -61,7 +61,7 @@
       </section>
       <section class="recent-failed">
         <div class="gray-desc">
-          最近失败
+          {{$t(`workflow.recentFail`)}}
           <span style="display: inline-block; width: 80px;">
             <span v-if="recentFailID">{{$utils.convertTimestamp(workflowInfo.recentFailedTask.create_time,'mm-dd-mm')}}</span>
           </span>
@@ -76,11 +76,11 @@
         </div>
       </section>
       <section class="time-rate">
-        <div class="gray-desc">平均执行时间</div>
+        <div class="gray-desc">{{$t(`workflow.averageExecutionTime`)}}</div>
         <div class="value">{{ avgRuntime || '-' }}</div>
       </section>
       <section class="time-rate">
-        <div class="gray-desc">成功率</div>
+        <div class="gray-desc">{{$t(`workflow.successRate`)}}</div>
         <div class="value">{{ avgSuccessRate || '-' }}</div>
       </section>
       <section class="operations" @click.stop>
@@ -180,10 +180,10 @@ export default {
   methods: {
     setFavorite (projectName, workflowName, type) {
       if (type === 'common_workflow') {
-        this.$message.info('自定义工作流暂不支持收藏！')
+        this.$message.info(this.$t(`workflow.customWorkflowsDonotSupportCollections`))
         return
       } else if (type === 'release') {
-        this.$message.info('发布工作流暂不支持收藏！')
+        this.$message.info(this.$t(`workflow.releaseWorkflowsDonotSupportCollections`))
         return
       }
       const payload = {
@@ -196,7 +196,7 @@ export default {
           this.$emit('refreshWorkflow', this.projectName)
           this.$message({
             type: 'success',
-            message: '取消收藏成功'
+            message: this.$t(`workflow.cancelFavoriteSuccess`)
           })
         })
       } else {
@@ -204,7 +204,7 @@ export default {
           this.$emit('refreshWorkflow', this.projectName)
           this.$message({
             type: 'success',
-            message: '添加收藏成功'
+            message: this.$t(`workflow.addFavoriteSuccess`)
           })
         })
       }

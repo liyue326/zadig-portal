@@ -15,16 +15,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.iconnacos:before {
-  content: "\e6c0";
-}
 
-.iconapollo:before {
-  content: "\e6c2";
-}
-
-.iconcunchufuwu:before {
-  content: "\e6bd";
+.iconinvisible:before {
+  content: "\e7d1";
 }
 
 .iconnacos:before {

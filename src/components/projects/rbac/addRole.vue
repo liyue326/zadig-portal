@@ -1,10 +1,10 @@
 <template>
-  <el-dialog class="form" title="添加角色" :visible.sync="dialogRoleAddFormVisible">
+  <el-dialog class="form" :title="$t('project.rbac.addRole')" :visible.sync="dialogRoleAddFormVisible">
     <el-form ref="form" :model="form" :rules="formRules" label-position="left">
-      <el-form-item label="角色名称" prop="name" label-width="100px">
-        <el-input size="small" :disabled="isEdit" v-model="form.name"  placeholder="请输入角色名称"></el-input>
+      <el-form-item :label="$t('project.rbac.roleName')" prop="name" label-width="130px">
+        <el-input size="small" :disabled="isEdit" v-model="form.name"  :placeholder="$t('project.rbac.inputRoleName')"></el-input>
       </el-form-item>
-      <el-form-item label="权限列表" prop="permissions" label-width="100px">
+      <el-form-item :label="$t('project.rbac.permissionList')" prop="permissions" label-width="130px">
         <div class="permissions-group" v-for="(group,group_index) in permissionGroups" :key="group_index">
           <el-checkbox
             :label="group.resource"
@@ -29,8 +29,8 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button size="small" @click="dialogRoleAddFormVisible = false">取 消</el-button>
-      <el-button size="small" type="primary" @click="submit">确 定</el-button>
+      <el-button size="small" @click="dialogRoleAddFormVisible = false">{{$t(`global.cancel`)}}</el-button>
+      <el-button size="small" type="primary" @click="submit">{{$t(`global.confirm`)}}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -69,33 +69,34 @@ export default {
         name: '',
         permissions: [],
         isPublic: false
-      },
-      formRules: {
+      }
+    }
+  },
+  computed: {
+    formRules () {
+      const validateRoleName = (rule, value, callback) => {
+        if (typeof value === 'undefined' || value === '') {
+          callback(new Error(this.$t('project.rbac.inputRoleName')))
+        } else {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            callback(new Error(this.$t('project.rbac.checkRoleName')))
+          } else {
+            callback()
+          }
+        }
+      }
+      return {
         name: [
-          { trigger: ['blur', 'change'], validator: this.validateFileName, required: true }
-        ],
-        isPublic: [
-          { required: true, message: '请选择项目类型', trigger: 'blur' }
+          { trigger: ['blur', 'change'], validator: validateRoleName, required: true }
         ],
         permissions: [
-          { type: 'array', required: true, message: '请选择至少一个权限', trigger: 'change' }
+          { type: 'array', required: true, message: this.$t('project.rbac.selectAtLeastOnePermission'), trigger: 'change' }
 
         ]
       }
     }
   },
   methods: {
-    validateFileName (rule, value, callback) {
-      if (typeof value === 'undefined' || value === '') {
-        callback(new Error('填写角色名称'))
-      } else {
-        if (!/^[a-z0-9-]+$/.test(value)) {
-          callback(new Error('角色名称只支持小写字母和数字，特殊字符只支持中划线'))
-        } else {
-          callback()
-        }
-      }
-    },
     initNewForm () {
       this.form = _.cloneDeep(initFormData)
     },
@@ -143,7 +144,6 @@ export default {
         }
       }
       resources[resource] = false
-
       return false
     },
     async getPolicyDefinitions () {

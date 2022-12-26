@@ -9,7 +9,7 @@
                    type="primary"
                    :href="`https://docs.koderover.com/zadig/settings/system-settings/#代理配置`"
                    :underline="false"
-                   target="_blank">帮助文档</el-link>
+                   target="_blank">{{$t(`global.helpDoc`)}}</el-link>
         </template>
       </el-alert>
     </template>
@@ -22,7 +22,7 @@
                ref="proxyForm"
                validateField="function(xx)">
         <el-form-item prop="type"
-                      label="类型">
+                      :label="$t(`global.type`)">
           <el-select v-model="proxyInfo.type"
                      size="small"
                      @change="changeProxy">
@@ -81,7 +81,7 @@
           <el-button @click="ifSetting('proxyForm')"
                      size="small"
                      type="primary"
-                     :disabled="noPost">确定</el-button>
+                     :disabled="noPost">{{$t(`global.confirm`)}}</el-button>
         </el-form-item>
       </el-form>
     </div>

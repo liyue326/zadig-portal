@@ -1,6 +1,6 @@
 <template>
   <el-dialog :fullscreen="true" custom-class="create-project" :before-close="handleClose" :visible.sync="dialogVisible">
-    <header class="project-contexts-modal__header">{{isEdit?'修改项目信息':'新建项目'}}</header>
+    <header class="project-contexts-modal__header">{{isEdit?$t(`project.createProjectComp.editProjectInfo`):$t(`project.createProjectComp.createProject`)}}</header>
     <section class="project-contexts-modal__content">
       <el-form
         :model="projectForm"
@@ -11,13 +11,13 @@
         class="demo-projectForm"
         inline-message
       >
-        <el-form-item label="项目名称" prop="project_name">
+        <el-form-item :label="$t(`project.projectName`)" prop="project_name">
           <el-input @keyup.native="()=>projectForm.project_name=projectForm.project_name.trim()" v-model="projectForm.project_name"></el-input>
         </el-form-item>
-        <el-form-item label="项目主键" prop="product_name" class="label-icon">
+        <el-form-item :label="$t(`project.createProjectComp.projectIdentifier`)" prop="product_name" class="label-icon">
           <span slot="label">
-            项目标识
-            <el-tooltip effect="dark" content="项目标识是该项目资源的全局唯一标识符，用于该项目下所有资源的引用与更新，默认自动生成，同时支持手动指定，创建后不可更改" placement="top">
+            {{$t(`project.createProjectComp.projectIdentifier`)}}
+            <el-tooltip effect="dark" :content="$t(`project.createProjectComp.projectIdentifierTip`)" placement="top">
               <i class="el-icon-question" style="margin-left: 5px;"></i>
             </el-tooltip>
           </span>
@@ -26,10 +26,10 @@
             <i :class="[editProjectName ? 'el-icon-finished' : 'el-icon-edit-outline']"></i>
           </span>
         </el-form-item>
-        <el-form-item prop="desc" label="描述信息">
-          <el-input type="textarea" :rows="1" placeholder="请输入描述信息" v-model="projectForm.desc"></el-input>
+        <el-form-item prop="desc" :label="$t(`global.desc`)">
+          <el-input type="textarea" :rows="1" :placeholder="$t(`global.inputDesc`)" v-model="projectForm.desc"></el-input>
         </el-form-item>
-        <el-form-item v-if="!isEdit" label="项目类型">
+        <el-form-item v-if="!isEdit" :label="$t(`project.createProjectComp.type`)">
           <div class="project-type">
             <div
               class="project-type-item"
@@ -53,30 +53,30 @@
               href="https://docs.koderover.com/zadig/pages/compatibility/"
               target="_blank"
               :underline="false"
-            >支持的基础设施列表</el-link>
+            >{{$t(`project.createProjectComp.compatibility`)}}</el-link>
           </div>
         </el-form-item>
         <div v-if="!isEdit" class="advanced-title">
           <el-button type="text" @click="showAdvanced = !showAdvanced">
-            高级配置
+            {{$t(`project.createProjectComp.advancedConfigurations`)}}
             <i :class="{'el-icon-arrow-right': !showAdvanced, 'el-icon-arrow-down': showAdvanced }"></i>
           </el-button>
         </div>
         <div v-show="showAdvanced || isEdit">
-          <el-form-item label="访问权限" prop="public">
+          <el-form-item :label="$t(`project.createProjectComp.accessPermission`)" prop="public">
             <el-select v-model="projectForm.public" popper-class="access-permission">
-              <el-option label="私有" :value="false">
-                <div class="title">私有</div>
-                <div class="desc">该项目对系统普通用户默认不可见，项目管理员可通过添加成员对特定用户添加相应权限。</div>
+              <el-option :label="$t(`project.createProjectComp.private`)" :value="false">
+                <div class="title">{{$t(`project.createProjectComp.private`)}}</div>
+                <div class="desc">{{$t(`project.createProjectComp.privateDesc`)}}</div>
               </el-option>
-              <el-option label="公开" :value="true">
-                <div class="title">公开</div>
-                <div class="desc">用户默认享有公开权限，可查看项目中的工作流、环境、服务、构建、测试等资源。</div>
+              <el-option :label="$t(`project.createProjectComp.public`)" :value="true">
+                <div class="title">{{$t(`project.createProjectComp.public`)}}</div>
+                <div class="desc">{{$t(`project.createProjectComp.publicDesc`)}}</div>
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="项目管理员" v-if="!isEdit" prop="admins">
-            <el-select v-model="projectForm.admins" filterable multiple remote :remote-method="remoteMethod" :loading="loading" placeholder="请输入用户名搜索用户">
+          <el-form-item :label="$t(`project.createProjectComp.projectAdministrator`)" v-if="!isEdit" prop="admins">
+            <el-select v-model="projectForm.admins" filterable multiple remote :remote-method="remoteMethod" :loading="loading" :placeholder="$t(`project.createProjectComp.inputUsernameToSearch`)">
               <el-option
                 v-for="user in users"
                 :key="user.uid"
@@ -90,8 +90,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="!isEdit" label="指定集群" prop="cluster_ids">
-            <el-select filterable multiple clearable v-model="projectForm.cluster_ids" placeholder="选择项目使用的集群资源">
+          <el-form-item v-if="!isEdit" :label="$t(`project.createProjectComp.specifiedCluster`)" prop="cluster_ids">
+            <el-select filterable multiple clearable v-model="projectForm.cluster_ids" :placeholder="$t(`project.createProjectComp.selectCluster`)">
               <el-option v-for="cluster in allCluster" :key="cluster.id" :label="$utils.showClusterName(cluster)" :value="cluster.id"></el-option>
             </el-select>
           </el-form-item>
@@ -99,7 +99,7 @@
       </el-form>
     </section>
     <footer class="project-contexts-modal__footer">
-      <el-button type="primary" @click="submitForm('projectForm')">{{isEdit?'确认修改':'立即新建'}}</el-button>
+      <el-button type="primary" @click="submitForm('projectForm')">{{isEdit?$t(`project.createProjectComp.confirmUpdate`):$t(`project.createProjectComp.createNow`)}}</el-button>
     </footer>
   </el-dialog>
 </template>
@@ -112,17 +112,6 @@ import {
   getClusterListAPI
 } from '@api'
 const pinyin = require('pinyin')
-const validateProductName = (rule, value, callback) => {
-  if (typeof value === 'undefined' || value === '') {
-    callback(new Error('填写项目主键'))
-  } else {
-    if (!/^[a-z0-9-]+$/.test(value)) {
-      callback(new Error('项目主键只支持小写字母和数字，特殊字符只支持中划线'))
-    } else {
-      callback()
-    }
-  }
-}
 export default {
   data () {
     return {
@@ -145,18 +134,95 @@ export default {
           create_env_type: 'system'
         }
       },
-      rules: {
+      allCluster: [],
+      showAdvanced: false
+    }
+  },
+  computed: {
+    currentUserId () {
+      return this.$store.state.login.userinfo.uid
+    },
+    isEdit () {
+      return this.$route.path.includes('/projects/edit')
+    },
+    showProjectName () {
+      return !this.isEdit && this.editProjectName
+    },
+    projectName () {
+      if (this.isEdit) {
+        return this.$route.params.project_name
+      } else {
+        return false
+      }
+    },
+    projectType () {
+      const feature = this.projectForm.product_feature
+      if (feature.basic_facility === 'cloud_host') {
+        return 'host'
+      } else if (feature.create_env_type === 'external') {
+        return 'external'
+      } else if (feature.deploy_type === 'helm') {
+        return 'helm'
+      } else {
+        return 'k8s'
+      }
+    },
+    projectTypeList () {
+      return [
+        {
+          type: 'k8s', // can't be modified
+          title: this.$t(`project.createProjectComp.yamlProject`),
+          firstDesc: this.$t(`project.createProjectComp.yamlProjectFirstDesc`),
+          secondDesc: this.$t(`project.createProjectComp.yamlProjectSecondDesc`),
+          icon: 'iconfont iconk8s'
+        },
+        {
+          type: 'helm',
+          title: this.$t(`project.createProjectComp.helmProject`),
+          firstDesc: this.$t(`project.createProjectComp.helmProjectFirstDesc`),
+          secondDesc: this.$t(`project.createProjectComp.helmProjectSecondDesc`),
+          icon: 'iconfont iconhelmrepo'
+        },
+        {
+          type: 'external',
+          title: this.$t(`project.createProjectComp.hostingProject`),
+          firstDesc: this.$t(`project.createProjectComp.hostingProjectFirstDesc`),
+          secondDesc: this.$t(`project.createProjectComp.hostingProjectSecondDesc`),
+          icon: 'iconfont iconvery-trustee'
+        },
+        {
+          type: 'host',
+          title: this.$t(`project.createProjectComp.hostsProject`),
+          firstDesc: this.$t(`project.createProjectComp.hostsProjectFirstDesc`),
+          secondDesc: this.$t(`project.createProjectComp.hostsProjectSecondDesc`),
+          icon: 'iconfont iconzhuji'
+        }
+      ]
+    },
+    rules () {
+      const validateProjectName = (rule, value, callback) => {
+        if (typeof value === 'undefined' || value === '') {
+          callback(new Error(this.$t(`project.createProjectComp.inputProjectIdentifier`)))
+        } else {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            callback(new Error(this.$t(`project.createProjectComp.inputProjectIdentifierCheck`)))
+          } else {
+            callback()
+          }
+        }
+      }
+      return {
         project_name: [
-          { required: true, message: '请输入项目名称', trigger: 'blur' }
+          { required: true, message: this.$t(`project.createProjectComp.inputProjectName`), trigger: 'blur' }
         ],
         product_name: [
-          { required: true, trigger: 'change', validator: validateProductName }
+          { required: true, trigger: 'change', validator: validateProjectName }
         ],
         admins: [
           {
             type: 'array',
             required: true,
-            message: '请选择项目管理员',
+            message: this.$t(`project.createProjectComp.selectProjectAdmin`),
             trigger: 'change'
           }
         ],
@@ -164,54 +230,14 @@ export default {
           {
             type: 'array',
             required: true,
-            message: '请选择集群资源',
-            trigger: 'change'
-          }
-        ],
-        enabled: [
-          {
-            type: 'boolean',
-            required: true,
-            message: '请选择项目是否启用项目',
+            message: this.$t(`project.createProjectComp.selectCluster`),
             trigger: 'change'
           }
         ],
         public: [
-          { required: true, message: '项目权限不能为空', trigger: 'blur' }
+          { required: true, message: this.$t(`project.createProjectComp.selectProjectAccessPermission`), trigger: 'blur' }
         ]
-      },
-      allCluster: [],
-      showAdvanced: false,
-      projectTypeList: [
-        {
-          type: 'k8s', // can't be modified
-          title: 'K8s YAML 项目',
-          firstDesc: '基础设施使用 Kubernetes',
-          secondDesc: '使用 Kubernetes YAML 管理和部署服务',
-          icon: 'iconfont iconk8s'
-        },
-        {
-          type: 'helm',
-          title: 'K8s Helm Chart 项目',
-          firstDesc: '基础设施使用 Kubernetes',
-          secondDesc: '使用 Helm Chart 管理和部署服务',
-          icon: 'iconfont iconhelmrepo'
-        },
-        {
-          type: 'external',
-          title: 'K8s 托管项目',
-          firstDesc: '托管现有 Kubernetes 集群中的资源',
-          secondDesc: '支持服务镜像的更新',
-          icon: 'iconfont iconvery-trustee'
-        },
-        {
-          type: 'host',
-          title: '主机项目',
-          firstDesc: '基础设施使用主机',
-          secondDesc: '使用自定义脚本部署升级服务',
-          icon: 'iconfont iconzhuji'
-        }
-      ]
+      }
     }
   },
   methods: {
@@ -270,7 +296,7 @@ export default {
       createProjectAPI(payload).then(res => {
         this.$message({
           type: 'success',
-          message: '新建项目成功'
+          message: this.$t(`project.createProjectComp.successfullySaved`)
         })
         this.$store.dispatch('getProjectList')
         if (payload.product_feature.basic_facility === 'kubernetes') {
@@ -301,7 +327,7 @@ export default {
       updateSingleProjectAPI(projectName, payload).then(res => {
         this.$message({
           type: 'success',
-          message: '更新项目成功'
+          message: this.$t(`project.createProjectComp.successfullyUpdated`)
         })
         this.$store.dispatch('getProjectList')
         this.$router.push('/v1/projects')
@@ -355,36 +381,6 @@ export default {
             style: pinyin.STYLE_NORMAL
           }).join('')
         }
-      }
-    }
-  },
-  computed: {
-    currentUserId () {
-      return this.$store.state.login.userinfo.uid
-    },
-    isEdit () {
-      return this.$route.path.includes('/projects/edit')
-    },
-    showProjectName () {
-      return !this.isEdit && this.editProjectName
-    },
-    projectName () {
-      if (this.isEdit) {
-        return this.$route.params.project_name
-      } else {
-        return false
-      }
-    },
-    projectType () {
-      const feature = this.projectForm.product_feature
-      if (feature.basic_facility === 'cloud_host') {
-        return 'host'
-      } else if (feature.create_env_type === 'external') {
-        return 'external'
-      } else if (feature.deploy_type === 'helm') {
-        return 'helm'
-      } else {
-        return 'k8s'
       }
     }
   },

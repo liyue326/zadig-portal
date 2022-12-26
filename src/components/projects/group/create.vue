@@ -9,21 +9,21 @@
       :rules="rules"
       inline-message
     >
-      <el-form-item label="变量组名称" prop="name">
-        <el-input v-model="groupDetail.name" size="small" :disabled="!!id" placeholder="请输入变量组名称" />
+      <el-form-item :label="$t('project.varsGroup.name')" prop="name">
+        <el-input v-model="groupDetail.name" size="small" :disabled="!!id" :placeholder="$t('project.varsGroup.inputVarsGroupName')" />
       </el-form-item>
-      <el-form-item label="描述信息" prop="description">
-        <el-input type="textarea" :rows="2" v-model="groupDetail.description" size="small" placeholder="描述信息" />
+      <el-form-item :label="$t('global.desc')" prop="description">
+        <el-input type="textarea" :rows="2" v-model="groupDetail.description" size="small" :placeholder="$t(`workflow.desc`)" />
       </el-form-item>
-      <el-form-item label="变量" prop="variable_yaml" style="max-width: 1000px;">
+      <el-form-item :label="$t(`global.var`)" prop="variable_yaml" style="max-width: 1000px;">
         <Resize class="desc mirror" @sizeChange="$refs.codemirror.refresh()">
-          <codemirror ref="codemirror" v-model="groupDetail.variable_yaml" :placeholder="'输入 YAML 格式变量'" />
+          <codemirror ref="codemirror" v-model="groupDetail.variable_yaml" :placeholder="$t('project.varsGroup.inputVarsGroupYaml')" />
         </Resize>
       </el-form-item>
     </el-form>
     <div class="bottom">
-      <el-button @click="$router.back()" :loading="handleLoading" size="medium">取消</el-button>
-      <el-button @click="handleOpe" :loading="handleLoading" type="primary" size="medium">确定</el-button>
+      <el-button @click="$router.back()" :loading="handleLoading" size="medium">{{$t(`global.cancel`)}}</el-button>
+      <el-button @click="handleOpe" :loading="handleLoading" type="primary" size="medium">{{$t(`global.confirm`)}}</el-button>
     </div>
   </div>
 </template>
@@ -46,18 +46,6 @@ export default {
         description: '',
         variable_yaml: ''
       },
-      rules: {
-        name: {
-          required: true,
-          trigger: 'change',
-          message: '请填写变量组名称'
-        },
-        variable_yaml: {
-          required: true,
-          trigger: 'change',
-          message: '请输入 YAML 格式变量'
-        }
-      },
       handleLoading: false
     }
   },
@@ -71,6 +59,20 @@ export default {
     },
     id () {
       return this.$route.query.id
+    },
+    rules () {
+      return {
+        name: {
+          required: true,
+          trigger: 'change',
+          message: this.$t('project.varsGroup.inputVarsGroupName')
+        },
+        variable_yaml: {
+          required: true,
+          trigger: 'change',
+          message: this.$t('project.varsGroup.inputVarsGroupYaml')
+        }
+      }
     }
   },
   methods: {
@@ -113,17 +115,17 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: '变量组',
+          title: this.$t('subTopbarMenu.varsGroup'),
           url: `/v1/projects/detail/${this.projectName}/group`
         },
-        { title: this.$route.query.name || '新建', url: '' }
+        { title: this.$route.query.name || this.$t('global.create'), url: '' }
       ]
     })
   }

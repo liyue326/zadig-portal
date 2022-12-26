@@ -32,7 +32,7 @@
         </el-form-item>
 
         <el-table :data="importNamespace.services" style="width: 100%;">
-          <el-table-column width="200px" label="服务名称">
+          <el-table-column width="200px" :label="$t(`global.serviceName`)">
             <template slot-scope="{ row, $index }">
               <el-form-item
                 label-width="0"
@@ -40,7 +40,7 @@
                 :rules="{ required: true, type: 'string', message: '请输入服务名称', trigger: 'change'}"
                 :show-message="false"
               >
-                <el-input v-model="row.name" placeholder="输入服务名称" size="small" style="width: 85%;"></el-input>
+                <el-input v-model="row.name" :placeholder="$t('services.common.inputServiceName')" size="small" style="width: 85%;"></el-input>
                 <el-button type="text" icon="el-icon-minus" style="margin-left: 5px;" @click="operateService('delete', $index)"></el-button>
               </el-form-item>
             </template>
@@ -99,7 +99,7 @@
         <el-button type="text" icon="el-icon-plus" @click="operateService('add')">添加服务</el-button>
       </el-form>
       <div class="dialog-footer">
-        <el-button plain native-type="submit" @click="closeDialog()" size="small" :disabled="importLoading">取消</el-button>
+        <el-button plain native-type="submit" @click="closeDialog()" size="small" :disabled="importLoading">{{$t(`global.cancel`)}}</el-button>
         <el-button
           type="primary"
           native-type="submit"
@@ -107,7 +107,7 @@
           class="start-create"
           :loading="importLoading"
           @click="loadServiceFromKubernetesNamespace"
-        >导入</el-button>
+        >{{$t('global.import')}}</el-button>
       </div>
     </el-dialog>
   </div>

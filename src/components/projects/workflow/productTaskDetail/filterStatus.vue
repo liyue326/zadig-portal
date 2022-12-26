@@ -7,11 +7,11 @@
             <el-radio v-for="item in filteredItems" :key="item.value" :label="item.value">{{ item.text }}</el-radio>
           </el-radio-group>
           <div class="bottom" style="text-align: center;">
-            <el-button type="text" size="mini" @click="clearFilter">清空</el-button>
+            <el-button type="text" size="mini" @click="clearFilter">{{$t('global.clear')}}</el-button>
           </div>
         </div>
         <div class="content right" v-show="filterInfo.type">
-          <el-input v-model="filterInfo.search" size="mini" placeholder="搜索" suffix-icon="el-icon-search"></el-input>
+          <el-input v-model="filterInfo.search" size="mini" :placeholder="$t('global.search')" suffix-icon="el-icon-search"></el-input>
           <div class="middle">
             <el-checkbox-group v-model="filterInfo.selectList">
               <el-checkbox
@@ -23,7 +23,7 @@
             </el-checkbox-group>
           </div>
           <div class="bottom">
-            <el-button type="primary" plain @click="submit" size="mini" style="width: 100%;">确认</el-button>
+            <el-button type="primary" plain @click="submit" size="mini" style="width: 100%;">{{$t('global.confirm')}}</el-button>
           </div>
         </div>
       </div>

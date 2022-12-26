@@ -26,7 +26,7 @@
       <template v-slot:serviceName>
         <el-form-item
           prop="service_name"
-          label="服务名称"
+          :label="$t(`global.serviceName`)"
           :rules="{
             type: 'string',
             required: true,
@@ -254,7 +254,7 @@
         size="small"
         type="primary"
         @click="savePmService"
-      >保存</el-button>
+      >{{$t(`global.save`)}}</el-button>
     </div>
   </div>
 </template>
@@ -277,7 +277,7 @@ import ZadigBuild from '@/components/projects/build/zadigBuild.vue'
 
 const validateServiceName = (rule, value, callback) => {
   if (value === '') {
-    callback(new Error('请输入服务名称'))
+    callback(new Error(this.$t('services.common.inputServiceName')))
   } else {
     if (!/^[a-z0-9-]+$/.test(value)) {
       callback(new Error('名称只支持小写字母和数字，特殊字符只支持中划线'))
@@ -446,8 +446,8 @@ export default {
         '确认跳出后就不再进入 onboarding 流程。',
         '确认跳出产品交付向导？',
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }
       )

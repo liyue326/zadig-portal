@@ -1,6 +1,6 @@
 <template>
   <div class="test-timer">
-    <el-dialog :title="timerEditMode?'修改定时器配置':'添加定时器'"
+    <el-dialog :title="timerEditMode?$t(`workflow.editTimer`):$t(`workflow.addTimer`)"
                :width="dialogWidth"
                :center="!dialogLeft"
                :close-on-click-modal="false"
@@ -13,16 +13,16 @@
                  :rules="triggerRules"
                  label-width="100px"
                  label-position="left">
-          <el-form-item label="触发方式"
+          <el-form-item :label="$t(`workflow.triggerWay`)"
                         prop="type">
             <el-radio v-model="schedule_config.type"
-                      label="timing">{{ schedule_config.timing.name }}</el-radio>
+                      label="timing">{{ $t(`triggerWay.${schedule_config.timing.name }`) }}</el-radio>
             <el-radio v-model="schedule_config.type"
-                      label="gap">{{ schedule_config.gap.name }}</el-radio>
+                      label="gap">{{ $t(`triggerWay.${schedule_config.gap.name}`) }}</el-radio>
             <el-radio v-model="schedule_config.type"
-                      label="crontab">{{ schedule_config.crontab.name }}</el-radio>
+                      label="crontab">{{ $t(`triggerWay.${schedule_config.crontab.name}`) }}</el-radio>
           </el-form-item>
-          <el-form-item label="时间配置">
+          <el-form-item :label="$t(`workflow.timeConfig`)">
             <div v-if="schedule_config.type === 'timing'"
                  class="inline-show">
               <!--定时-->
@@ -110,11 +110,11 @@
            class="dialog-footer">
         <el-button size="small"
                    @click="cancelSchedule()"
-                   round>取 消</el-button>
+                   round>{{$t(`global.cancel`)}}</el-button>
         <el-button size="small"
                    type="primary"
                    @click="addSchedule"
-                   round>确 定</el-button>
+                   round>{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
     <div v-show="schedules.enabled"
@@ -122,11 +122,11 @@
       <div class="section-wrapper">
         <el-table :data="schedules['items']"
                   style="width: 100%;">
-          <el-table-column label="触发方式"
+          <el-table-column :label="$t(`workflow.triggerWay`)"
                            #default="{ row }">
             {{ schedule_config[row.type].name }}
           </el-table-column>
-          <el-table-column label="时间配置"
+          <el-table-column :label="$t(`workflow.timeConfig`)"
                            #default="{ row}">
             <span v-if="row.type === 'timing'">
               {{ getWeekday(row.frequency) }}&nbsp;&nbsp;{{ row.time }}
@@ -138,16 +138,16 @@
               {{ row.cron }}
             </span>
           </el-table-column>
-          <el-table-column label="操作"
+          <el-table-column :label="$t(`global.operation`)"
                            #default="{ $index }">
             <el-button @click="editSchedule($index)"
                        size="mini"
                        type="primary"
-                       plain>编辑</el-button>
+                       plain>{{$t(`global.edit`)}}</el-button>
             <el-button @click="deleteSchedule($index)"
                        size="mini"
                        type="danger"
-                       plain>删除</el-button>
+                       plain>{{$t(`global.delete`)}}</el-button>
           </el-table-column>
         </el-table>
       </div>
@@ -192,21 +192,21 @@ export default {
         type: 'timing',
         timing: {
           type: 'timing',
-          name: '定时循环',
+          name: 'timingCycle',
           frequency: '',
           number: 1,
           time: ''
         },
         gap: {
           type: 'gap',
-          name: '间隔循环',
+          name: 'gapCycle',
           number: 1,
           frequency: '',
           time: ''
         },
         crontab: {
           type: 'crontab',
-          name: 'Cron 表达式',
+          name: 'cronExpression',
           number: 1,
           frequency: '',
           time: '',

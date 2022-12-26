@@ -1,9 +1,9 @@
 <template>
   <div class="key-value-container">
-    <div class="secondary-title" style="margin-bottom: 10px;">指定需要覆盖的键值对</div>
+    <div class="secondary-title" style="margin-bottom: 10px;">{{$t('environments.helm.keyValueComp.title')}}</div>
     <el-form ref="form" :model="keyValueForm" label-position="left">
       <el-table :data="keyValues">
-        <el-table-column label="键">
+        <el-table-column :label="$t(`global.key`)">
           <template slot-scope="{ $index }">
             <el-form-item
               :prop="`keyValues[${$index}].key`"
@@ -18,7 +18,7 @@
                 filterable
                 allow-create
                 clearable
-                placeholder="键"
+                :placeholder="$t(`global.key`)"
                 size="small"
                 @change="selectKey($event, $index)"
                 @visible-change="firstEstimatedValues"
@@ -29,7 +29,7 @@
             </el-form-item>
           </template>
         </el-table-column>
-        <el-table-column label="值">
+        <el-table-column :label="$t(`global.value`)">
           <template slot-scope="{ $index }">
             <el-form-item
               :prop="`keyValues[${$index}].value`"
@@ -37,11 +37,11 @@
                   required: true, message: '请输入 value 值', trigger: 'blur'
               }"
             >
-              <el-input v-model="keyValueForm.keyValues[$index].value" placeholder="值" size="small"></el-input>
+              <el-input v-model="keyValueForm.keyValues[$index].value" :placeholder="$t(`global.value`)" size="small"></el-input>
             </el-form-item>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120px">
+        <el-table-column :label="$t(`global.operation`)" width="120px">
           <template slot-scope="{ $index }">
             <span class="operate" @click="keyValues.splice($index, 1)">
               <i class="el-icon-close"></i>
@@ -53,7 +53,7 @@
         </el-table-column>
       </el-table>
     </el-form>
-    <el-button type="text" @click="addKeyValue" icon="el-icon-circle-plus-outline" class="gray-color">添加</el-button>
+    <el-button type="text" @click="addKeyValue" icon="el-icon-circle-plus-outline" class="gray-color">{{$t(`global.add`)}}</el-button>
   </div>
 </template>
 
@@ -95,6 +95,7 @@ export default {
       const keys = this.keyValues.map(kv => kv.key)
       return Object.keys(this.listKeyValues).filter(key => !keys.includes(key))
     }
+
   },
   methods: {
     selectKey (key, index) {

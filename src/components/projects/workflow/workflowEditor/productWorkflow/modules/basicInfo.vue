@@ -10,27 +10,27 @@
           <el-row :gutter="20">
             <el-col :span="8">
               <el-form-item prop="display_name"
-                            label="工作流名称">
+                            :label="$t(`global.workflowName`)">
                 <el-input v-model="workflowInfo.display_name"
                           style="width: 80%;"
-                          placeholder="请输入工作流名称"></el-input>
+                          :placeholder="$t(`workflow.inputWorkflowName`)"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item prop="name"
-                            label="工作流标识">
+                            :label="$t(`global.workflowID`)">
                 <el-input v-model="workflowInfo.name"
                           :disabled="editMode"
                           style="width: 80%;"
-                          placeholder="请输入工作流标识"></el-input>
+                          :placeholder="$t(`workflow.inputWorkflowID`)"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item prop="env_name">
                 <template slot="label">
-                  <span>指定环境</span>
+                  <span>{{$t(`workflow.specifyEnvironment`)}}</span>
                   <el-tooltip effect="dark"
-                              content="支持工作流默认部署到某个环境"
+                              :content="$t(`workflow.specifyEnvironmentTip`)"
                               placement="top">
                     <i class="pointer el-icon-question"></i>
                   </el-tooltip>
@@ -55,13 +55,13 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="描述">
+          <el-form-item :label="$t('global.desc')">
             <el-input type="input"
                       style="width: 100%;"
                       v-model="workflowInfo.description"></el-input>
           </el-form-item>
         </el-form>
-        <div class="policy-title">运行策略</div>
+        <div class="policy-title">{{$t(`workflow.runPolicy`)}}</div>
         <el-form :model="workflowInfo"
                  :rules="rules"
                  ref="workflowInfoPolicy"
@@ -69,9 +69,9 @@
                  label-width="120px">
           <el-form-item prop="is_parallel" class="label-icon">
             <template slot="label">
-              <span>并发运行 </span>
+              <span>{{$t(`workflow.concurrentExecution`)}} </span>
               <el-tooltip effect="dark"
-                          content="当同时更新多个不同服务时，产生的多个任务将会并发执行，以提升工作流运行效率"
+                          :content="$t(`workflow.concurrentExecutionTip`)"
                           placement="top">
                 <i class="pointer el-icon-question"></i>
               </el-tooltip>
@@ -80,18 +80,18 @@
           </el-form-item>
           <el-form-item prop="reset_image" class="label-icon" v-if="!isExternal">
             <template slot="label">
-              <span>镜像版本回退 </span>
+              <span>{{$t(`workflow.imageVersionRollback`)}} </span>
               <el-tooltip effect="dark"
-                          content="当任务运行状态和测试结果满足回退策略的设定，镜像版本将自动回退到上一个版本"
+                          :content="$t(`workflow.imageVersionRollbackTip`)"
                           placement="top">
                 <i class="pointer el-icon-question"></i>
               </el-tooltip>
             </template>
             <el-switch v-model="workflowInfo.reset_image" @change="workflowInfo.reset_image_policy = ''"></el-switch>
           </el-form-item>
-          <el-form-item prop="reset_image_policy" label="设置回退策略" v-if="workflowInfo.reset_image">
+          <el-form-item prop="reset_image_policy" :label="$t(`workflow.setFallbackPolicy`)" v-if="workflowInfo.reset_image">
             <el-radio-group v-model="workflowInfo.reset_image_policy">
-              <el-radio v-for="policy in resetPolicy" :key="policy.label" :label="policy.label">{{ policy.text }}</el-radio>
+              <el-radio v-for="policy in resetPolicy" :key="policy.label" :label="policy.label">{{ $t(`resetPolicy.${policy.text}`) }}</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -110,13 +110,13 @@ export default {
     return {
       resetPolicy: [{
         label: 'taskCompleted',
-        text: '任务执行完成'
+        text: 'taskCompleted'
       }, {
         label: 'deployFailed',
-        text: '部署结果失败'
+        text: 'deployFailed'
       }, {
         label: 'testFailed',
-        text: '测试结果失败'
+        text: 'testFailed'
       }],
       projects: [],
       projectList: [],
@@ -127,7 +127,7 @@ export default {
             type: 'string',
             required: true,
             trigger: ['blur', 'change'],
-            message: '请输入工作流名称'
+            message: this.$t(`workflow.inputWorkflowName`)
           }
         ],
         name: [

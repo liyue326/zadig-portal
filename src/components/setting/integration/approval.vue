@@ -35,7 +35,7 @@
         <el-form-item label="IM" prop="type">
           <el-radio-group v-model="approvalInfo.type">
             <el-radio label="lark">飞书</el-radio>
-            <!-- <el-radio label="钉钉" disabled></el-radio> -->
+            <!-- <el-radio :label="$t(`webhookType.dingding`)" disabled></el-radio> -->
           </el-radio-group>
         </el-form-item>
         <el-form-item prop="name" label="应用名称">

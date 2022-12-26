@@ -2,7 +2,7 @@
   <div class="projects-pm-service-container">
     <UpdateEnv ref="updateEnv"/>
     <div class="policy">
-      <el-button type="primary" size="small" @click="showPolicyDrawer = true" plain>策略</el-button>
+      <el-button type="primary" size="small" @click="showPolicyDrawer = true" plain>{{$t('services.common.policySection')}}</el-button>
     </div>
     <div class="config-container-pm">
       <ServiceList
@@ -36,7 +36,7 @@
         </el-button>
       </div>
     </div>
-    <el-drawer title="策略" custom-class="policy-drawer" :visible.sync="showPolicyDrawer" direction="rtl" size="600px" destroy-on-close>
+    <el-drawer :title="$t('services.common.policySection')" custom-class="policy-drawer" :visible.sync="showPolicyDrawer" direction="rtl" size="600px" destroy-on-close>
       <Policy />
     </el-drawer>
   </div>
@@ -130,7 +130,7 @@ export default {
     z-index: 1;
 
     .el-button {
-      width: 30px;
+      writing-mode: vertical-rl;
       margin-bottom: -12px;
       padding: 12px 5px;
       white-space: initial;

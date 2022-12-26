@@ -1,10 +1,10 @@
 <template>
   <div class="settings">
     <el-form :model="workflowInfo" label-position="left" ref="settings">
-      <div class="mg-b16 title">运行策略</div>
+      <div class="mg-b16 title">{{$t(`workflow.runPolicy`)}}</div>
       <el-form-item>
         <span class="mg-r16">
-          <span class="text">并发运行</span>
+          <span class="text">{{$t(`workflow.concurrentExecution`)}}</span>
           <el-tooltip effect="dark" content="当同时更新多个不同服务时，产生的多个任务将会并发执行，以提升工作流运行效率" placement="top">
             <i class="pointer el-icon-question"></i>
           </el-tooltip>
@@ -12,16 +12,16 @@
         <el-switch v-model="workflowInfo.multi_run"></el-switch>
       </el-form-item>
       <div class="mg-b16 mg-t24 title">
-        <span>共享目录</span>
-        <el-button type="text" v-if="!workflowInfo.share_storages ||workflowInfo.share_storages.length===0" @click="addBuildEnv">添加</el-button>
+        <span>{{$t(`workflow.shareDirectory`)}}</span>
+        <el-button type="text" v-if="!workflowInfo.share_storages ||workflowInfo.share_storages.length===0" @click="addBuildEnv">{{$t(`global.add`)}}</el-button>
       </div>
       <div v-if="workflowInfo.share_storages&&workflowInfo.share_storages.length>0">
         <el-row :gutter="6" class="th">
           <el-col :span="8">
-            <span class="th-title">名称</span>
+            <span class="th-title">{{$t(`global.name`)}}</span>
           </el-col>
           <el-col :span="8">
-            <span class="th-title">共享目录</span>
+            <span class="th-title">{{$t(`workflow.shareDirectory`)}}</span>
           </el-col>
         </el-row>
 

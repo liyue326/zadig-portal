@@ -1,20 +1,20 @@
 <template>
   <div class="job-k8s-deploy">
-    <el-form label-width="120px" :model="job" ref="ruleForm" label-position="left" class="mg-t24 mg-b24">
-      <el-form-item label="任务名称" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
+    <el-form label-width="130px" :model="job" ref="ruleForm" label-position="left" class="mg-t24 mg-b24">
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
-      <el-form-item label="集群" prop="spec.cluster_id" :rules="{ required: true, message: '请选择集群名称', trigger: ['change', 'blur'] }">
+      <el-form-item :label="$t(`workflow.cluster`)" prop="spec.cluster_id" :rules="{ required: true, message: '请选择集群名称', trigger: ['change', 'blur'] }">
         <el-select v-model="job.spec.cluster_id" placeholder="请选择集群名称" size="small" style="width: 220px;" @change="getNamespaceList">
           <el-option v-for="cluster in clusters" :key="cluster.id" :label="$utils.showClusterName(cluster)" :value="cluster.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="命名空间" prop="spec.namespace" :rules="{required: true, message: '命名空间不能为空', trigger: ['blur','change']}">
+      <el-form-item :label="$t(`workflow.namespace`)" prop="spec.namespace" :rules="{required: true, message: '命名空间不能为空', trigger: ['blur','change']}">
         <el-select v-model="job.spec.namespace" filterable placeholder="请选择" size="small" style="width: 220px;" @change="getResourceList">
           <el-option v-for="item in namespaceList" :key="item" :label="item" :value="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="资源名称" prop="spec.patch_items" :rules="{required: true, message: '资源名称不能为空', trigger: ['blur','change']}">
+      <el-form-item :label="$t(`workflow.resourceName`)" prop="spec.patch_items" :rules="{required: true, message: '资源名称不能为空', trigger: ['blur','change']}">
         <el-select
           placeholder="请选择"
           size="small"
@@ -29,7 +29,7 @@
           <el-option v-for="(item,index) in resourceList" :key="index" :label="`${item.resource_kind}/${item.resource_name}`" :value="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="更新内容" prop="spec.patch_content" style="min-height: 150px;">
+      <el-form-item :label="$t(`workflow.updateContent`)" prop="spec.patch_content" style="min-height: 150px;">
         <el-collapse v-model="activeName" v-if="job.spec.patch_items.length > 0">
           <div v-for="(item,index) in job.spec.patch_items" :key="index">
             <el-collapse-item :name="item.resource_name" class="mg-l8">
@@ -71,11 +71,11 @@
                   </div>
                 </div>
                 <div class="content-env">
-                  <div>变量</div>
+                  <div>{{$t(`global.var`)}}</div>
                   <el-row class="th">
-                    <el-col :span="6" class="th-title">键</el-col>
-                    <el-col :span="8" class="th-title">类型</el-col>
-                    <el-col :span="6" class="th-title">值</el-col>
+                    <el-col :span="6" class="th-title">{{$t(`global.key`)}}</el-col>
+                    <el-col :span="8" class="th-title">{{$t(`global.type`)}}</el-col>
+                    <el-col :span="6" class="th-title">{{$t(`global.value`)}}</el-col>
                   </el-row>
                   <el-row v-for="(app,index) in item.params" :key="index" :gutter="2">
                     <el-col :span="6">
@@ -87,7 +87,7 @@
                       <el-form-item>
                         <el-select
                           v-model="app.type"
-                          placeholder="类型"
+                          :placeholder="$t(`global.type`)"
                           size="small"
                           :class="{'partial-width': app.type === 'choice'}"
                           style="display: inline-block; width: 80%; margin-right: 6px;"
@@ -105,7 +105,7 @@
                         <el-select v-if="app.type==='choice'" v-model="app.value" placeholder="默认值" size="small" style="max-width: 176px;">
                           <el-option v-for="option in app.choice_option" :key="option" :label="option" :value="option"></el-option>
                         </el-select>
-                        <el-input v-if="app.type==='string'" :disabled="app.auto_generate" placeholder="值" v-model="app.value" size="small"></el-input>
+                        <el-input v-if="app.type==='string'" :disabled="app.auto_generate" :placeholder="$t(`global.value`)" v-model="app.value" size="small"></el-input>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -117,7 +117,7 @@
       </el-form-item>
     </el-form>
     <el-dialog :visible.sync="dialogVisible" title="枚举" width="600px" :close-on-click-modal="false" :show-close="false" append-to-body>
-      <el-form ref="form" :model="currentVars" label-position="left" label-width="90px">
+      <el-form ref="form" :model="currentVars" label-position="left" label-width="100px">
         <el-form-item label="变量名称">
           <el-input v-model="currentVars.name" size="small"></el-input>
         </el-form-item>
@@ -126,8 +126,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveVariable" size="small">确 定</el-button>
+        <el-button @click="dialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveVariable" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -376,7 +376,6 @@ export default {
           padding-bottom: 5px;
           list-style: none;
           background-color: #eb5848;
-          -webkit-transition: max-height 200ms ease-out;
           transition: max-height 200ms ease-out;
 
           .yaml-errors__errors-list-item {
@@ -388,8 +387,6 @@ export default {
             font-size: 14px;
             background-color: #eb5848;
             border-bottom: 1px solid #ff7666;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
 
             .yaml-errors__errors-list-item-counter {
               margin-right: 20px;
@@ -397,12 +394,10 @@ export default {
             }
 
             .yaml-errors__errors-list-item-text {
-              -ms-flex: 1;
               flex: 1;
               width: 300px;
               max-width: 100%;
               padding: 5px 0;
-              -webkit-box-flex: 1;
               line-height: 20px;
             }
 

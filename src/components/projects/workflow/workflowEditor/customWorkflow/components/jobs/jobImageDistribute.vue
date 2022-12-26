@@ -1,10 +1,10 @@
 <template>
   <div class="job-deploy">
     <el-form label-width="120px" :model="job" ref="ruleForm" label-position="left" class="mg-t24 mg-b24">
-      <el-form-item label="任务名称" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
-      <el-form-item label="服务组件" :required="job.spec.source && job.spec.source!=='runtime'">
+      <el-form-item :label="$t(`global.serviceModule`)" :required="job.spec.source && job.spec.source!=='runtime'">
         <el-form-item prop="spec.targets" v-if="job.spec.source === 'runtime'" class="form-item">
           <el-select size="small" key="2" v-model="job.spec.targets" filterable clearable value-key="value" multiple style="width: 220px;">
             <el-option
@@ -52,7 +52,7 @@
       <section>
         <div style="margin-bottom: 8px;">
           <el-button type="primary" size="small" plain @click="advanced_setting_modified = !advanced_setting_modified">
-            高级配置
+            {{$t(`project.createProjectComp.advancedConfigurations`)}}
             <i :class="[advanced_setting_modified ? 'el-icon-arrow-up' : 'el-icon-arrow-down']" style="margin-left: 8px;"></i>
           </el-button>
         </div>
@@ -108,7 +108,7 @@ export default {
     return {
       validateJobName,
       validObj: new ValidateSubmit(),
-      formLabelWidth: '90px',
+      formLabelWidth: '120px',
       dockerList: [],
       originServiceAndBuilds: [],
       advanced_setting_modified: false

@@ -65,7 +65,7 @@ export default {
             if (params && params.length && params[0]) {
               const { data, marker, name } =
                 params && params.length && params[0]
-              return `${name}<br/>${marker}周交付部署: ${data.value} 次`
+              return `${name}<br/>${marker}${this.$t('dataStatistics.insight.deliveryDeployByWeek')}: ${data.value}`
             }
             return '-'
           }

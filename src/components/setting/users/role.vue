@@ -1,28 +1,28 @@
 <template>
   <div class="roles-overview-container">
     <el-alert type="info" :closable="false">
-      <template>可定义系统级别的角色，包括数据概览、效能洞察、测试中心、交付中心、模板库模块的权限控制</template>
+      <template>{{$t('sysSetting.users.roleTip')}}</template>
     </el-alert>
     <div class="search-user">
       <el-row :gutter="10">
         <el-col :span="3">
-          <el-button @click="roleOperate('add',null)" size="small" plain type="primary">新建系统角色</el-button>
+          <el-button @click="roleOperate('add',null)" size="small" plain type="primary">{{$t('global.add')}}</el-button>
         </el-col>
       </el-row>
     </div>
     <div
       v-loading="loading"
-      element-loading-text="加载中..."
+      :element-loading-text="$t(`global.loading`)"
       element-loading-spinner="iconfont iconfont-loading icongeren"
       class="roles-container"
     >
       <el-table :data="roles">
-        <el-table-column prop="name" label="角色名称"></el-table-column>
-        <el-table-column prop="desc" label="描述信息"></el-table-column>
-        <el-table-column label="操作" width="280">
+        <el-table-column prop="name" :label="$t('sysSetting.users.roleName')"></el-table-column>
+        <el-table-column prop="desc" :label="$t('sysSetting.users.roleDesc')"></el-table-column>
+        <el-table-column :label="$t(`global.operation`)" width="280">
           <template slot-scope="scope">
-            <el-button :disabled="scope.row.name === 'admin'" @click="roleOperate('edit',scope.row)" type="primary" size="mini" plain>编辑</el-button>
-            <el-button :disabled="scope.row.name === 'admin'" @click="deleteRole(scope.row)" type="danger" size="mini" plain>删除</el-button>
+            <el-button :disabled="scope.row.name === 'admin'" @click="roleOperate('edit',scope.row)" type="primary" size="mini" plain>{{$t(`global.edit`)}}</el-button>
+            <el-button :disabled="scope.row.name === 'admin'" @click="deleteRole(scope.row)" type="danger" size="mini" plain>{{$t(`global.delete`)}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -41,7 +41,6 @@ import {
   deleteSystemRoleAPI,
   checkRegistrationAPI
 } from '@api'
-import bus from '@utils/eventBus'
 import OperateRole from './components/roleOperate.vue'
 export default {
   components: {
@@ -95,10 +94,7 @@ export default {
       const res = await getRoleListAPI(payload).catch(error => {
         console.log(error)
         this.loading = false
-      }
-
-      )
-
+      })
       if (res) {
         this.roles = res
       }
@@ -106,20 +102,19 @@ export default {
     },
     deleteRole (row) {
       this.$confirm(
-        '此角色的成员权限也会被删除，请谨慎操作。',
-        `确定删除 ${row.name}系统角色`,
+        this.$t('sysSetting.users.deleteRoleTip'),
+        this.$t('sysSetting.users.deleteRoleConfirm', { name: row.name }),
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }
       )
         .then(() => {
-          console.log(row)
           deleteSystemRoleAPI(row.name).then(res => {
             this.$message({
               type: 'success',
-              message: '系统角色删除成功'
+              message: this.$t('sysSetting.users.roleHasBeenDeleted')
             })
             this.getRoleList()
           })
@@ -128,7 +123,7 @@ export default {
           console.log(error)
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: this.$t('sysSetting.users.cancelDelete')
           })
         })
     },
@@ -139,7 +134,6 @@ export default {
     }
   },
   created () {
-    bus.$emit('set-topbar-title', { title: '系统角色管理', breadcrumb: [] })
     this.getRoleList()
     this.checkRegistration()
   }

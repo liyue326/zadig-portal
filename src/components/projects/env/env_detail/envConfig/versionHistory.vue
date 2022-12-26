@@ -1,22 +1,22 @@
 <template>
   <div>
-    <el-dialog title="版本历史" :visible.sync="historyVisible" width="70%" class="config-history-dialog">
+    <el-dialog :title="$t('environments.config.versionHistory')" :visible.sync="historyVisible" width="70%" class="config-history-dialog">
       <div style="margin-bottom: 16px;">
-        <el-button @click="showDiff" type="primary" plain size="mini" icon="el-icon-view">比较所选版本</el-button>
+        <el-button @click="showDiff" type="primary" plain size="mini" icon="el-icon-view">{{$t('environments.config.compareTheSelectedVersions')}}</el-button>
       </div>
 
       <el-table v-loading="historyLoading" :data="histories" @selection-change="selectionChanged" ref="configHistoryTable">
         <el-table-column type="selection"></el-table-column>
-        <el-table-column prop="version" label="版本"></el-table-column>
-        <el-table-column prop="create_time" label="创建时间">
+        <el-table-column prop="version" :label="$t('environments.config.version')"></el-table-column>
+        <el-table-column prop="create_time" :label="$t('environments.config.creationTime')">
           <template slot-scope="scope">
             <span>{{moment(scope.row.create_time*1000).format('YYYY-MM-DD HH:mm')}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="update_user_name" label="最后修改"></el-table-column>
-        <el-table-column label="操作" width>
+        <el-table-column prop="update_user_name" :label="$t('environments.config.lastModified')"></el-table-column>
+        <el-table-column :label="$t(`global.operation`)" width>
           <template slot-scope="scope">
-            <el-button v-if="scope.$index!==0" v-hasPermi="{projectName: projectName, action: 'config_environment', resource:{name:envName,type:'env'},isBtn: true }" @click="rollbackTo(scope.row)" icon="el-icon-refresh-left" size="mini">回滚</el-button>
+            <el-button v-if="scope.$index!==0" v-hasPermi="{projectName: projectName, action: 'config_environment', resource:{name:envName,type:'env'},isBtn: true }" @click="rollbackTo(scope.row)" icon="el-icon-refresh-left" size="mini">{{$t('environments.config.rollback')}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -50,7 +50,6 @@ export default {
       selectedHistories: [],
       diffVisible: false,
       configDiff: [],
-
       srcConfigName: null,
       historyLoading: false,
       maxWidth: ''
@@ -79,9 +78,10 @@ export default {
     diffTitle () {
       const candidates = this.selectedHistories
       if (Array.isArray(candidates) && candidates.length > 1) {
-        return `${candidates[0].version} 相对于 ${candidates[1].version} 的 diff`
+        return this.$t('environments.config.diffTitle', { newVersion: candidates[0].version, oldVersion: candidates[1].version })
+      } else {
+        return this.$t('environments.config.noVersionSelected')
       }
-      return '配置 diff（未勾选）'
     }
   },
   methods: {
@@ -90,7 +90,7 @@ export default {
       const candidates = this.selectedHistories
       if (candidates.length !== 2) {
         this.$message({
-          message: '只能选择两个版本用于比较',
+          message: this.$t('environments.config.selectVersionLimitation'),
           type: 'warning'
         })
         return
@@ -117,7 +117,7 @@ export default {
     selectionChanged (val) {
       if (val.length > 2) {
         this.$message({
-          message: '只能选择两个版本用于比较',
+          message: this.$t('environments.config.selectVersionLimitation'),
           type: 'warning'
         })
         this.$refs.configHistoryTable.toggleRowSelection(val[val.length - 1])
@@ -155,7 +155,7 @@ export default {
           return {
             ...re,
             services,
-            version: index === 0 ? '当前版本' : `版本 ${index}`
+            version: index === 0 ? this.$t('environments.config.currentVersion') : this.$t('environments.config.versionIndex', { index: index })
           }
         })
       }

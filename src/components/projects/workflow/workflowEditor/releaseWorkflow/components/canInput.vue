@@ -16,7 +16,7 @@
         @focus="handleInput(true)"
         @blur="handleInput(false)"
       ></el-input>
-      <el-button type="text" @click="handleInput(false)" size="mini" class="mg-l8">确定</el-button>
+      <el-button type="text" @click="handleInput(false)" size="mini" class="mg-l8">{{$t(`global.confirm`)}}</el-button>
     </span>
   </div>
 </template>

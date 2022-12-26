@@ -22,9 +22,9 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         { title: this.projectName, isProjectName: true, url: `/v1/projects/detail/${this.projectName}/detail` },
-        { title: '测试', url: `/v1/projects/detail/${this.projectName}/test` },
+        { title: this.$t('subTopbarMenu.tests'), url: `/v1/projects/detail/${this.projectName}/test` },
         { title: this.workflowName, url: '' }]
     })
   },

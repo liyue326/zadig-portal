@@ -9,27 +9,27 @@
           >{{ '#' +scope.row.scan_id }}</router-link>
         </template>
       </el-table-column>
-      <el-table-column min-width="100" prop="status" label="任务状态">
+      <el-table-column min-width="100" prop="status" :label="$t(`scanning.taskStatus`)">
         <template slot-scope="scope">
           <span
             :class="[`status-${$utils.taskElTagType(scope.row.status)}`]"
-          >&nbsp;{{ wordTranslation(scope.row.status,'pipeline','task') }}</span>
+          >&nbsp;{{ $t(`workflowTaskStatus.${scope.row.status}`) }}</span>
         </template>
       </el-table-column>
-      <el-table-column min-width="120" label="持续时间">
+      <el-table-column min-width="120" :label="$t(`workflow.duration`)">
         <template slot-scope="scope">
           <el-icon name="time"></el-icon>
           <span v-if="scope.row.status!=='running'" style="margin-left: 5px;">{{ $utils.timeFormatEn(scope.row.run_time) }}</span>
           <span v-else style="margin-left: 5px;">
             {{ taskDuration(scope.row.scan_id,scope.row.created_at) +
             $utils.timeFormatEn(durationSet[scope.row.scan_id]) }}
-            <el-tooltip v-if="durationSet[scope.row.task_id]<0" content="本地系统时间和服务端可能存在不一致，请同步。" placement="top">
+            <el-tooltip v-if="durationSet[scope.row.task_id]<0" :content="$t(`scanning.prompt.timeMismatch`)" placement="top">
               <i class="el-icon-warning" style="color: red;"></i>
             </el-tooltip>
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="执行人" min-width="120">
+      <el-table-column :label="$t(`scanning.executor`)" min-width="120">
         <template slot-scope="{ row }">
           <div class="common-column">{{ row.creator }}</div>
           <div class="common-column column-gray">{{ unix(row.created_at).format('MM-DD HH:mm') }}</div>
@@ -49,7 +49,6 @@
 </template>
 
 <script>
-import { wordTranslate } from '@utils/wordTranslate.js'
 import { unix } from 'moment'
 export default {
   data () {
@@ -59,9 +58,6 @@ export default {
     }
   },
   methods: {
-    wordTranslation (word, category, subitem) {
-      return wordTranslate(word, category, subitem)
-    },
     taskDuration (taskId, started) {
       const refresh = () => {
         const duration = Math.floor(Date.now() / 1000) - started

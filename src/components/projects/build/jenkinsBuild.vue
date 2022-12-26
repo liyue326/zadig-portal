@@ -2,7 +2,7 @@
   <section class="jenkins-build-container" :class="{'small-padding': mini}">
     <el-form ref="jenkinsForm" :model="jenkinsBuild" label-position="left" class="primary-form" label-width="120px" inline-message>
       <slot name="origin"></slot>
-      <el-form-item label="Jenkins 选择">
+      <el-form-item :label="$t(`build.prompt.chooseJenkins`)">
         <el-select v-model="jenkinsBuild.jenkins_build.jenkins_id" size="small" value-key="key" filterable>
           <el-option
             v-for="(item,index) in jenkinsList"
@@ -13,16 +13,16 @@
         </el-select>
       </el-form-item>
       <el-form-item
-        label="构建名称"
+        :label="$t(`build.buildName`)"
         prop="name"
         :rules="[
-              { required: true, message: '构建名称不能为空', trigger: ['blur', 'change'] },
+              { required: true, message: $t(`build.prompt.buildNameCannotBeEmpty`), trigger: ['blur', 'change'] },
               { validator: validName, trigger: ['blur', 'change'] }
             ]"
       >
-        <el-input v-model="jenkinsBuild.name" placeholder="构建名称" autofocus size="small" :disabled="!isCreate" auto-complete="off"></el-input>
+        <el-input v-model="jenkinsBuild.name" :placeholder="$t(`build.buildName`)" autofocus size="small" :disabled="!isCreate" auto-complete="off"></el-input>
       </el-form-item>
-      <el-form-item label="服务选择">
+      <el-form-item :label="$t(`workflow.selectService`)">
         <el-select v-model="jenkinsBuild.targets" multiple size="small" value-key="key" filterable>
           <el-option
             v-for="(service,index) in serviceTargets"
@@ -32,20 +32,20 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="Jenkins Job" prop="jenkins_build.job_name" :rules="[{ required: true, trigger: 'change', message: 'jobs不能为空' }]">
+      <el-form-item label="Jenkins Job" prop="jenkins_build.job_name" :rules="[{ required: true, trigger: 'change', message: $t(`build.prompt.jobsCannotBeEmpty`) }]">
         <el-select v-model="jenkinsBuild.jenkins_build.job_name" size="small" value-key="key" @change="changeJobName" filterable>
           <el-option v-for="(item,index) in jenkinsJobList" :key="index" :label="item" :value="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="构建超时">
+      <el-form-item :label="$t(`build.timeout`)">
         <el-input-number size="mini" :min="1" v-model="jenkinsBuild.timeout"></el-input-number>
-        <span>分钟</span>
+        <span>{{$t(`build.minute`)}}</span>
       </el-form-item>
-      <span class="item-title">构建参数</span>
+      <span class="item-title">{{$t(`build.jenkinsBuildArgs`)}}</span>
       <el-alert
         class="description"
         show-icon
-        title="Jenkins Build Parameters 中必须存在“IMAGE”变量，作为构建镜像的名称，Jenkins 成功构建镜像后，部署阶段会使用该镜像更新服务"
+        :title="$t(`build.prompt.jenkinsBuildArgs`)"
         :closable="false"
         type="warning"
       ></el-alert>
@@ -59,17 +59,6 @@
 import { queryJenkinsJob, queryJenkinsParams } from '@api'
 import EnvVariable from './envVariable.vue'
 
-const validName = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入构建名称'))
-  } else {
-    if (!/^[a-z0-9-]+$/.test(value)) {
-      callback(new Error('名称只支持小写字母和数字，特殊字符只支持中划线'))
-    } else {
-      callback()
-    }
-  }
-}
 export default {
   props: {
     jenkinsBuildData: Object,
@@ -82,7 +71,6 @@ export default {
   data () {
     return {
       jenkinsJobList: [],
-      validName,
       initJenkinsBuild: {
         name: '',
         desc: '',
@@ -103,6 +91,20 @@ export default {
   computed: {
     jenkinsBuild () {
       return Object.assign(this.initJenkinsBuild, this.jenkinsBuildData)
+    },
+    validName () {
+      const ret = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t(`build.prompt.fillInBuildName`)))
+        } else {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            callback(new Error(this.$t(`build.prompt.buildNameConvention`)))
+          } else {
+            callback()
+          }
+        }
+      }
+      return ret
     }
   },
   watch: {
@@ -128,9 +130,7 @@ export default {
           item => item.name === 'IMAGE'
         )
       ) {
-        this.$message.error(
-          'Jenkins Build Parameters 中必须存在“IMAGE”变量，作为构建镜像的名称，Jenkins 成功构建镜像后，部署阶段会使用该镜像更新服务'
-        )
+        this.$message.error(this.$t(`build.prompt.jenkinsBuildArgs`))
         return Promise.reject()
       }
       return this.$refs.jenkinsForm.validate().then(() => {

@@ -23,7 +23,7 @@
     >
       <JobOperate @change="setJob" ref="jobOperate" />
     </el-drawer>
-    <el-button @click="addJob" v-if="isShowJobAddBtn" size="small" class="add">+ 任务</el-button>
+    <el-button @click="addJob" v-if="isShowJobAddBtn" size="small" class="add">+ {{$t(`workflow.job`)}}</el-button>
   </div>
 </template>
 
@@ -319,7 +319,7 @@ export default {
     addJob () {
       if (this.stageInfo.jobs.length > 0) {
         if (this.isShowFooter) {
-          this.$message.error('请先保存上一个任务配置')
+          this.$message.error(this.$t(`workflow.saveLastJobconfigFirst`))
         } else {
           this.isShowJobOperateDialog = true
         }
@@ -330,8 +330,8 @@ export default {
     },
     delJob (item, index) {
       this.$confirm(`确定删除任务 [${item.name}]？`, '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(res => {
         this.stageInfo.jobs.splice(index, 1)

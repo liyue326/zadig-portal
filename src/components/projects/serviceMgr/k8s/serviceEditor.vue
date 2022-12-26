@@ -12,8 +12,8 @@
               <CodeMirror style="width: 100%; height: 100%;" ref="myCm" :value="service.yaml" :options="cmOptions" @input="onCmCodeChange"/>
             </div>
             <div class="modal-block" v-if="service.source === 'template' && showModal">
-              <el-button v-if="service.auto_sync || (service.visibility === 'public' && service.product_name !== projectName)" type="primary" size="small" @click="showModal = false">预览</el-button>
-              <el-button v-else type="primary" size="small" @click="showModal = false">预览/编辑</el-button>
+              <el-button v-if="service.auto_sync || (service.visibility === 'public' && service.product_name !== projectName)" type="primary" size="small" @click="showModal = false">{{$t('global.preview')}}</el-button>
+              <el-button v-else type="primary" size="small" @click="showModal = false">{{$t('global.preview')}}/{{$t('global.edit')}}</el-button>
             </div>
           </div>
         </div>
@@ -35,8 +35,8 @@
       </div>
       <div class="controls__wrap">
         <div class="controls__right">
-          <el-button v-hasPermi="{projectName: projectName, actions:['edit_service','create_service'],operator:'or',isBtn:true}" v-if="!hideSave" type="primary" size="small" :disabled="disabledSave || !yamlChange" @click="updateService">保存</el-button>
-          <el-button v-hasPermi="{projectName: projectName, action:'manage_environment',isBtn:true}" v-if="!isOnboarding" type="primary" size="small" :disabled="!showJoinToEnvBtn" @click="showJoinToEnvDialog">加入环境</el-button>
+          <el-button v-hasPermi="{projectName: projectName, actions:['edit_service','create_service'],operator:'or',isBtn:true}" v-if="!hideSave" type="primary" size="small" :disabled="disabledSave || !yamlChange" @click="updateService">{{$t(`global.save`)}}</el-button>
+          <el-button v-hasPermi="{projectName: projectName, action:'manage_environment',isBtn:true}" v-if="!isOnboarding" type="primary" size="small" :disabled="!showJoinToEnvBtn" @click="showJoinToEnvDialog">{{$t('services.common.addToEnv')}}</el-button>
         </div>
       </div>
     </div>
@@ -152,6 +152,8 @@ export default {
         ? this.service.visibility
         : 'private'
       const yaml = this.service.yaml
+      const variableYaml = this.service.variable_yaml
+      const serviceVars = this.service.service_vars
       const isEdit = this.serviceInTree.status === 'added'
       const payload = {
         product_name: projectName,
@@ -159,7 +161,9 @@ export default {
         visibility: visibility,
         type: 'k8s',
         yaml: yaml,
-        source: 'spock'
+        source: 'spock',
+        variable_yaml: variableYaml,
+        service_vars: serviceVars
       }
       return saveServiceTemplateAPI(isEdit, payload).then(res => {
         this.$message({

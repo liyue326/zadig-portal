@@ -1,10 +1,10 @@
 <template>
   <div class="job-k8s-deploy">
     <el-form label-width="120px" :model="job" ref="ruleForm" class="mg-t24 mg-b24" label-position="left">
-      <el-form-item label="任务名称" prop="name" >
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" >
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
-      <el-form-item label="灰度任务类型" prop="spec.docker_registry_id">
+      <el-form-item :label="$t(`workflow.grayTaskType`)" prop="spec.docker_registry_id">
         <el-select v-model="job.spec.first" placeholder="请选择" size="small" style="width: 220px;">
           <el-option label="首个灰度任务" :value="true"></el-option>
           <el-option label="非首个灰度任务" :value="false"></el-option>
@@ -17,7 +17,7 @@
       </el-form-item>
       <el-form-item
         v-if="job.spec.first"
-        label="镜像仓库"
+        :label="$t(`status.imageRepo`)"
         prop="spec.docker_registry_id"
       >
         <el-select v-model="job.spec.docker_registry_id" filterable placeholder="请选择" size="small" style="width: 220px;">
@@ -26,7 +26,7 @@
       </el-form-item>
       <el-form-item
         v-if="job.spec.first"
-        label="集群"
+        :label="$t(`workflow.cluster`)"
         prop="spec.cluster_id"
       >
         <el-select v-model="job.spec.cluster_id" placeholder="请选择集群名称" size="small" style="width: 220px;" @change="getNamespaceList">
@@ -35,14 +35,14 @@
       </el-form-item>
       <el-form-item
         v-if="job.spec.first"
-        label="命名空间"
+        :label="$t(`workflow.namespace`)"
         prop="spec.namespace"
       >
         <el-select v-model="job.spec.namespace" filterable placeholder="请选择" size="small" style="width: 220px;" @change="getWorkloadList">
           <el-option v-for="item in namespaceList" :key="item" :label="item" :value="item"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item v-if="job.spec.first" label="容器名称" prop="spec.targets">
+      <el-form-item v-if="job.spec.first" :label="$t(`workflow.containerName`)" prop="spec.targets">
         <el-select
           v-model="job.spec.targets"
           placeholder="请选择"
@@ -60,10 +60,10 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="灰度百分比" prop="spec.gray_scale">
+      <el-form-item :label="$t(`workflow.grayPercentage`)" prop="spec.gray_scale">
         <el-input-number size="mini" :min="1" v-model="job.spec.gray_scale"></el-input-number>
       </el-form-item>
-      <el-form-item label="超时时间" prop="spec.deploy_timeout">
+      <el-form-item :label="$t(`global.timeout`)" prop="spec.deploy_timeout">
         <el-input-number size="mini" :min="1" v-model="job.spec.deploy_timeout"></el-input-number>
         <span>分钟</span>
       </el-form-item>

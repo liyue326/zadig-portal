@@ -13,8 +13,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" native-type="submit" size="small" @click="updateExternalConfig" class="start-create">确定</el-button>
-        <el-button plain native-type="submit" size="small" @click="dialogExternalVisible = false">取消</el-button>
+        <el-button type="primary" native-type="submit" size="small" @click="updateExternalConfig" class="start-create">{{$t(`global.confirm`)}}</el-button>
+        <el-button plain native-type="submit" size="small" @click="dialogExternalVisible = false">{{$t(`global.cancel`)}}</el-button>
       </div>
     </el-dialog>
 
@@ -29,12 +29,12 @@
               :href="`https://docs.koderover.com/zadig/settings/others/`"
               :underline="false"
               target="_blank"
-            >帮助文档</el-link>。
+            >{{$t(`global.helpDoc`)}}</el-link>。
           </template>
         </el-alert>
       </template>
       <div class="sync-container">
-        <el-button size="small" type="primary" plain @click="dialogExternalVisible = true">添加</el-button>
+        <el-button size="small" type="primary" plain @click="dialogExternalVisible = true">{{$t(`global.add`)}}</el-button>
       </div>
       <el-table :data="external" style="width: 100%;">
         <el-table-column label="系统名称" prop="name"></el-table-column>
@@ -42,10 +42,10 @@
         <el-table-column label="API Token">
           <template>**********</template>
         </el-table-column>
-        <el-table-column label="操作" width="160">
+        <el-table-column :label="$t(`global.operation`)" width="160">
           <template slot-scope="{ row }">
-            <el-button type="primary" size="mini" plain @click="handleExternalEdit(row)">编辑</el-button>
-            <el-button type="danger" size="mini" @click="handleExternalDelete(row.id)" plain>删除</el-button>
+            <el-button type="primary" size="mini" plain @click="handleExternalEdit(row)">{{$t(`global.edit`)}}</el-button>
+            <el-button type="danger" size="mini" @click="handleExternalDelete(row.id)" plain>{{$t(`global.delete`)}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -131,8 +131,8 @@ export default {
     },
     handleExternalDelete (id) {
       this.$confirm(`确定要删除这个外部系统配置吗？`, '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         deleteExternalSystemAPI(id).then(res => {

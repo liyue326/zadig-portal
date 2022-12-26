@@ -1,22 +1,6 @@
+import i18n from '@/lang'
 export function wordTranslate (word, category, subitem = '') {
   const wordComparisonTable = {
-    pipeline: {
-      task: {
-        '': '未运行',
-        created: '排队中',
-        waiting: '排队中',
-        running: '正在运行',
-        failed: '失败',
-        passed: '成功',
-        timeout: '超时',
-        cancelled: '取消',
-        blocked: '阻塞',
-        queued: '队列中',
-        skipped: '跳过',
-        prepare: '准备环境',
-        reject: '拒绝'
-      }
-    },
     approval: {
       status: {
         '': '待审批',
@@ -61,10 +45,6 @@ export function wordTranslate (word, category, subitem = '') {
   } else if (subitem !== '') {
     return wordComparisonTable[category][subitem][word]
   }
-}
-
-export function translateTaskStatus (status) {
-  return wordTranslate(status, 'pipeline', 'task')
 }
 
 export function colorTranslate (word, category, subitem = '') {
@@ -129,23 +109,23 @@ export function calcEnvStatusColor (status) {
 
 export function translateEnvStatus (status, updateble) {
   if (status === 'Running' && updateble) {
-    return '环境可更新'
+    return i18n.t('environmentStatus.updateable')
   } else if (status === 'Creating') {
-    return '正在创建'
+    return i18n.t('environmentStatus.creating')
   } else if (status === 'Running') {
-    return '正在运行'
+    return i18n.t('environmentStatus.running')
   } else if (status === 'Updating') {
-    return '更新中'
+    return i18n.t('environmentStatus.updating')
   } else if (status === 'Succeeded') {
-    return '正常'
+    return i18n.t('environmentStatus.succeeded')
   } else if (status === 'Unstable') {
-    return '运行不稳定'
+    return i18n.t('environmentStatus.unstable')
   } else if (status === 'Deleting') {
-    return '删除中'
+    return i18n.t('environmentStatus.deleting')
   } else if (status === 'Error') {
-    return '内部错误'
+    return i18n.t('environmentStatus.error')
   } else if (status === 'Unknown') {
-    return '未知'
+    return i18n.t('environmentStatus.unknown')
   }
 }
 
@@ -168,7 +148,6 @@ export function translateSubTaskType (type) {
 
 export default {
   wordTranslate,
-  translateTaskStatus,
   colorTranslate,
   calcTaskStatusColor,
   calcEnvStatusColor,

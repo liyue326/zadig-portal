@@ -69,7 +69,7 @@
         </van-col>
       </van-row>
     </div>
-    <van-divider content-position="left">历史任务</van-divider>
+    <van-divider content-position="left">{{$t(`workflow.historyTask`)}}</van-divider>
     <div>
       <van-cell
         v-for="task in testTasks"
@@ -82,7 +82,7 @@
         <template #label>
           <span class="task-id">{{`#${task.task_id}`}}</span>
           <span class="status">
-            <van-tag plain :type="$utils.mobileVantTagType(task.status)">{{ myTranslate(task.status) }}</van-tag>
+            <van-tag size="small" :type="$utils.mobileVantTagType(task.status)">{{ task.status?$t(`workflowTaskStatus.${task.status}`):$t(`workflowTaskStatus.notRunning`) }}</van-tag>
           </span>
           <template v-if="task.test_reports">
             <van-tag plain v-for="(item,testIndex) in task.testSummary" :key="testIndex" color="#909399">{{item.success}}/{{item.total}}</van-tag>
@@ -117,7 +117,6 @@ import {
   Notify
 } from 'vant'
 import { getLatestTestReportAPI, workflowTaskListAPI, runTestsAPI } from '@api'
-import { wordTranslate } from '@utils/wordTranslate.js'
 import moment from 'moment'
 export default {
   components: {
@@ -238,9 +237,6 @@ export default {
     },
     convertTimestamp (value) {
       return moment.unix(value).format('MM-DD HH:mm')
-    },
-    myTranslate (word) {
-      return wordTranslate(word, 'pipeline', 'task')
     },
     taskDuration (task_id, started) {
       const refresh = () => {

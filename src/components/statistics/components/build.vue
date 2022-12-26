@@ -1,6 +1,6 @@
 <template>
   <div class="auto-build">
-    <span class="title">自动化构建</span>
+    <span class="title">{{$t('dataStatistics.overview.buildAutomation')}}</span>
     <div class="chart-container">
       <el-row>
         <el-col :span="14">
@@ -16,7 +16,7 @@
                   <h2>
                     <ICountUp :delay="delay" :endVal="total" class="counter-number" :options="options" />
                   </h2>
-                  <span class="desc">总次数</span>
+                  <span class="desc">{{$t('dataStatistics.overview.totalBuilds')}}</span>
                 </div>
               </el-col>
               <el-col class="auto-build-container-block" :span="12">
@@ -31,7 +31,7 @@
                     />
                   </h2>
                   <h2 v-else>N/A</h2>
-                  <span class="desc">成功率</span>
+                  <span class="desc">{{$t('dataStatistics.overview.successRate')}}</span>
                 </div>
               </el-col>
             </el-row>
@@ -55,7 +55,7 @@ export default {
       total: 0,
       success: 0,
       successRate: 0,
-      subText: '近 30 天构建情况',
+      subText: this.$t('dataStatistics.overview.recentBuilds'),
       delay: 1000,
       percentageOptions: {
         useEasing: true,

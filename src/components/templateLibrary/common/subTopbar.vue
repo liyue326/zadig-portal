@@ -12,7 +12,7 @@
           <router-link :to="`/v1/template/workflows`" v-if="hasPlutus" active-class="active">
             <li class="nav-item">
               <i class="icon iconfont icongongzuoliucheng"></i>
-              <span class="name">工作流</span>
+              <span class="name">{{$t(`global.workflow`)}}</span>
             </li>
           </router-link>
         </ul>
@@ -28,12 +28,12 @@
         >
           <button type="button" class="display-btn el-button">
             <i class="el-icon-plus"></i>
-            &nbsp;&nbsp;工作流模板&nbsp;&nbsp;
+            &nbsp;&nbsp;{{$t(`workflow.workflowTemplate`)}}&nbsp;&nbsp;
             <i class="el-icon-caret-bottom el-icon--right"></i>
           </button>
           <el-dropdown-menu slot="dropdown" class="create-workflow-template">
-            <el-dropdown-item command="custom">自定义工作流</el-dropdown-item>
-            <el-dropdown-item command="release">发布工作流</el-dropdown-item>
+            <el-dropdown-item command="custom">{{$t(`workflow.customWorkflow`)}}</el-dropdown-item>
+            <el-dropdown-item command="release">{{$t(`workflow.releaseWorkflow`)}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </template>
@@ -66,7 +66,7 @@ export default {
           url: `/v1/template/dockerfiles`
         },
         {
-          name: '构建',
+          name: this.$t(`global.build`),
           icon: 'iconfont iconvery-build',
           url: `/v1/template/builds`
         }

@@ -36,7 +36,7 @@
                      @click="selectFile"
                      type="primary"
                      :disabled="selectPath===''"
-                     plain>确定</el-button>
+                     plain>{{$t(`global.confirm`)}}</el-button>
         </span>
       </div>
 

@@ -66,7 +66,7 @@
       </el-form-item>
       <template>
         <el-form-item
-          label="名称"
+          :label="$t(`global.name`)"
           prop="repoName"
           :rules="{
                 required: true,
@@ -125,7 +125,7 @@
         </el-form-item>
         <el-form-item
           v-if="codehostSource === 'other'"
-          label="文件目录"
+          :label="$t(`global.fileDirectory`)"
           :rules="{
                 required: true,
                 message: '请输入文件目录',
@@ -163,7 +163,7 @@
       <el-form-item prop="url" label="仓库地址">
         <el-input v-model="source.url" placeholder="https://github.com/owner/repo" size="small" :disabled="isUpdate"></el-input>
       </el-form-item>
-      <el-form-item prop="path" label="文件目录">
+      <el-form-item prop="path" :label="$t(`global.fileDirectory`)">
         <span :key="item" v-for="item in selectPath">[{{ item }}]&nbsp;</span>
         <el-button @click="openFileTree" :disabled="!source.url || isUpdate" type="primary" plain size="mini" icon="el-icon-plus" circle></el-button>
       </el-form-item>

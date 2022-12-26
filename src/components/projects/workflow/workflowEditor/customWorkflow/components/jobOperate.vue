@@ -8,7 +8,7 @@
       @click="setCurTask(index,item)"
     >
       <div class="mg-b8">
-        <span class="item-title">{{item.label || item.name}}</span>
+        <span class="item-title">{{item.label ? $t(`workflow.jobType.${item.label}`) : item.name}}</span>
         <el-tag size="mini" class="item-tag mg-l8" v-if="item.is_offical" effect="plain">官方</el-tag>
       </div>
       <span class="item-dec">{{item.description}}</span>

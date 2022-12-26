@@ -5,7 +5,7 @@
          @click="changeTab('basicInfo')">
       <div class="tab"
            :class="{'active-tab':currentTab==='basicInfo' }">
-        <span class="number">基本信息</span>
+        <span class="number">{{$t(`productWorkflowSideBar.base`)}}</span>
       </div>
     </div>
     <div v-if="currentModules['buildDeploy']"
@@ -13,7 +13,7 @@
       <div @click="changeTab('buildDeploy')"
            class="tab"
            :class="{'active-tab':currentTab==='buildDeploy'}">
-        <span class="number">构建部署</span>
+        <span class="number">{{$t(`productWorkflowSideBar.build`)}}</span>
       </div>
       <span class="operation">
         <i @click="deleteModule('buildDeploy')"
@@ -26,7 +26,7 @@
       <div @click="changeTab('artifactDeploy')"
            class="tab"
            :class="{'active-tab':currentTab==='artifactDeploy'}">
-        <span class="number">交付物部署</span>
+        <span class="number">{{$t(`productWorkflowSideBar.artifact`)}}</span>
       </div>
       <span class="operation">
         <i @click="deleteModule('artifactDeploy')"
@@ -39,7 +39,7 @@
       <div @click="changeTab('test')"
            class="tab"
            :class="{'active-tab':currentTab==='test' }">
-        <span class="number">测试</span>
+        <span class="number">{{$t(`productWorkflowSideBar.test`)}}</span>
       </div>
       <span class="operation">
         <i @click="deleteModule('test')"
@@ -52,7 +52,7 @@
       <div @click="changeTab('distribute')"
            class="tab"
            :class="{'active-tab':currentTab==='distribute' }">
-        <span class="number">分发部署</span>
+        <span class="number">{{$t(`productWorkflowSideBar.distribute`)}}</span>
       </div>
       <span class="operation">
         <i @click="deleteModule('distribute')"
@@ -65,7 +65,7 @@
       <div @click="changeTab('extension')"
            class="tab"
            :class="{'active-tab':currentTab==='extension' }">
-        <span class="number">扩展</span>
+        <span class="number">{{$t(`productWorkflowSideBar.expand`)}}</span>
       </div>
       <span class="operation">
         <i @click="deleteModule('extension')"
@@ -78,7 +78,7 @@
       <div @click="changeTab('trigger')"
            class="tab"
            :class="{'active-tab':currentTab==='trigger' }">
-        <span class="number">触发器</span>
+        <span class="number">{{$t(`productWorkflowSideBar.trigger`)}}</span>
       </div>
       <span class="operation">
         <i @click="deleteModule('trigger')"
@@ -91,7 +91,7 @@
       <div @click="changeTab('notify')"
            class="tab"
            :class="{'active-tab':currentTab==='notify' }">
-        <span class="number">通知</span>
+        <span class="number">{{$t(`productWorkflowSideBar.notify`)}}</span>
       </div>
       <span class="operation">
         <i @click="deleteModule('notify')"

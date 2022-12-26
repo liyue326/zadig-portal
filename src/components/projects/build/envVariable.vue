@@ -14,14 +14,14 @@
           <el-form-item class="display-flex">
             <el-select
               v-model="preEnvs.envs[build_env_index].type"
-              placeholder="类型"
+              :placeholder="$t(`global.type`)"
               size="small"
               :class="{'partial-width': preEnvs.envs[build_env_index].type !== 'string'}"
               style="margin-right: 6px;"
               @change="changeEnvType(build_env_index)"
             >
-              <el-option label="字符串" value="string"></el-option>
-              <el-option label="枚举" value="choice"></el-option>
+              <el-option :label="$t(`global.string`)" value="string"></el-option>
+              <el-option :label="$t(`global.enumerate`)" value="choice"></el-option>
             </el-select>
             <i
               v-show="preEnvs.envs[build_env_index].type === 'choice'"
@@ -31,8 +31,8 @@
           </el-form-item>
         </el-col>
         <el-col :span="4">
-          <el-form-item :prop="'envs.' + build_env_index + '.key'" :rules="{required: true, message: '键 不能为空', trigger: 'blur'}">
-            <el-input placeholder="键" v-model="preEnvs.envs[build_env_index].key" size="small" :disabled="preEnvs.envs[build_env_index].disabledKey"></el-input>
+          <el-form-item :prop="'envs.' + build_env_index + '.key'" :rules="{required: true, message: $t(`global.inputKey`), trigger: 'blur'}">
+            <el-input :placeholder="$t(`global.key`)" v-model="preEnvs.envs[build_env_index].key" size="small" :disabled="preEnvs.envs[build_env_index].disabledKey"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="4">
@@ -40,7 +40,7 @@
             <el-select
               v-if="preEnvs.envs[build_env_index].command !== 'other'&&preEnvs.envs[build_env_index].type==='choice'"
               v-model="preEnvs.envs[build_env_index].value"
-              placeholder="默认值"
+              :placeholder="$t(`global.defaultValue`)"
               size="small"
             >
               <el-option v-for="option in preEnvs.envs[build_env_index].choice_option" :key="option" :label="option" :value="option"></el-option>
@@ -48,11 +48,11 @@
             <el-input
               v-if="preEnvs.envs[build_env_index].type==='string' && preEnvs.envs[build_env_index].command !== 'other'"
               :disabled="isJenkins&&preEnvs.envs[build_env_index].auto_generate"
-              placeholder="值"
+              :placeholder="$t(`global.value`)"
               v-model="preEnvs.envs[build_env_index].value"
               size="small"
             ></el-input>
-            <el-select v-if="preEnvs.envs[build_env_index].command === 'other'" v-model="preEnvs.envs[build_env_index].value" filterable placeholder="请选择" size="small" ref="select" @focus="handleEnvChange(preEnvs.envs[build_env_index],preEnvs.envs[build_env_index].command)">
+            <el-select v-if="preEnvs.envs[build_env_index].command === 'other'" v-model="preEnvs.envs[build_env_index].value" filterable :placeholder="$t(`build.prompt.select`)" size="small" ref="select" @focus="handleEnvChange(preEnvs.envs[build_env_index],preEnvs.envs[build_env_index].command)">
               <el-option v-for="(item,index) in envs" :key="index" :label="item" :value="item">{{item}}</el-option>
             </el-select>
           </el-form-item>
@@ -62,17 +62,17 @@
         </el-col>
         <el-col :span="12" v-if="isJenkins&&preEnvs.envs[build_env_index].name==='IMAGE'" class="tip">
           <el-checkbox v-model="preEnvs.envs[build_env_index].auto_generate"></el-checkbox>
-          <span>使用系统内置变量 $IMAGE，具体详见</span>
+          <span>{{$t(`build.prompt.useSystemImageNamingRules`)}}</span>
           <router-link
                        :to="`/v1/projects/detail/${$route.params.project_name}/services?service_name=${serviceName.length>0?serviceName[0].service_name : ''}&rightbar=policy`">
-          镜像名称规则
+            {{$t(`build.imageNamingRules`)}}
           </router-link>
         </el-col>
         <el-col :span="mini ? 4 : 3" v-show="preEnvs.envs[build_env_index].type!=='choice'" v-if="!isJenkins">
           <el-form-item prop="is_credential">
             <el-checkbox v-model="preEnvs.envs[build_env_index].is_credential">
-              敏感信息
-              <el-tooltip effect="dark" content="设置为敏感信息变量后，系统会将变量进行加密，使用时进行解密，同时在工作流运行日志里不可见" placement="top">
+              {{$t(`build.secretParameter`)}}
+              <el-tooltip effect="dark" :content="$t(`build.secretParameterTooltip`)" placement="top">
                 <i class="el-icon-question"></i>
               </el-tooltip>
             </el-checkbox>
@@ -81,25 +81,25 @@
         <el-col :span="8" v-if="!isJenkins">
           <el-form-item style="margin-right: 0;">
             <div class="app-operation">
-              <el-button v-if="preEnvs.envs.length >= 1" @click="deleteBuildEnv(build_env_index)" type="danger" size="small" plain>删除</el-button>
-              <el-button v-if="build_env_index===preEnvs.envs.length-1" @click="addBuildEnv()" type="primary" size="small" plain>新增</el-button>
+              <el-button v-if="preEnvs.envs.length >= 1" @click="deleteBuildEnv(build_env_index)" type="danger" size="small" plain>{{$t(`global.delete`)}}</el-button>
+              <el-button v-if="build_env_index===preEnvs.envs.length-1" @click="addBuildEnv()" type="primary" size="small" plain>{{$t(`global.add`)}}</el-button>
             </div>
           </el-form-item>
         </el-col>
       </el-row>
     </el-form>
-    <el-dialog :visible.sync="dialogVisible" title="枚举" width="600px" :close-on-click-modal="false" :show-close="false" append-to-body>
+    <el-dialog :visible.sync="dialogVisible" :title="$t(`global.enumerate`)" width="600px" :close-on-click-modal="false" :show-close="false" append-to-body>
       <el-form ref="form" :model="currentVars" label-position="left" label-width="90px">
-        <el-form-item label="变量名称">
+        <el-form-item :label="$t(`build.variableKey`)">
           <el-input v-model="currentVars.key" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="可选值">
-          <el-input type="textarea" v-model="currentVars.choice_option" placeholder="可选值之间用英文 “,” 隔开" size="small" rows="4"></el-input>
+        <el-form-item :label="$t(`build.variableOptions`)">
+          <el-input type="textarea" v-model="currentVars.choice_option" :placeholder="$t(`build.prompt.variableOptions`)" size="small" rows="4"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveVariable" size="small">确 定</el-button>
+        <el-button @click="dialogVisible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveVariable" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
     <section class="inner-variable" v-if="!isJenkins">
@@ -166,6 +166,7 @@ export default {
       default: () => {
         return {
           origin: 'build',
+          // TODO: HOW TO CHANGE THIS
           title: '构建',
           vars: []
         }
@@ -180,21 +181,28 @@ export default {
     return {
       dialogVisible: false,
       currentVars: {},
-      showBuildInEnvVar: false,
-      buildVars: [
+      showBuildInEnvVar: false
+    }
+  },
+  computed: {
+    projectName () {
+      return this.$route.params.project_name
+    },
+    buildVars () {
+      return [
         {
           variable: '$WORKSPACE',
-          desc: '工作目录'
+          desc: this.$t(`systemVariables.workspace`)
         },
         {
           variable: '$TASK_ID',
-          desc: '工作流任务 ID'
+          desc: this.$t(`systemVariables.workflowTaskID`)
         },
         {
           variable: '$IMAGE',
-          desc: '输出镜像名称',
+          desc: this.$t(`systemVariables.image`),
           link: {
-            label: '更新镜像命名规则',
+            label: this.$t(`systemVariables.updateImageNamingRulesPrompt`),
             handler: () => {
               this.$router.replace({
                 query: Object.assign({}, this.$route.query, {
@@ -206,9 +214,9 @@ export default {
         },
         {
           variable: '$PKG_FILE',
-          desc: '构建出的 Tar 包名称',
+          desc: this.$t(`systemVariables.artifact`),
           link: {
-            label: '更新 Tar 包命名规则',
+            label: this.$t(`systemVariables.updateArtifactNamingRulesPrompt`),
             handler: () => {
               this.$router.replace({
                 query: Object.assign({}, this.$route.query, {
@@ -220,110 +228,103 @@ export default {
         },
         {
           variable: '$SERVICE',
-          desc: '构建的服务名称'
+          desc: this.$t(`systemVariables.service`)
         },
         {
           variable: '$SERVICE_MODULE',
-          desc: '构建的服务组件名称'
+          desc: this.$t(`systemVariables.serviceModule`)
         },
         {
           variable: '$DIST_DIR',
-          desc: '构建出的 Tar 包的目的目录'
+          desc: this.$t(`systemVariables.artifactPath`)
         },
         {
           variable: '$ENV_NAME',
-          desc: '执行的环境名称'
+          desc: this.$t(`systemVariables.buildEnvName`)
         },
         {
           variable: '$BUILD_URL',
-          desc: '构建任务的 URL'
+          desc: this.$t(`systemVariables.buildTaskLink`)
         },
         {
           variable: '$CI',
-          desc: '值恒等于 true，表示当前环境是 CI/CD 环境'
+          desc: this.$t(`systemVariables.ci`)
         },
         {
           variable: '$ZADIG',
-          desc: '值恒等于 true，表示在 Zadig 系统上执行脚本'
+          desc: this.$t(`systemVariables.zadig`)
         },
         {
           // eslint-disable-next-line no-template-curly-in-string
           variable: '$REPONAME_<index>',
-          desc: '指定 <index> 的代码库名称，其中 <index> 为构建配置中代码的位置，初始值为 0'
+          desc: this.$t(`systemVariables.repoNameIndex`)
         },
         {
           // eslint-disable-next-line no-template-curly-in-string
           variable: '$REPO_<index>',
-          desc: '指定 <index> 的代码库名称（可用于代码信息相关变量名，仓库名称中的中划线 "-" 替换成下划线"_"），其中 <index> 为构建配置中代码的位置，初始值为 0'
+          desc: this.$t(`systemVariables.repoIndex`)
         },
         {
           // eslint-disable-next-line no-template-curly-in-string
           variable: '$<REPO>_PR',
           // eslint-disable-next-line no-template-curly-in-string
-          desc: '构建时使用的代码 Pull Request 信息，其中 <REPO> 是具体的代码仓库名称，使用时可以填写仓库名称或者结合 $REPO_<index> 变量使用，比如可以通过 eval PR=\${${REPO_0}_PR} 方式获取第一个代码库的 Pull Request 信息，如选择多个 PR，变量值形如 1,2,3'
+          desc: this.$t(`systemVariables.repoPR`)
         },
         {
           // eslint-disable-next-line no-template-curly-in-string
           variable: '$<REPO>_BRANCH',
           // eslint-disable-next-line no-template-curly-in-string
-          desc: '构建时使用的代码分支信息，其中 <REPO> 是具体的代码仓库名称，使用时可以填写仓库名称或者结合 $REPO_index 变量使用，比如可以通过 eval BRANCH=\\${${REPO_0}_BRANCH} 方式获取第一个代码库的分支信息'
+          desc: this.$t(`systemVariables.repoBranch`)
         },
         {
           // eslint-disable-next-line no-template-curly-in-string
           variable: '$<REPO>_TAG',
           // eslint-disable-next-line no-template-curly-in-string
-          desc: '构建时使用代码 Tag 信息，其中 <REPO> 是具体的代码仓库名称，使用时可以填写仓库名称或者结合 $REPO_index 变量使用，比如可以通过 eval TAG=\\${${REPO_0}_TAG} 方式获取第一个代码库的分支信息'
+          desc: this.$t(`systemVariables.repoTag`)
         },
         {
           // eslint-disable-next-line no-template-curly-in-string
           variable: '$<REPO>_COMMIT_ID',
           // eslint-disable-next-line no-template-curly-in-string
-          desc: '构建时使用代码 Commit 信息，其中 <REPO> 是具体的代码仓库名称，使用时可以填写仓库名称或者结合 $REPO_index]变量使用，比如可以通过 eval COMMITID=\\${${REPO_0}_COMMIT_ID} 方式获取第一个代码库的 COMMIT 信息'
+          desc: this.$t(`systemVariables.repoCommitID`)
         },
         {
-          // eslint-disable-next-line no-template-curly-in-string
           variable: '',
-          // eslint-disable-next-line no-template-curly-in-string
-          desc: '如使用 其他 代码源，$<REPO>_PR 和 $<REPO>_COMMIT_ID 变量不支持'
+          desc: this.$t(`systemVariables.otherTypeRepoWarning`)
         }
-      ],
-      testVars: [
+      ]
+    },
+    testVars () {
+      return [
         {
           variable: '$WORKSPACE',
-          desc: '工作目录'
+          desc: this.$t(`systemVariables.workspace`)
         },
         {
           variable: '$LINKED_ENV',
-          desc: '被测命名空间'
+          desc: this.$t(`systemVariables.linkedEnv`)
         },
         {
           variable: '$ENV_NAME',
-          desc: '被测环境名称'
+          desc: this.$t(`systemVariables.testEnvName`)
         },
         {
           variable: '$TEST_URL',
-          desc: '测试任务的 URL'
+          desc: this.$t(`systemVariables.testTaskLink`)
         },
         {
           variable: '$SERVICES',
-          desc:
-            '通过工作流任务更新的服务组，服务名以 “,” 分隔，形如 service1,service2,service3。推荐使用 array=(${SERVICES//,/ ' +
-            '} 方式转化成数组'
+          desc: this.$t(`systemVariables.testServices`)
         },
         {
           variable: '$CI',
-          desc: '值恒等于 true，表示当前环境是 CI/CD 环境'
+          desc: this.$t(`systemVariables.ci`)
         },
         {
           variable: '$ZADIG',
-          desc: '值恒等于 true，表示在 ZADIG 系统上执行脚本'
+          desc: this.$t(`systemVariables.zadig`)
         }
       ]
-    }
-  },
-  computed: {
-    projectName () {
-      return this.$route.params.project_name
     }
   },
   methods: {

@@ -31,7 +31,7 @@
       </el-table>
     </section>
     <div slot="footer">
-      <el-button type="primary" @click="policyDialog = false" size="small">确 定</el-button>
+      <el-button type="primary" @click="policyDialog = false" size="small">{{$t(`global.confirm`)}}</el-button>
     </div>
   </el-dialog>
 </template>

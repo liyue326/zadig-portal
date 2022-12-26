@@ -2,42 +2,42 @@
   <div class="integration-home">
     <div class="tab-container">
       <el-tabs @tab-click="changeTab" type="card" style="height: 200px;" v-model="currentTab">
-        <el-tab-pane name="account" label="账号系统">
+        <el-tab-pane name="account" :label="$t(`sysSetting.integration.accountsTab`)">
           <keep-alive>
             <Account v-if="currentTab === 'account'" />
           </keep-alive>
         </el-tab-pane>
-        <el-tab-pane name="project" label="项目管理">
+        <el-tab-pane name="project" :label="$t(`sysSetting.integration.projectTab`)">
           <keep-alive>
             <Project v-if="currentTab === 'project'" />
           </keep-alive>
         </el-tab-pane>
-        <el-tab-pane name="code" label="代码源">
+        <el-tab-pane name="code" :label="$t(`sysSetting.integration.gitProvidersTab`)">
           <keep-alive>
             <Code v-if="currentTab === 'code'" />
           </keep-alive>
         </el-tab-pane>
-        <el-tab-pane v-if="hasPlutus" name="config" label="配置管理">
+        <el-tab-pane v-if="hasPlutus" name="config" :label="$t(`sysSetting.integration.configsTab`)">
           <keep-alive>
             <ConfigManage v-if="currentTab === 'config'" />
           </keep-alive>
         </el-tab-pane>
-        <el-tab-pane name="jenkins" label="Jenkins 集成">
+        <el-tab-pane name="jenkins" :label="$t(`sysSetting.integration.jenkinsTab`)">
           <keep-alive>
             <Jenkins v-if="currentTab === 'jenkins'" />
           </keep-alive>
         </el-tab-pane>
-        <el-tab-pane name="sonar" label="Sonar 集成">
+        <el-tab-pane name="sonar" :label="$t(`sysSetting.integration.sonarTab`)">
           <keep-alive>
             <Sonar v-if="currentTab === 'sonar'" />
           </keep-alive>
         </el-tab-pane>
-        <el-tab-pane name="approval" label="审批系统" v-if="hasPlutus">
+        <el-tab-pane name="approval" :label="$t(`sysSetting.integration.approvalSystemTab`)" v-if="hasPlutus">
           <keep-alive>
             <Approval v-if="currentTab === 'approval'" />
           </keep-alive>
         </el-tab-pane>
-        <el-tab-pane name="external" label="其他系统">
+        <el-tab-pane name="external" :label="$t(`sysSetting.integration.otherSystemTab`)">
           <keep-alive>
             <External v-if="currentTab === 'external'" />
           </keep-alive>
@@ -95,7 +95,7 @@ export default {
     })
   },
   mounted () {
-    bus.$emit('set-topbar-title', { title: '集成管理', breadcrumb: [] })
+    bus.$emit('set-topbar-title', { title: this.$t(`sidebarMenu.integration`), breadcrumb: [] })
     this.showCurrentTab()
   }
 }

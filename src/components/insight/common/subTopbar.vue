@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="operation">
-      <el-select v-model="selectedProjects" @change="changeProject" size="small" collapse-tags multiple placeholder="筛选项目">
+      <el-select v-model="selectedProjects" @change="changeProject" size="small" collapse-tags multiple :placeholder="$t('dataStatistics.insight.selectProject')">
         <el-option v-for="item in projects" :key="item.name" :label="item.alias" :value="item.name"></el-option>
       </el-select>
       <el-date-picker
@@ -25,8 +25,8 @@
         unlink-panels
         range-separator="-"
         value-format="timestamp"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
+        :start-placeholder="$t('dataStatistics.insight.startTime')"
+        :end-placeholder="$t('dataStatistics.insight.endTime')"
         :picker-options="pickerOptions"
       ></el-date-picker>
     </div>
@@ -37,46 +37,6 @@ import { getProjectsAPI } from '@api'
 export default {
   data () {
     return {
-      pickerOptions: {
-        shortcuts: [
-          {
-            text: '最近一周',
-            onClick (picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '最近一个月',
-            onClick (picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '最近三个月',
-            onClick (picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '最近一年',
-            onClick (picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 365)
-              picker.$emit('pick', [start, end])
-            }
-          }
-        ]
-      },
       selectedDuration: [
         new Date().getTime() - 3600 * 1000 * 24 * 30,
         new Date().getTime()
@@ -85,22 +45,63 @@ export default {
       projects: []
     }
   },
-  props: {},
   computed: {
+    pickerOptions () {
+      return {
+        shortcuts: [
+          {
+            text: this.$t('dataStatistics.insight.lastWeek'),
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: this.$t('dataStatistics.insight.lastMonth'),
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: this.$t('dataStatistics.insight.lastThreeMonths'),
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: this.$t('dataStatistics.insight.lastYear'),
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 365)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      }
+    },
     routerList () {
       return [
         {
-          name: '构建效能',
+          name: this.$t('dataStatistics.insight.buildInsight'),
           icon: 'iconfont icongongzuoliucheng',
           url: `/v1/insight/build`
         },
         {
-          name: '测试效能',
+          name: this.$t('dataStatistics.insight.testInsight'),
           icon: 'iconfont iconvery-testing',
           url: `/v1/insight/test`
         },
         {
-          name: '部署效能',
+          name: this.$t('dataStatistics.insight.deployInsight'),
           icon: 'iconfont iconvery-environ',
           url: `/v1/insight/service`
         }

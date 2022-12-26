@@ -10,7 +10,7 @@
                    type="primary"
                    :href="`https://docs.koderover.com/zadig/settings/system-settings/#缓存清理`"
                    :underline="false"
-                   target="_blank">帮助文档</el-link>
+                   target="_blank">{{$t(`global.helpDoc`)}}</el-link>
         </template>
       </el-alert>
     </template>
@@ -27,12 +27,12 @@
         <el-switch v-model="cleanStatus.cron_enabled"></el-switch>
         <span v-if="cleanStatus.cron_enabled">
           <el-input style="width: 200px;" size="small" v-model="cleanStatus.cron"  placeholder="Cron 表达式"></el-input>
-          <el-button size="mini" type="primary" @click="timingClean" plain round>保存</el-button>
+          <el-button size="mini" type="primary" @click="timingClean" plain round>{{$t(`global.save`)}}</el-button>
         </span>
       </div>
       <template v-if="cleanStatus">
         <div class="desc">
-          <span class="title">状态：</span>
+          <span class="title">{{$t('global.status')}} :</span>
           <el-tag size="mini"
                   :type="tagTypeMap[cleanStatus.status]">{{statusMap[cleanStatus.status]}}
           </el-tag>
@@ -116,8 +116,8 @@ export default {
     },
     cleanCache () {
       this.$confirm('停止的容器、所有未被容器使用的网络、无用的镜像和构建缓存镜像将被删除，确认清理？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         cleanCacheAPI().then(response => {

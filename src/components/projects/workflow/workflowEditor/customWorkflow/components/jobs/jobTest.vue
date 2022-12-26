@@ -1,13 +1,17 @@
 <template>
   <div class="job-test">
-    <el-form ref="ruleForm" :model="job" class="mg-t24 mg-b24" label-position="left" label-width="90px" size="small">
-      <el-form-item label="任务名称" prop="name" :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}">
+    <el-form ref="ruleForm" :model="job" class="mg-t24 mg-b24" label-position="left" label-width="100px" size="small">
+      <el-form-item
+        :label="$t(`workflow.jobName`)"
+        prop="name"
+        :rules="{required: true,validator:validateJobName, trigger: ['blur', 'change']}"
+      >
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
-      <div class="mg-b24 title">选择测试</div>
+      <div class="mg-b24 title">{{$t(`workflow.selectTest`)}}</div>
       <el-row :gutter="24" class="mg-b16">
-        <el-col :span="6">测试名称</el-col>
-        <el-col :span="6">测试配置</el-col>
+        <el-col :span="6">{{$t(`global.testName`)}}</el-col>
+        <el-col :span="6">{{$t(`workflow.testConfig`)}}</el-col>
         <el-col :span="6"></el-col>
       </el-row>
       <div v-for="(item,index) in job.spec.test_modules" :key="index">
@@ -20,18 +24,18 @@
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-tooltip class="item" effect="dark" content="变量配置" placement="top">
+            <el-tooltip class="item" effect="dark" :content="$t(`workflow.varConfig`)" placement="top">
               <span class="iconfont iconbianliang1" @click="handleVarBranchChange('var',item,index)"></span>
             </el-tooltip>
-            <el-tooltip class="item" effect="dark" content="分支配置" placement="top">
+            <el-tooltip class="item" effect="dark" :content="$t(`workflow.branchConfig`)" placement="top">
               <span class="iconfont iconfenzhi" @click="handleVarBranchChange('branch',item,index)"></span>
             </el-tooltip>
-            <el-tooltip class="item" effect="dark" content="共享存储配置" placement="top">
+            <el-tooltip class="item" effect="dark" :content="$t(`workflow.storageConfig`)" placement="top">
               <span class="iconfont iconcunchufuwu" @click="handleVarBranchChange('pv',item,index)"></span>
             </el-tooltip>
           </el-col>
           <el-col :span="4">
-            <el-button type="danger" size="mini" plain @click="delTest(index)">删除</el-button>
+            <el-button type="danger" size="mini" plain @click="delTest(index)">{{$t(`global.delete`)}}</el-button>
           </el-col>
         </el-row>
       </div>
@@ -44,15 +48,15 @@
         </el-option>
         <el-option v-for="(test,index) in testList" :key="index" :value="test.name" :label="test.name">{{test.name}}</el-option>
       </el-select>
-      <el-button type="success" size="mini" plain :disabled="Object.keys(test).length === 0" @click="addTest()">+ 添加</el-button>
+      <el-button type="success" size="mini" plain :disabled="Object.keys(test).length === 0" @click="addTest()">+ {{$t(`global.add`)}}</el-button>
     </el-form>
     <el-dialog :title="`${curItem.name} 变量配置`" :visible.sync="isShowVarDialog" :append-to-body="true" width="40%">
       <el-table :data="curItem.key_vals" size="small">
-        <el-table-column prop="key" label="键"></el-table-column>
-        <el-table-column label="类型">
+        <el-table-column prop="key" :label="$t(`global.key`)"></el-table-column>
+        <el-table-column :label="$t(`global.type`)">
           <template slot-scope="scope">{{scope.row.type === 'string' ? '字符串' : '枚举'}}</template>
         </el-table-column>
-        <el-table-column label="值" width="260">
+        <el-table-column :label="$t(`global.value`)" width="260">
           <template slot-scope="scope">
             <el-select
               size="small"
@@ -96,13 +100,13 @@
         </el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isShowVarDialog = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveCurSetting('var',curItem)" size="small">确 定</el-button>
+        <el-button @click="isShowVarDialog = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveCurSetting('var',curItem)" size="small">{{$t(`global.confirm`)}}</el-button>
       </span>
     </el-dialog>
     <el-dialog :title="`${curItem.name} 分支配置`" :visible.sync="isShowBranchDialog" :append-to-body="true" width="40%">
       <el-table :data="curItem.repos" size="small">
-        <el-table-column prop="repo_name" label="代码库" width="200px"></el-table-column>
+        <el-table-column prop="repo_name" :label="$t(`global.repository`)" width="200px"></el-table-column>
         <el-table-column prop="branch" label="默认分支">
           <template slot-scope="scope">
             <el-select size="small" v-model="scope.row.branch" filterable>
@@ -110,9 +114,9 @@
             </el-select>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100px">
+        <el-table-column :label="$t(`global.operation`)" width="100px">
           <template slot-scope="scope">
-            <el-button @click="delRepo(scope.row)" type="danger" size="mini">删除</el-button>
+            <el-button @click="delRepo(scope.row)" type="danger" size="mini">{{$t(`global.delete`)}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -120,16 +124,22 @@
         <el-select v-model="curItem.curRepo" value-key="repo_name" filterable size="small" placeholder="请选择代码库">
           <el-option v-for="repo of curItem.originRepos" :key="repo.repo_name" :label="repo.repo_name" :value="repo"></el-option>
         </el-select>
-        <el-button @click="addRepo" :disabled="curItem.originRepos && curItem.originRepos.length === 0" type="primary" size="mini" plain>添加</el-button>
+        <el-button
+          @click="addRepo"
+          :disabled="curItem.originRepos && curItem.originRepos.length === 0"
+          type="primary"
+          size="mini"
+          plain
+        >{{$t(`global.add`)}}</el-button>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isShowBranchDialog = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveCurSetting('branch',curItem)" size="small">确 定</el-button>
+        <el-button @click="isShowBranchDialog = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveCurSetting('branch',curItem)" size="small">{{$t(`global.confirm`)}}</el-button>
       </span>
     </el-dialog>
     <el-dialog :title="`${curItem.name} 共享存储配置`" :visible.sync="isShowPvDialog" :append-to-body="true" width="40%">
       <el-form ref="form" label-position="left" label-width="120px" v-if="curItem.share_storage_info">
-        <el-form-item label="开启共享存储">
+        <el-form-item :label="$t(`workflow.enableSharedStorage`)">
           <el-switch
             v-model="curItem.share_storage_info.enabled"
             :disabled="!isCanOpenShareStorage"
@@ -138,14 +148,14 @@
             @change="handleSwitchChange($event,curItem)"
             active-color="#0066ff"
           ></el-switch>
-          <el-tooltip v-if="!isCanOpenShareStorage" content="集群无共享存储资源，请前往「系统设置」-「集群管理」配置" placement="top">
+          <el-tooltip v-if="!isCanOpenShareStorage" :content="$t(`workflow.enableSharedStorageTip`)" placement="top">
             <i class="el-icon-warning" style="color: red; vertical-align: -2px;"></i>
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="选择共享目录" v-if="isCanOpenShareStorage&&curItem.share_storage_info.enabled">
+        <el-form-item :label="$t(`workflow.selectShareDirectory`)" v-if="isCanOpenShareStorage&&curItem.share_storage_info.enabled">
           <el-select
             v-model="curItem.share_storage_info.share_storages"
-            placeholder="选择共享目录"
+           :placeholder="$t(`workflow.selectShareDirectory`)"
             filterable
             multiple
             value-key="name"
@@ -159,8 +169,8 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isShowPvDialog = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="saveCurSetting('pv',curItem)" size="small">确 定</el-button>
+        <el-button @click="isShowPvDialog = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="saveCurSetting('pv',curItem)" size="small">{{$t(`global.confirm`)}}</el-button>
       </span>
     </el-dialog>
   </div>

@@ -8,11 +8,11 @@
         @click="startTask(workflow)"
         class="left"
       >
-        <span class="iconfont iconzhixing">&nbsp;执行</span>
+        <span class="iconfont iconzhixing">&nbsp;{{$t(`workflow.run`)}}</span>
       </el-button>
-      <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
         <el-button type="primary" effect="dark" class="left permission-disabled">
-          <span class="iconfont iconzhixing">&nbsp;执行</span>
+          <span class="iconfont iconzhixing">&nbsp;{{$t(`workflow.run`)}}</span>
         </el-button>
       </el-tooltip>
       <template v-if="detail.category === 'release'">
@@ -23,7 +23,7 @@
         >
           <span class="iconfont icondeploy edit-setting"></span>
         </router-link>
-        <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+        <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
           <span class="middle">
             <span class="permission-disabled iconfont icondeploy edit-setting"></span>
           </span>
@@ -37,7 +37,7 @@
         >
           <span class="iconfont icondeploy edit-setting"></span>
         </router-link>
-        <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+        <el-tooltip v-else effect="dark" :content="$t(`permission.lackPermission`)" placement="top">
           <span class="middle">
             <span class="permission-disabled iconfont icondeploy edit-setting"></span>
           </span>
@@ -46,11 +46,11 @@
       <div class="right">
         <CusTags :values="stages" class="item" noLimit />
         <span class="item">
-          <span class="item left">修改人</span>
+          <span class="item left">{{$t('workflow.updateBy')}}</span>
           {{ detail.updated_by }}
         </span>
         <span class="item">
-          <span class="item left">最后修改时间</span>
+          <span class="item left">{{$t('workflow.lastModify')}}</span>
           {{ $utils.convertTimestamp(detail.update_time) }}
         </span>
       </div>
@@ -59,7 +59,7 @@
     <el-card class="box-card full" :body-style="{ padding: '0px', margin: '15px 0 30px 0' }">
       <div slot="header" class="block-title">
         <span>
-          <i class="iconfont iconhistory title-icon"></i>历史任务
+          <i class="iconfont iconhistory title-icon"></i>{{$t('workflow.historyTask')}}
         </span>
         <!-- <FilterStatus
           ref="filterStatusRef"
@@ -86,7 +86,7 @@
       />
     </el-card>
 
-    <el-dialog :visible.sync="taskDialogVisible" title="执行工作流" custom-class="run-workflow" width="60%" class="dialog" :before-close="close">
+    <el-dialog :visible.sync="taskDialogVisible" :title="$t(`workflow.runWorkflow`)" custom-class="run-workflow" width="60%" class="dialog" :before-close="close">
       <RunCustomWorkflow
         v-if="taskDialogVisible"
         :workflowName="workflowName"
@@ -257,14 +257,14 @@ export default {
     bus.$emit('set-topbar-title', {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t(`global.project`), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: '工作流',
+          title: this.$t(`global.workflow`),
           url: `/v1/projects/detail/${this.projectName}/pipelines`
         },
         { title: this.displayName || this.workflowName, url: '' }

@@ -11,6 +11,8 @@ import VueClipboard from 'vue-clipboard2'
 import utils from '@utils/utilities'
 import translate from '@utils/wordTranslate'
 
+import i18n from '@/lang'
+
 // Mixin
 import goBackMixin from '@/mixin/goBackMixin'
 import onboardingStatusMixin from '@/mixin/onboardingStatusMixin'
@@ -114,6 +116,7 @@ function mountApp () {
   new Vue({
     router,
     store,
+    i18n,
     components: { App },
     render: (h) => h(App)
   }).$mount('#app')

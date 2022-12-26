@@ -1,16 +1,16 @@
 <template>
   <div class="job-gray-rollback">
     <el-form label-width="120px" :model="job" ref="ruleForm" class="mg-t24 mg-b24" label-position="left">
-      <el-form-item label="任务名称" prop="name" >
+      <el-form-item :label="$t(`workflow.jobName`)" prop="name" >
         <el-input v-model="job.name" size="small" style="width: 220px;"></el-input>
       </el-form-item>
 
-      <el-form-item label="集群" prop="spec.cluster_id" >
+      <el-form-item :label="$t(`workflow.cluster`)" prop="spec.cluster_id" >
         <el-select v-model="job.spec.cluster_id" placeholder="请选择集群名称" size="small" @change="getNamespaceList" style="width: 220px;">
           <el-option v-for="cluster in clusters" :key="cluster.id" :label="$utils.showClusterName(cluster)" :value="cluster.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="命名空间" prop="spec.namespace" >
+      <el-form-item :label="$t(`workflow.namespace`)" prop="spec.namespace" >
         <el-select v-model="job.spec.namespace" filterable placeholder="请选择" size="small" @change="getDeploymentList" style="width: 220px;">
           <el-option v-for="item in namespaceList" :key="item" :label="item" :value="item"></el-option>
         </el-select>

@@ -1,6 +1,6 @@
 <template>
   <div class="service-details-container">
-    <el-dialog :visible.sync="ephemeralContainersDialog.visible" title="启动调试容器" width="600px" :close-on-click-modal="false" class="ephemeralContainers-dialog" :show-close="false" append-to-body>
+    <el-dialog :visible.sync="ephemeralContainersDialog.visible" :title="$t('environments.common.serviceDetail.startEphemeralContainer')" width="600px" :close-on-click-modal="false" class="ephemeralContainers-dialog" :show-close="false" append-to-body>
       <el-alert style="background: #fff;" title="调试容器正常启动后，点击「调试」按钮可对服务进行诊断" type="info" :closable="false"></el-alert>
       <el-form ref="ephemeralContainerForm" :model="ephemeralContainersDialog" label-position="left" label-width="90px">
         <el-form-item label="镜像来源">
@@ -20,20 +20,20 @@
         </span>
       </el-alert>
       <div slot="footer">
-        <el-button @click="ephemeralContainersDialog.visible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="startEphemeralContainersDebug" size="small">确 定</el-button>
+        <el-button @click="ephemeralContainersDialog.visible = false" size="small">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" @click="startEphemeralContainersDebug" size="small">{{$t(`global.confirm`)}}</el-button>
       </div>
     </el-dialog>
     <div class="info-card">
       <div class="info-header">
-        <span>基本信息</span>
+        <span>{{$t('global.basicInfo')}}</span>
       </div>
       <el-row :gutter="0"
               class="info-body">
         <el-col :span="12"
                 class="WAN">
           <div class="addr-title title">
-            外网访问
+            {{$t('environments.common.serviceDetail.ingressHosts')}}
           </div>
           <div class="addr-content">
             <template v-if="allHosts.length > 0">
@@ -43,13 +43,13 @@
                    target="_blank">{{ host.host }}</a>
               </div>
             </template>
-            <div v-else>无</div>
+            <div v-else>{{$t('global.emptyText')}}</div>
           </div>
         </el-col>
         <el-col :span="12"
                 class="LAN">
           <div class="addr-title title">
-            内网访问
+            {{$t('environments.common.serviceDetail.serviceEndpoints')}}
           </div>
           <div class="addr-content">
             <template v-if="allEndpoints.length > 0">
@@ -85,7 +85,7 @@
                 </el-popover>
               </div>
             </template>
-            <div v-else>无</div>
+            <div v-else>{{$t('global.emptyText')}}</div>
           </div>
         </el-col>
       </el-row>
@@ -94,7 +94,7 @@
 
     <div class="info-card" v-if="envSource ==='' || envSource === 'spock'">
       <div class="info-header">
-        <span>基本操作</span>
+        <span>{{$t('environments.common.serviceDetail.basicOperation')}}</span>
       </div>
       <div class="info-body fundamental-ops">
         <template>
@@ -104,16 +104,16 @@
                        type="primary"
                        size="small"
                        plain>
-              配置管理
+              {{$t('environments.common.serviceDetail.serviceConfiguration')}}
             </el-button>
           </router-link>
-          <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+          <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
             <el-button icon="iconfont iconshare1"
                        class="permission-disabled"
                        type="primary"
                        size="small"
                        plain>
-              配置管理
+              {{$t('environments.common.serviceDetail.serviceConfiguration')}}
             </el-button>
           </el-tooltip>
           <el-button v-if="checkPermissionSyncMixin({projectName: projectName, action: 'get_environment',resource:{name:envName,type:'env'}})" @click="showExport"
@@ -121,15 +121,15 @@
                      type="primary"
                      size="small"
                      plain>
-            Yaml 导出
+              {{$t('environments.common.serviceDetail.exportYaml')}}
           </el-button>
-          <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+          <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
             <el-button icon="iconfont iconcloud icon-bold"
                        class="permission-disabled"
                        type="primary"
                        size="small"
                        plain>
-               Yaml 导出
+              {{$t('environments.common.serviceDetail.exportYaml')}}
             </el-button>
           </el-tooltip>
           <router-link v-if="checkPermissionSyncMixin({projectName: projectName, action: 'get_service'})"
@@ -138,16 +138,16 @@
                        type="primary"
                        size="small"
                        plain>
-              服务管理
+              {{$t('environments.common.serviceDetail.serviceManagement')}}
             </el-button>
           </router-link>
-          <el-tooltip v-else effect="dark" content="无权限操作" placement="top">
+          <el-tooltip v-else effect="dark" :content="$t('permission.lackPermission')" placement="top">
             <el-button icon="iconfont iconlink1 icon-bold"
                        class="permission-disabled"
                        type="primary"
                        size="small"
                        plain>
-              服务管理
+              {{$t('environments.common.serviceDetail.serviceManagement')}}
             </el-button>
           </el-tooltip>
         </template>
@@ -155,7 +155,7 @@
     </div>
     <div class="info-card">
       <div class="info-header display-flex">
-        <span>服务实例</span>
+        <span>{{$t('environments.common.serviceDetail.serviceInstance')}}</span>
         <el-popover placement="top"
                     trigger="hover"
                     class="middle">
@@ -168,7 +168,7 @@
              slot="reference"></i>
         </el-popover>
         <el-tooltip effect="dark" content="刷新服务实例" placement="top">
-          <el-button icon="el-icon-refresh" type="text" @click="fetchServiceData">刷新</el-button>
+          <el-button icon="el-icon-refresh" type="text" @click="fetchServiceData">{{$t(`global.refresh`)}}</el-button>
         </el-tooltip>
       </div>
       <div class="info-body" v-loading="servicesLoading">
@@ -180,13 +180,13 @@
                     style="width: 100%;">
             <el-table-column width="140"
                              prop="name"
-                             label="名称">
+                             :label="$t(`global.name`)">
               <template slot-scope="scope">
                 <span>{{ scope.row.name }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="images"
-                             label="镜像">
+                             :label="$t('environments.common.imageInfo')">
               <template slot-scope="scope">
                 <div v-for="(item,index) of scope.row.images"
                      :key="index"
@@ -222,14 +222,14 @@
                     </el-select>
                     <div>
                       <span>
-                        <i title="取消"
+                        <i :title="$t('global.cancel')"
                            @click="cancelEditImage(item)"
-                           class="el-icon-circle-close icon-color icon-color-cancel operation">取消</i>
+                           class="el-icon-circle-close icon-color icon-color-cancel operation">{{$t('global.cancel')}}</i>
                       </span>
                       <span>
-                        <i title="保存"
+                        <i :title="$t('global.save')"
                            @click="saveImage(item,scope.row.name,scope.row.type)"
-                           class="el-icon-circle-check icon-color icon-color-confirm operation">保存</i>
+                           class="el-icon-circle-check icon-color icon-color-confirm operation">{{$t('global.save')}}</i>
                       </span>
                     </div>
                   </template>
@@ -239,7 +239,7 @@
             </el-table-column>
             <el-table-column props="replicas"
                              width="125px"
-                             label="副本数量">
+                             :label="$t('environments.common.serviceDetail.serviceReplicas')">
               <template slot-scope="scope">
                 <el-input-number v-if="checkPermissionSyncMixin({projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'}})" size="mini"
                                  :min="0"
@@ -251,16 +251,16 @@
                                  v-model="scope.row.replicas"></el-input-number>
               </template>
             </el-table-column>
-            <el-table-column  label="操作"
+            <el-table-column  :label="$t(`global.operation`)"
                              width="220px">
               <template slot-scope="scope">
                 <el-button v-hasPermi="{projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'},isBtn:true}" @click="restartService(scope.row.name,scope.row.type)"
-                           size="mini">重启实例</el-button>
+                           size="mini">{{$t('environments.common.serviceDetail.restartServiceInstance')}}</el-button>
                 <el-button v-hasPermi="{projectName: projectName, action: 'get_environment',resource:{name:envName,type:'env'},isBtn:true}" @click="showScaleEvents(scope.row.name,scope.row.type)"
-                           size="mini">查看事件</el-button>
+                           size="mini">{{$t('environments.common.serviceDetail.viewEvents')}}</el-button>
               </template>
             </el-table-column>
-            <el-table-column label="详情"
+            <el-table-column :label="$t('global.detail')"
                              props="pods"
                              type="expand"
                              width="80px">
@@ -282,15 +282,15 @@
                               ref="pod-row">
                         <el-col :span="12">
                           <div>
-                            <span class="title">实例名称：</span>
+                            <span class="title">{{$t('environments.common.serviceDetail.instanceName')}}:</span>
                             <span class="content">{{ activePod[scope.$index].name }}</span>
                           </div>
                           <div>
-                            <span class="title">实例 IP：</span>
+                            <span class="title">{{$t('environments.common.serviceDetail.instanceIp')}}:</span>
                             <span class="content">{{ activePod[scope.$index].ip }}</span>
                           </div>
                           <div>
-                            <span class="title">健康探测：</span>
+                            <span class="title">{{$t('environments.common.serviceDetail.healthDetection')}} :</span>
                             <span
                               class="content"
                               :style="{ color: activePod[scope.$index].containers_ready ? 'inherit' : 'red' }"
@@ -305,10 +305,10 @@
                           </div>
                         </el-col>
                         <el-col :span="6">
-                          <span class="title">运行时长：</span>
+                          <span class="title">{{$t('environments.common.serviceDetail.serviceAge')}} :</span>
                           <span class="content">{{ activePod[scope.$index].age }}</span>
                           <div>
-                            <span class="title">节点信息：</span>
+                            <span class="title">{{$t('environments.common.serviceDetail.nodeInfo')}} :</span>
                             <span class="content">{{ activePod[scope.$index].host_ip }}( {{activePod[scope.$index].node_name}} )</span>
                           </div>
                         </el-col>
@@ -317,7 +317,7 @@
                           <el-tooltip v-if="!ephemeralContainersEnabled" effect="dark" content="实例所在的集群不支持 EphemeralContainers 功能，启动调试容器不可用" placement="top">
                             <span style="margin-left: auto;">
                               <el-badge value="alpha" class="ephemeral-badge">
-                                <el-button :disabled="!ephemeralContainersEnabled" size="small">启动调试容器</el-button>
+                                <el-button :disabled="!ephemeralContainersEnabled" size="small">{{$t('environments.common.serviceDetail.startEphemeralContainer')}}</el-button>
                               </el-badge>
                             </span>
                           </el-tooltip>
@@ -325,13 +325,13 @@
                           <el-button @click="openEphemeralContainersDialog(activePod[scope.$index].name)"
                                      v-hasPermi="{projectName: projectName, action: 'debug_pod',resource:{name:envName,type:'env'},isBtn:true, disabled: activePod[scope.$index].enable_debug_container || !activePod[scope.$index].canOperate}"
                                      :disabled="activePod[scope.$index].enable_debug_container || !activePod[scope.$index].canOperate"
-                                     size="small">启动调试容器</el-button>
+                                     size="small">{{$t('environments.common.serviceDetail.startEphemeralContainer')}}</el-button>
                           </el-badge>
                           <el-button style="margin-left: 40px;" v-hasPermi="{projectName: projectName, action: 'manage_environment',resource:{name:envName,type:'env'}}" @click="restartPod(activePod[scope.$index])"
                                      :disabled="!activePod[scope.$index].canOperate"
-                                     size="small">重启</el-button>
+                                     size="small">{{$t('environments.common.serviceDetail.restartPod')}} </el-button>
                           <el-button v-hasPermi="{projectName: projectName, action: 'get_environment',resource:{name:envName,type:'env'}}" @click="showPodEvents(activePod[scope.$index])"
-                                     size="small">查看事件</el-button>
+                                     size="small">{{$t('environments.common.serviceDetail.viewEvents')}} </el-button>
                         </el-col>
                       </el-row>
                       <el-row v-for="container of activePod[scope.$index].containers"
@@ -339,21 +339,21 @@
                               :class="['container-row', container.__color || activePod[scope.$index].__color]">
                         <el-col :span="12">
                           <div>
-                            <span class="title">容器名称：</span>
+                            <span class="title">{{$t('environments.common.serviceDetail.containerName')}} :</span>
                             <span class="content">{{ container.name }}</span>
                           </div>
                           <div>
-                            <span class="title">当前镜像：</span>
+                            <span class="title">{{$t('environments.common.serviceDetail.podImage')}} :</span>
                             <span class="content">{{ container.imageShort }}</span>
                           </div>
                           <div v-if="container.message">
-                            <span class="title">错误信息：</span>
+                            <span class="title">{{$t('global.errorMsg')}} : </span>
                             <span class="content">{{ container.message }}</span>
                           </div>
                         </el-col>
                         <el-col :span="7">
                           <div>
-                            <span class="title">状态：</span>
+                            <span class="title">{{$t('global.status')}} :</span>
                             <span class="content">{{ container.status }}</span>
                             <el-tooltip effect="dark" content="未通过健康探测" placement="top">
                               <i
@@ -364,7 +364,7 @@
                             </el-tooltip>
                           </div>
                           <div v-if="container.startedAtReadable">
-                            <span class="title">启动时间：</span>
+                            <span class="title">{{$t('environments.common.serviceDetail.startTime')}} :</span>
                             <span class="content">{{ container.startedAtReadable }}</span>
                           </div>
                         </el-col>
@@ -373,11 +373,11 @@
                           <el-button v-hasPermi="{projectName: projectName, action: 'debug_pod',resource:{name:envName,type:'env'},isBtn:true}" @click="showContainerExec(activePod[scope.$index].name,container.name)"
                                      :disabled="!activePod[scope.$index].canOperate"
                                      icon="iconfont iconTerminal"
-                                     size="small"> 调试</el-button>
+                                     size="small"> {{$t('environments.common.serviceDetail.podDebug')}}</el-button>
                           <el-button v-hasPermi="{projectName: projectName, action: 'get_environment',resource:{name:envName,type:'env'},isBtn:true}" @click="showContainerLog(activePod[scope.$index].name,container.name)"
                                      :disabled="!activePod[scope.$index].canOperate"
                                      icon="el-icon-document"
-                                     size="small">实时日志</el-button>
+                                     size="small">{{$t('environments.common.serviceDetail.realTimeLog')}} </el-button>
                         </el-col>
                       </el-row>
                     </div>
@@ -398,9 +398,9 @@
                class="log-dialog">
       <span slot="title"
             class="modal-title">
-        <span class="unimportant">Pod 名称:</span>
+        <span class="unimportant">{{$t('environments.common.serviceDetail.podName')}}:</span>
         {{logModal.podName}}
-        <span class="unimportant">容器:</span>
+        <span class="unimportant">{{$t('environments.common.serviceDetail.containerName')}}:</span>
         {{logModal.containerName}}
         <i class="el-icon-full-screen screen"
            @click="fullScreen('logModal')"></i>
@@ -418,9 +418,9 @@
                class="log-dialog">
       <span slot="title"
             class="modal-title">
-        <span class="unimportant">Pod 名称:</span>
+        <span class="unimportant">{{$t('environments.common.serviceDetail.podName')}}:</span>
         {{execModal.podName}}
-        <span class="unimportant">容器:</span>
+        <span class="unimportant">{{$t('environments.common.serviceDetail.containerName')}}:</span>
         {{execModal.containerName}}
         <i class="el-icon-full-screen screen"
            @click="fullScreen(execModal.podName +'-debug')"></i>
@@ -437,7 +437,7 @@
                    ref="debug"/>
       <div class="download-content">
         <el-input v-model="downloadFilePath" placeholder="输入文件在容器中的绝对路径"></el-input>
-        <el-button type="primary" @click="downloadFile(execModal.podName, execModal.containerName)" :disabled="!downloadFilePath" plain>下载</el-button>
+        <el-button type="primary" @click="downloadFile(execModal.podName, execModal.containerName)" :disabled="!downloadFilePath" plain>{{$t('global.download')}}</el-button>
       </div>
     </el-dialog>
 
@@ -466,13 +466,13 @@
               <el-button @click="toggleYAML(obj)"
                          type="text"
                          icon="el-icon-caret-bottom">
-                {{ obj.expanded ? '收起' : '展开' }}
+                {{ obj.expanded ? $t('global.collapse') : $t('global.expand') }}
               </el-button>
               <el-button @click="copyYAML(obj, i)"
                          type="primary"
                          plain
                          size="small"
-                         class="at-right">复制</el-button>
+                         class="at-right">{{$t(`global.copy`)}}</el-button>
             </div>
             <Editor v-show="obj.expanded"
                     :value="obj.readableText"
@@ -489,7 +489,7 @@
 
     <el-dialog :visible.sync="eventsModal.visible"
                width="70%"
-               title="查看事件"
+               :title="$t('environments.common.serviceDetail.viewEvents')"
                class="events-dialog">
       <span slot="title"
             class="modal-title">
@@ -506,7 +506,7 @@
         <el-table-column prop="message"
                          label="消息"></el-table-column>
         <el-table-column prop="reason"
-                         label="状态"
+                         :label="$t(`global.status`)"
                          width="240"></el-table-column>
         <el-table-column prop="count"
                          label="总数"
@@ -783,8 +783,8 @@ export default {
     },
     restartService (scaleName, type) {
       this.$confirm('确定重启实例吗?', '重启', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         const projectName = this.projectName
@@ -831,8 +831,8 @@ export default {
     },
     restartPod (pod) {
       this.$confirm('确定重启吗?', '重启', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         const ownerQuery = this.envName ? `&envName=${this.envName}` : ''
@@ -996,9 +996,9 @@ export default {
       {
         title: '',
         breadcrumb: [
-          { title: '项目', url: '/v1/projects' },
+          { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
           { title: this.projectName, isProjectName: true, url: `/v1/projects/detail/${this.projectName}/detail` },
-          { title: '环境', url: `/v1/projects/detail/${this.projectName}/envs/detail` },
+          { title: this.$t('subTopbarMenu.environments'), url: `/v1/projects/detail/${this.projectName}/envs/detail` },
           { title: this.envName, url: `/v1/projects/detail/${this.projectName}/envs/detail?envName=${this.envName}` },
           { title: this.serviceName, url: '' }
         ]

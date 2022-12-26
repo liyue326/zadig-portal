@@ -1,20 +1,20 @@
 <template>
   <div class="projects-delivery-container">
     <div class="guide-container">
-      <Step :activeStep="3" :stepThreeTitle="`配置环境`"/>
+      <Step :activeStep="3" :thirdStepTitle="$t('project.onboardingComp.configureEnv')"/>
       <div class="current-step-container">
         <div class="title-container">
-          <span class="first">第四步</span>
-          <span class="second">运行工作流触发服务的自动化交付</span>
+          <span class="first">{{$t('project.onboardingComp.fourthStep')}}</span>
+          <span class="second">{{$t('project.onboardingComp.fourthStepTip')}}</span>
         </div>
         <div class="block-list">
           <el-table v-loading="loading" :data="mapWorkflows" style="width: 100%;">
-            <el-table-column label="工作流名称">
+            <el-table-column :label="$t(`global.workflowName`)">
               <template slot-scope="scope">
                 <span style="margin-left: 10px;">{{ scope.row.name }}</span>
               </template>
             </el-table-column>
-            <el-table-column width="120px" label="环境信息">
+            <el-table-column width="120px" :label="$t('project.onboardingComp.envName')">
               <template slot-scope="scope">
                 <a
                   v-if="scope.row.env_name"
@@ -23,7 +23,7 @@
                   target="_blank">{{ scope.row.env_name }}</a>
               </template>
             </el-table-column>
-            <el-table-column label="服务入口">
+            <el-table-column :label="$t('global.serviceEntrypoint')">
               <template slot-scope="scope">
                 <div v-for="(ingress,ingress_index) in scope.row.ingress_infos" :key="ingress_index">
                   <div v-for="(item,host_index) in scope.row.ingress_infos[ingress_index]['host_info']" :key="host_index">
@@ -32,7 +32,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column width="200px" label="包含步骤">
+            <el-table-column width="200px" :label="$t('project.onboardingComp.workflowStages')">
               <template slot-scope="scope">
                 <span>
                   <span v-for="(stage,index) in scope.row.enabledStages" :key="index" class="stage-tag">
@@ -41,13 +41,13 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column width="150px" label="更新信息（时间/操作人）">
+            <el-table-column width="150px" :label="$t('project.onboardingComp.updateTime')">
               <template slot-scope="scope">{{$utils.convertTimestamp(scope.row.updateTime)}}</template>
             </el-table-column>
-            <el-table-column width="120px" label="操作">
+            <el-table-column width="120px" :label="$t(`global.operation`)">
               <template slot-scope="scope">
                 <span v-if="pipeStatus.status !== 'success'">准备中，请稍后...</span>
-                <el-button v-else type="primary" size="mini" round @click="runCurrentTask(scope.row)" plain>点击运行</el-button>
+                <el-button v-else type="primary" size="mini" round @click="runCurrentTask(scope.row)" plain>{{$t('project.onboardingComp.clickToRun')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -68,10 +68,10 @@
     </div>
     <div class="controls__wrap">
       <div class="controls__right">
-        <el-button type="primary" size="small"  :disabled="loading" @click="onboardingFinish">完成</el-button>
+        <el-button type="primary" size="small"  :disabled="loading" @click="onboardingFinish">{{$t('project.onboardingComp.finish')}}</el-button>
       </div>
     </div>
-    <el-dialog :visible.sync="taskDialogVisible" title="运行 产品-工作流" custom-class="run-workflow" width="60%" class="dialog">
+    <el-dialog :visible.sync="taskDialogVisible" :title="$t(`workflow.runProductWorkflow`)" custom-class="run-workflow" width="60%" class="dialog">
       <RunWorkflow
         v-if="taskDialogVisible"
         :workflowName="workflow.name"
@@ -179,7 +179,7 @@ export default {
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' },
         { title: this.projectName, isProjectName: true, url: '' }
       ]
     })

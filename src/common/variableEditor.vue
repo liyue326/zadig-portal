@@ -7,7 +7,7 @@
     <el-dialog :title="`变量 ${varKey}`" :visible.sync="dialogVisible" width="60%" class="global-variable-editor-dialog" append-to-body :close-on-click-modal="false">
       <CodeMirror @input="changeValue" ref="codemirror-full" :value="value" :options="options" class="full" />
       <span slot="footer" class="dialog-footer">
-        <el-button size="small" type="primary" @click="dialogVisible = false">确定</el-button>
+        <el-button size="small" type="primary" @click="dialogVisible = false">{{$t(`global.confirm`)}}</el-button>
       </span>
     </el-dialog>
   </div>

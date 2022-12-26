@@ -14,7 +14,7 @@
 
     <el-table :data="filteredTestCases"
               style="width: 100%;">
-      <el-table-column label="测试用例描述">
+      <el-table-column :label="$t(`testing.taskDetails.cases.description`)">
         <template slot-scope="scope">
 
           <el-button v-if="checkStatus(scope.row)==='失败'"
@@ -33,7 +33,7 @@
       </el-table-column>
       <el-table-column prop="scope.row"
                        label-class-name="filter-header"
-                       label="测试结果"
+                       :label="$t(`testing.taskDetails.cases.result`)"
                        width="100"
                        align="left">
         <template slot-scope="scope">
@@ -66,7 +66,7 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="运行时间(s)"
+      <el-table-column :label="$t(`testing.taskDetails.cases.executionTime`)"
                        width="110"
                        align="center">
         <template slot-scope="scope">
@@ -83,25 +83,7 @@ export default {
   data () {
     return {
       showFailureMetaFlag: {},
-      filteredLabels: [],
-      testResultLabels: [
-        {
-          text: '失败',
-          value: 'failure'
-        },
-        {
-          text: '成功',
-          value: 'succeeded'
-        },
-        {
-          text: '错误',
-          value: 'error'
-        },
-        {
-          text: '未执行',
-          value: 'skipped'
-        }
-      ]
+      filteredLabels: []
     }
   },
   methods: {
@@ -155,6 +137,26 @@ export default {
           }
         })
       }
+    },
+    testResultLabels () {
+      return [
+        {
+          text: this.$t(`testing.status.fail`),
+          value: 'failure'
+        },
+        {
+          text: this.$t(`testing.status.success`),
+          value: 'succeeded'
+        },
+        {
+          text: this.$t(`testing.status.error`),
+          value: 'error'
+        },
+        {
+          text: this.$t(`testing.status.unstart`),
+          value: 'skipped'
+        }
+      ]
     }
   },
   props: {

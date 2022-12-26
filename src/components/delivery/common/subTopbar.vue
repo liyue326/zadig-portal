@@ -6,13 +6,13 @@
           <router-link v-hasPermi="{type: 'system', action: 'release_get'}" active-class="active" to="/v1/delivery/version">
             <li class="nav-item">
               <i class="icon iconfont iconvery-versionmana"></i>
-              <span class="name">版本管理</span>
+              <span class="name">{{$t('deliveryCenter.versionManagement')}}</span>
             </li>
           </router-link>
           <router-link v-hasPermi="{type: 'system', action: 'delivery_get'}" active-class="active" to="/v1/delivery/artifacts">
             <li class="nav-item">
               <i class="icon iconfont iconvery-delitracking"></i>
-              <span class="name">交付物追踪</span>
+              <span class="name">{{$t('deliveryCenter.artifactsTracking')}}</span>
             </li>
           </router-link>
         </ul>

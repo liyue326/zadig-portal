@@ -1,11 +1,11 @@
 <template>
   <div class="build-config-container" :class="{'mini-width': mini}">
     <div class="build-source" :class="{'small-padding': mini}">
-      <span class="build-source-title">构建方式</span>
+      <span class="build-source-title">{{$t(`build.buildType`)}}</span>
       <el-select v-model="source" size="small" value-key="key" :disabled="isEdit || !jenkinsEnabled" @change="loadBuild(buildName)" filterable>
         <el-option v-for="(item,index) in originOptions" :key="index" :label="item.label" :value="item.value"></el-option>
       </el-select>
-      <el-checkbox v-if="source ==='zadig'" v-model="useTemplate">使用模板</el-checkbox>
+      <el-checkbox v-if="source ==='zadig'" v-model="useTemplate">{{$t(`build.useTemplate`)}}</el-checkbox>
     </div>
     <JenkinsBuild
       v-if="jenkinsEnabled"
@@ -29,10 +29,10 @@
       :fromServicePage="fromServicePage"
     >
       <template v-if="canSelectBuildName" v-slot:buildName>
-        <el-form-item label="构建名称" prop="name">
+        <el-form-item :label="$t(`build.buildName`)" prop="name">
           <el-select
             v-model="buildConfig.name"
-            placeholder="构建名称"
+            :placeholder="$t(`build.buildName`)"
             :disabled="isEdit"
             size="small"
             @change="loadBuild"
@@ -55,7 +55,7 @@
           @click="handleBuildConfig"
           :disabled="saveDisabled"
           :loading="saveLoading"
-        >保存构建</el-button>
+        >{{$t(`build.saveBuild`)}}</el-button>
       </footer>
     </slot>
   </div>
@@ -116,16 +116,6 @@ export default {
   data () {
     return {
       source: 'zadig',
-      originOptions: [
-        {
-          value: 'zadig',
-          label: 'Zadig 构建'
-        },
-        {
-          value: 'jenkins',
-          label: 'Jenkins 构建'
-        }
-      ],
       jenkinsEnabled: false,
       jenkinsBuild: {},
       serviceTargets: [],
@@ -167,7 +157,7 @@ export default {
                 })
               this.$message({
                 type: 'success',
-                message: this.isEdit ? '保存构建成功' : '新建构建成功'
+                message: this.isEdit ? this.$t(`build.prompt.buildSaved`) : this.$t(`build.prompt.buildCreated`)
               })
               this.handlerSubmit()
             })
@@ -183,19 +173,19 @@ export default {
     async saveBuildConfigToTemplate () {
       if (this.source === 'zadig') {
         const templateNames = this.$refs.zadigBuildForm.templates.map(temp => temp.name)
-        this.$prompt('保存为系统全局构建模板，其中的代码信息将会被去除，构建信息将会作为构建模板内容保存，请确认！', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$prompt(this.$t(`build.prompt.saveAsTemplate`), this.$t(`global.tips`), {
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           inputValidator: input => {
             if (!input) {
-              return '请输入构建模板名称'
+              return this.$t(`build.prompt.fillInBuildTemplateName`)
             } else if (templateNames.includes(input)) {
-              return '构建模板名称已存在'
+              return this.$t(`build.prompt.templateNameIsDuplicated`)
             } else {
               return true
             }
           },
-          inputPlaceholder: '请输入构建模板名称',
+          inputPlaceholder: this.$t(`build.prompt.fillInBuildTemplateName`),
           type: 'warning'
         }).then(({ value }) => {
           this.$refs.zadigBuildForm
@@ -208,7 +198,7 @@ export default {
                 .then(() => {
                   this.$message({
                     type: 'success',
-                    message: '保存模板成功'
+                    message: this.$t(`build.prompt.templateSaved`)
                   })
                   this.$emit('updateBtnLoading', false)
                   this.$refs.zadigBuildForm.getBuildTemplates()
@@ -220,7 +210,7 @@ export default {
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消保存'
+            message: this.$t(`build.prompt.saveAsTemplateCanceled`)
           })
         })
       }
@@ -388,6 +378,18 @@ export default {
           this.buildNameIndex ? '-' + this.buildNameIndex : ''
         }`
         : ''
+    },
+    originOptions () {
+      return [
+        {
+          value: 'zadig',
+          label: this.$t(`build.buildTypeZadig`)
+        },
+        {
+          value: 'jenkins',
+          label: this.$t(`build.buildTypeJenkins`)
+        }
+      ]
     }
   },
   watch: {

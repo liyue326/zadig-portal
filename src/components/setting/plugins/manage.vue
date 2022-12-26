@@ -10,9 +10,9 @@
             :href="`https://docs.koderover.com/zadig/settings/custom-task/`"
             :underline="false"
             target="_blank"
-          >帮助</el-link>
+          >{{$t('global.help')}}</el-link>
         </el-col>
-        <el-button type="primary" plain size="small" v-if="plugins.length===0&&!isShowOperateForm" @click="isShowOperateForm=true">+ 添加</el-button>
+        <el-button type="primary" plain size="small" v-if="plugins.length===0&&!isShowOperateForm" @click="isShowOperateForm=true">+ {{$t(`global.add`)}}</el-button>
         <div v-else>
           <el-col :span="3">
             <el-form-item prop="codehost_id" :rules="{required: true, message: '代码源不能为空', trigger: ['blur', 'change']}">
@@ -116,10 +116,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="6" class="mg-t4">
-            <el-button type="primary" plain size="small" v-if="!isSaved" @click="submit('save')">保存</el-button>
-            <el-button type="primary" plain size="small" v-if="isSaved" @click="isSaved=false">编辑</el-button>
-            <el-button type="success" plain size="small" :disabled="!isSaved" @click="submit('sync')">同步</el-button>
-            <el-button type="danger" plain size="small" v-if="plugins.length>0" @click="del">删除</el-button>
+            <el-button type="primary" plain size="small" v-if="!isSaved" @click="submit('save')">{{$t(`global.save`)}}</el-button>
+            <el-button type="primary" plain size="small" v-if="isSaved" @click="isSaved=false">{{$t(`global.edit`)}}</el-button>
+            <el-button type="success" plain size="small" :disabled="!isSaved" @click="submit('sync')">{{$t('global.sync')}}</el-button>
+            <el-button type="danger" plain size="small" v-if="plugins.length>0" @click="del">{{$t(`global.delete`)}}</el-button>
           </el-col>
         </div>
       </el-form>
@@ -129,7 +129,7 @@
       <span>{{$utils.convertTimestamp(source.update_time)}}</span>
     </div>
     <div class="tip" v-if="source.error">
-      <span>错误信息：</span>
+      <span>{{$t('global.errorMsg')}} : </span>
       <span>{{source.error}}</span>
     </div>
   </div>
@@ -145,7 +145,7 @@ import {
   delPlugin,
   getPlugins
 } from '@api'
-
+import bus from '@utils/eventBus'
 export default {
   data () {
     return {
@@ -166,9 +166,6 @@ export default {
       isSaved: false,
       loading: false
     }
-  },
-  created () {
-    this.getPlugins()
   },
   methods: {
     getPlugins () {
@@ -359,8 +356,8 @@ export default {
     },
     del () {
       this.$confirm(`是否删除该插件源`, '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: this.$t(`global.confirm`),
+        cancelButtonText: this.$t(`global.cancel`),
         type: 'warning'
       }).then(() => {
         delPlugin(this.source.id).then(res => {
@@ -408,6 +405,10 @@ export default {
         }
       })
     }
+  },
+  created () {
+    this.getPlugins()
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t(`sidebarMenu.plugins`), url: '' }] })
   }
 }
 </script>

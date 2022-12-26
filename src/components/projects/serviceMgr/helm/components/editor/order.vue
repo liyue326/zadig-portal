@@ -48,20 +48,20 @@ export default {
       updateServicesOrchestrationAPI(this.projectName, { services })
     },
     allowDrop (draggingNode, dropNode, type) {
-      if (dropNode.data.label.indexOf('启动顺序') === -1) {
+      if (dropNode.data.label.indexOf(this.$t('services.common.startupSequence')) === -1) {
         return type !== 'inner'
       } else {
         return type === 'inner'
       }
     },
     allowDrag (draggingNode) {
-      return draggingNode.data.label.indexOf('启动顺序') === -1
+      return draggingNode.data.label.indexOf(this.$t('services.common.startupSequence')) === -1
     },
     generateNodeData () {
       const nodeData = []
       this.services.forEach((service, index) => {
         nodeData.push({
-          label: `启动顺序 ${index}`,
+          label: `${this.$t('services.common.startupSequence')} ${index}`,
           children: service.map(se => {
             return {
               label: se
@@ -70,7 +70,7 @@ export default {
         })
       })
       nodeData.push({
-        label: `启动顺序 ${nodeData.length}`,
+        label: `${this.$t('services.common.startupSequence')} ${nodeData.length}`,
         children: []
       })
       this.nodeData = nodeData
@@ -89,7 +89,7 @@ export default {
       const nodeLength = this.nodeData.length
       if (this.nodeData[nodeLength - 1].children.length) {
         this.nodeData.push({
-          label: `启动顺序 ${nodeLength}`,
+          label: `${this.$t('services.common.startupSequence')} ${nodeLength}`,
           children: []
         })
       }

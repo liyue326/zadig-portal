@@ -22,7 +22,7 @@
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" type="primary" @click="autoUpgradeEnv"
-        >确 定</el-button
+        >{{$t(`global.confirm`)}}</el-button
       >
     </span>
   </el-dialog>

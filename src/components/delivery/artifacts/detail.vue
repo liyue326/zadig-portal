@@ -1,53 +1,53 @@
 <template>
   <div v-loading="loading" class="artifacts-container">
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="详情" name="summary">
+      <el-tab-pane :label="$t('global.detail')" name="summary">
         <el-row class="row-container" :gutter="20">
           <el-col :span="8">
             <div class="function-area">
               <div class="item-container">
-                <h3 v-if="artifact.type==='image'" class="item-title">镜像信息</h3>
-                <h3 v-if="artifact.type==='file'" class="item-title">文件信息</h3>
+                <h3 v-if="artifact.type==='image'" class="item-title">{{$t(`status.imgInfo`)}}</h3>
+                <h3 v-if="artifact.type==='file'" class="item-title">{{$t('deliveryCenter.fileInfo')}}</h3>
                 <div class="item-detail">
                   <div>
-                    <span class="key">服务名称：</span>
+                    <span class="key">{{$t('global.serviceName')}}:</span>
                     <span class="value">{{artifact.name}}</span>
                   </div>
                   <template v-if="artifact.type==='image'">
                     <div>
-                      <span class="key">镜像标签：</span>
+                      <span class="key">{{$t('deliveryCenter.imageName')}}:</span>
                       <el-tooltip :content="artifact.image" placement="top" effect="light">
                         <span class="value">{{artifact.image_tag}}</span>
                       </el-tooltip>
                     </div>
                     <div>
-                      <span class="key">Digest：</span>
+                      <span class="key">Digest:</span>
                       <span class="value">{{artifact.image_digest}}</span>
                     </div>
                     <div>
-                      <span class="key">创建时间：</span>
+                      <span class="key">{{$t('deliveryCenter.creationTime')}}:</span>
                       <span class="value">{{ $utils.convertTimestamp(artifact.created_time)}}</span>
                     </div>
                     <div>
-                      <span class="key">架构：</span>
+                      <span class="key">{{$t('deliveryCenter.architecture')}}:</span>
                       <span class="value">{{artifact.architecture}}</span>
                     </div>
                     <div>
-                      <span class="key">操作系统：</span>
+                      <span class="key">{{$t('deliveryCenter.operatingSystem')}}:</span>
                       <span class="value">{{artifact.os}}</span>
                     </div>
                   </template>
                   <div v-else-if="artifact.type==='file'">
-                    <span class="key">创建时间：</span>
+                    <span class="key">{{$t('deliveryCenter.creationTime')}}:</span>
                     <span class="value">{{ $utils.convertTimestamp(artifact.created_time)}}</span>
                   </div>
                 </div>
               </div>
               <div v-if="artifact.commits && artifact.commits.length > 0" class="item-container">
-                <h3 class="item-title">代码信息</h3>
+                <h3 class="item-title">{{$t(`global.gitMessage`)}}</h3>
                 <div v-for="(cm,index) in artifact.commits" :key="index" class="item-detail">
                   <div>
-                    <span class="key">代码库：</span>
+                    <span class="key">{{$t(`global.repository`)}}:</span>
                     <span class="value">
                       <a
                         class="link"
@@ -57,7 +57,7 @@
                     </span>
                   </div>
                   <div v-if="cm.commit_id">
-                    <span class="key">SHA：</span>
+                    <span class="key">SHA:</span>
                     <span class="value">
                       <a
                         class="link"
@@ -67,7 +67,7 @@
                     </span>
                   </div>
                   <div>
-                    <span class="key">分支：</span>
+                    <span class="key">{{$t('repository.info.branch')}}:</span>
                     <span class="value">
                       <a
                         class="link"
@@ -77,7 +77,7 @@
                     </span>
                   </div>
                   <div v-if="cm.pr">
-                    <span class="key">PR：</span>
+                    <span class="key">PR:</span>
                     <span class="value">
                       <a
                         v-if="cm.source==='github'"
@@ -100,24 +100,24 @@
                     </span>
                   </div>
                   <div v-if="cm.commit_message">
-                    <span class="key">最新提交：</span>
+                    <span class="key">{{$t('deliveryCenter.commitMessage')}}:</span>
                     <span class="value">{{cm.commit_message}}</span>
                   </div>
                   <div v-if="cm.author_name">
-                    <span class="key">提交人：</span>
+                    <span class="key">{{$t('deliveryCenter.commitAuthorName')}}:</span>
                     <span class="value">{{cm.author_name}}</span>
                   </div>
                 </div>
               </div>
               <div class="item-container">
-                <h3 class="item-title">构建信息</h3>
+                <h3 class="item-title">{{$t('deliveryCenter.buildInfo')}}</h3>
                 <div class="item-detail">
                   <div v-if="artifact.type==='image'">
-                    <span class="key">镜像大小：</span>
+                    <span class="key">{{$t('deliveryCenter.imageSize')}}:</span>
                     <span class="value">{{$utils.formatBytes(artifact.image_size)}}</span>
                   </div>
                   <div v-if="this.buildUrl">
-                    <span class="key">工作流：</span>
+                    <span class="key">{{$t('project.workflows')}}:</span>
                     <router-link :to="this.buildUrl">
                       <span class="value link">{{this.buildUrlSplit}}</span>
                     </router-link>
@@ -129,7 +129,7 @@
           <el-col :span="8">
             <div class="function-area">
               <div class="item-container">
-                <h3 class="item-title">活动时间线</h3>
+                <h3 class="item-title">{{$t('deliveryCenter.activeTimeline')}}</h3>
                 <div class="events-container">
                   <div v-for="(event,index) in artifact.activities" :key="index" class="event">
                     <el-row class="event-item">
@@ -151,15 +151,15 @@
                           </router-link>
                         </div>
                         <div v-if="event.content">
-                          <span>内容：</span>
+                          <span>{{$t('deliveryCenter.activeTimelineContent')}}:</span>
                           <span>{{event.content}}</span>
                         </div>
                         <div v-if="event.namespace" class="event-data">
-                          <span>命名空间：</span>
+                          <span>{{$t('deliveryCenter.namespace')}}:</span>
                           <span>{{event.namespace}}</span>
                         </div>
                         <div v-if="event.env_name" class="event-data">
-                          <span>部署环境：</span>
+                          <span>{{$t('deliveryCenter.deployEnv')}}:</span>
                           <span>{{event.env_name}}</span>
                         </div>
                       </el-col>
@@ -172,9 +172,9 @@
           <el-col :span="8">
             <div class="function-area">
               <div class="item-container">
-                <h3 class="item-title">添加备注</h3>
+                <h3 class="item-title">{{$t('deliveryCenter.addComment')}}</h3>
                 <div>
-                  <el-input placeholder="请输入内容" v-model="commentContent">
+                  <el-input :placeholder="$t('deliveryCenter.inputCommentContent')" v-model="commentContent">
                     <template slot="append">
                       <el-button
                         @click="addArtifactActivities"
@@ -319,8 +319,8 @@ export default {
     bus.$emit('set-topbar-title', {
       title: '',
       breadcrumb: [
-        { title: '交付物中心', url: '/v1/delivery' },
-        { title: '交付物追踪', url: '/v1/delivery/artifacts' },
+        { title: this.$t('sidebarMenu.deliveryCenter'), url: `/v1/delivery` },
+        { title: this.$t('deliveryCenter.artifactsTracking'), url: `` },
         { title: this.serviceName, url: '' }
       ]
     })

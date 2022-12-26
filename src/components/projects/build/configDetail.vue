@@ -3,7 +3,7 @@
     <template v-slot:footer>
       <footer class="build-footer">
         <router-link :to="`/v1/projects/detail/${projectName}/builds`">
-          <el-button style="margin-right: 15px;" type="primary" plain>取消</el-button>
+          <el-button style="margin-right: 15px;" type="primary" plain>{{$t(`global.cancel`)}}</el-button>
         </router-link>
         <el-button
           v-hasPermi="{type: 'project', projectName:projectName, action: compBind.isEdit?'edit_build':'create_build',isBtn:true }"
@@ -19,7 +19,7 @@
           @updateBtnLoading="saveLoading = $event"
           :loading="saveLoading"
           type="text"
-        >保存为模板</el-button>
+        >{{$t(`build.saveAsTemplate`)}}</el-button>
       </footer>
     </template>
   </CommonBuild>
@@ -76,17 +76,17 @@ export default {
     bus.$emit('set-topbar-title', {
       title: '',
       breadcrumb: [
-        { title: '项目', url: '/v1/projects' },
+        { title: this.$t(`subTopbarMenu.projects`), url: '/v1/projects' },
         {
           title: this.projectName,
           isProjectName: true,
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: '构建',
+          title: this.$t(`subTopbarMenu.builds`),
           url: `/v1/projects/detail/${this.projectName}/builds`
         },
-        { title: this.isCreate ? '新建' : this.buildConfigName, url: '' }
+        { title: this.isCreate ? this.$t(`global.create`) : this.buildConfigName, url: '' }
       ]
     })
   },

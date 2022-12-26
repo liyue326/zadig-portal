@@ -3,7 +3,7 @@
     <div
       slot="title"
       style="text-align: center;"
-    >{{ mode | desc }}协作模式 {{ mode === 'updated' ? collaborationData.initName : collaborationData.name }}</div>
+    >{{ mode | desc(that) }}协作模式 {{ mode === 'updated' ? collaborationData.initName : collaborationData.name }}</div>
     <div class="policy-content">
       <div
         class="title update-name"
@@ -20,7 +20,7 @@
           </li>
         </ul>
         <div class="permission-desc">
-          <span :class="[key]">{{ key | desc }}</span>
+          <span :class="[key]">{{ key | desc(that) }}</span>
           <span>以下权限</span>
         </div>
         <div class="content">
@@ -33,7 +33,7 @@
                 <span class="name">{{ policyMap.workflow[verb] }}</span>
               </li>
             </ul>
-            <span v-if="workflow.verbs.length === 0">无</span>
+            <span v-if="workflow.verbs.length === 0">{{$t('global.emptyText')}}</span>
           </div>
           <div v-for="product in changedInfo[key].products" :key="product.name" class="resource-container">
             <div class="resource-name">{{ product.collaboration_type === 'new' ? '独享': '共享' }}环境 {{ product.name }} ：</div>
@@ -43,7 +43,7 @@
                 <span v-if="key ==='deleted'" class="icon deleted el-icon-circle-close"></span>
                 <span class="name">{{ policyMap.environment[verb] }}</span>
               </li>
-              <span v-if="product.verbs.length === 0">无</span>
+              <span v-if="product.verbs.length === 0">{{$t('global.emptyText')}}</span>
             </ul>
           </div>
           <div v-if="changedInfo.updated && changedInfo.updated.recycle_day">资源回收策略更新为 {{ changedInfo.updated.recycle_day }} 天。</div>
@@ -51,8 +51,8 @@
       </div>
     </div>
     <div slot="footer">
-      <el-button size="small" @click="dialogVisible = false" :disabled="loading">取 消</el-button>
-      <el-button size="small" type="primary" @click="handleCollaboration" :loading="loading">确 定</el-button>
+      <el-button size="small" @click="dialogVisible = false" :disabled="loading">{{$t(`global.cancel`)}}</el-button>
+      <el-button size="small" type="primary" @click="handleCollaboration" :loading="loading">{{$t(`global.confirm`)}}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -76,7 +76,8 @@ export default {
   },
   data () {
     return {
-      loading: false
+      loading: false,
+      that: this
     }
   },
   computed: {
@@ -96,11 +97,11 @@ export default {
     }
   },
   filters: {
-    desc (val) {
+    desc (val, that) {
       const info = {
-        added: '添加',
-        deleted: '删除',
-        updated: '更新'
+        added: that.$t('global.add'),
+        deleted: that.$t('global.delete'),
+        updated: that.$t('global.update')
       }
       return info[val]
     }

@@ -89,5 +89,8 @@
   },
   // 指定wxml的格式化
   "minapp-vscode.wxmlFormatter": "prettyHtml",
-  "minapp-vscode.disableAutoConfig": true
+  "minapp-vscode.disableAutoConfig": true,
+  "i18n-ally.localesPaths": [
+    "src/lang"
+  ]
 }

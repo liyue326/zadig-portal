@@ -2,12 +2,12 @@
   <div class="user-home">
     <div class="tab-container">
       <el-tabs v-model="currentTab" type="card" @tab-click="changeTab">
-        <el-tab-pane name="user" label="用户">
+        <el-tab-pane name="user" :label="$t('sysSetting.users.users')">
           <keep-alive>
             <User v-if="currentTab === 'user'" />
           </keep-alive>
         </el-tab-pane>
-        <el-tab-pane name="role" label="系统角色">
+        <el-tab-pane name="role" :label="$t('sysSetting.users.systemRoles')">
           <keep-alive>
             <Role v-if="currentTab === 'role'" />
           </keep-alive>
@@ -33,7 +33,7 @@ export default {
     }
   },
   mounted () {
-    bus.$emit('set-topbar-title', { title: '用户配置', breadcrumb: [] })
+    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t(`sidebarMenu.users`), url: '' }] })
     this.showCurrentTab()
   },
   methods: {

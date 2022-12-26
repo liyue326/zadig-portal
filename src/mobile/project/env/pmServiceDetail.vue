@@ -38,7 +38,7 @@
                 </van-row>
                 <van-row>
                   <van-col :span="24">
-                    <span class="title">状态：</span>
+                    <span class="title">{{$t('global.status')}} :</span>
                     <span class="health-check" :class="statusColorMap[item.status]">{{statusTranslation[item.status]}}</span>
                   </van-col>
                 </van-row>

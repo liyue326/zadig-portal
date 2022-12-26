@@ -14,8 +14,8 @@
         </el-tabs>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button size="small" @click="editHostDialogVisible = false">取 消</el-button>
-        <el-button type="primary" size="small" :disabled="currentPmServiceData.env_configs && currentPmServiceData.env_configs.length === 0" @click="bindHost">确 定</el-button>
+        <el-button size="small" @click="editHostDialogVisible = false">{{$t(`global.cancel`)}}</el-button>
+        <el-button type="primary" size="small" :disabled="currentPmServiceData.env_configs && currentPmServiceData.env_configs.length === 0" @click="bindHost">{{$t(`global.confirm`)}}</el-button>
       </span>
     </el-dialog>
   </div>
