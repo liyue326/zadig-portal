@@ -41,8 +41,8 @@
                     </el-tooltip>
                   </template>
                 </el-table-column>
-                <el-table-column prop="creator" label="执行人" width="100"></el-table-column>
-                <el-table-column prop="time" label="创建时间">
+                <el-table-column prop="updated_by" label="执行人" width="100"></el-table-column>
+                <el-table-column prop="start_time" label="创建时间">
                   <template slot-scope="scope">
                     <span>{{ $utils.convertTimestamp(scope.row.start_time)}}</span>
                   </template>
@@ -60,7 +60,7 @@
                     <span class="desc">({{item.config.project_name}})</span>
                   </span>
                   <span class="desc">
-                    最后一次变更：{{item.config.creator}}
+                    最后一次变更：{{item.config.updated_by}}
                     <span>{{ $utils.convertTimestamp(item.config.update_time)}}</span>
                   </span>
                 </div>
@@ -68,29 +68,39 @@
                   <el-table-column prop="service_name" label="服务名称" width="180"></el-table-column>
                   <el-table-column prop="status" label="运行状态" width="180">
                     <template slot-scope="scope">
-                      <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]">{{ scope.row.status}}</span>
+                      <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]">{{$t(`workflowTaskStatus.${scope.row.status}`)}}</span>
                     </template>
                   </el-table-column>
                   <el-table-column prop="image" label="镜像信息"></el-table-column>
                 </el-table>
               </div>
               <div v-if="item.show">
-                <div v-if="item.type==='my_workflow'">
-                  <el-select placeholder="选择工作流" v-model="curInfo.workflow_list" multiple>
-                    <el-option v-for="item in workflowList" :key="item.name">{{item.name}}</el-option>
-                  </el-select>
-                </div>
-                <div v-if="item.type==='my_env'">
-                  <el-select placeholder="选择项目" class="mg-t8" size="small" v-model="curInfo.config.project_name" @change="getEnvList">
-                    <el-option v-for="item in projectList" :key="item.name" :value="item.name">{{item.name}}</el-option>
-                  </el-select>
-                  <el-select placeholder="选择环境" class="mg-t8" size="small" v-model="curInfo.config.env_name" @change="getServiceList">
-                    <el-option v-for="item in envList" :key="item.name" :value="item.name">{{item.name}}</el-option>
-                  </el-select>
-                  <el-select placeholder="选择服务" class="mg-t8" size="small" v-model="curInfo.config.service_name" multiple>
-                    <el-option v-for="item in serviceList" :key="item.service_name" :value="item.service_name">{{item.service_name}}</el-option>
-                  </el-select>
-                </div>
+                <el-form ref="form" :model="curInfo" label-width="100px">
+                  <div v-if="item.type==='my_workflow'">
+                    <el-form-item label="选择工作流">
+                      <el-select placeholder="选择工作流" size="small"  v-model="curInfo.workflow_list" multiple>
+                        <el-option v-for="item in workflowList" :key="item.name">{{item.name}}</el-option>
+                      </el-select>
+                    </el-form-item>
+                  </div>
+                  <div v-if="item.type==='my_env'">
+                    <el-form-item label="选择项目">
+                      <el-select placeholder="选择项目" size="small" v-model="curInfo.config.project_name" @change="handleProjectChange">
+                        <el-option v-for="item in projectList" :key="item.name" :value="item.name">{{item.name}}</el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="选择环境">
+                      <el-select placeholder="选择环境" size="small" v-model="curInfo.config.env_name" @change="handleEnvChange">
+                        <el-option v-for="item in envList" :key="item.name" :value="item.name">{{item.name}}</el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="选择服务">
+                      <el-select placeholder="选择服务" size="small" v-model="curInfo.config.service_name" multiple>
+                        <el-option v-for="item in serviceList" :key="item.service_name" :value="item.service_name">{{item.service_name}}</el-option>
+                      </el-select>
+                    </el-form-item>
+                  </div>
+                </el-form>
                 <div class="mg-t24">
                   <el-button type="primary" size="small" @click="save(item)">保存</el-button>
                   <el-button size="small" @click="cancel(item)">取消</el-button>
@@ -126,7 +136,7 @@ import {
   getProjectsAPI,
   getEnvironmentsAPI,
   getEnvServicesAPI,
-  getWorkflowBindAPI
+  getMyWorkflowsAPI
 } from '@api'
 export default {
   name: 'Dashboard',
@@ -205,6 +215,15 @@ export default {
 
       this.isShowCardDialog = false
     },
+    handleProjectChange () {
+      this.curInfo.config.env_name = ''
+      this.curInfo.config.service_name = []
+      this.getEnvList()
+    },
+    handleEnvChange () {
+      this.curInfo.config.service_name = []
+      this.getServiceList()
+    },
     getSettings () {
       if (this.runningWorkflowTimer) {
         window.clearInterval(this.runningWorkflowTimer)
@@ -231,6 +250,7 @@ export default {
             this.getMyWorkflow(item)
           }
           if (item.type === 'my_env') {
+            if (!item.config.project_name) return
             this.getMyEnv(item)
           }
         })
@@ -252,7 +272,6 @@ export default {
     },
     getRunningWorkflow (item) {
       this.runningWorkflowTimer = window.setInterval(() => {
-        console.log(333)
         getRunningWorkflowAPI().then(res => {
           this.$set(item, 'workflow_list', res.data)
         })
@@ -261,12 +280,14 @@ export default {
     },
     getMyEnv (item) {
       this.envTimer = window.setInterval(() => {
-        console.log(item)
-        getMyEnvAPI(item.name, item.project_name).then(res => {
+        getMyEnvAPI(
+          item.config.env_name || item.config.name,
+          item.config.project_name
+        ).then(res => {
           this.$set(item, 'config', res)
           this.$set(item, 'services', res.services)
         })
-      }, 8000)
+      }, 2000)
       this.intervalTimerList.push(this.envTimer)
     },
     getProjectList () {
@@ -288,11 +309,11 @@ export default {
       })
     },
     getWorkflowList () {
-      getWorkflowBindAPI(
+      getMyWorkflowsAPI(
         this.curInfo.config.project_name,
         this.curInfo.config.env_name
       ).then(res => {
-        this.serviceList = res
+        this.workflowList = res.workflow_list
       })
     },
     handleCommand (val, item, index) {
@@ -312,9 +333,13 @@ export default {
       } else {
         if (item.type === 'my_env') {
           this.getProjectList()
+          this.curInfo.config.project_name = item.config.project_name
+          this.curInfo.config.env_name = item.config.name
+          this.curInfo.config.service_modules = item.config.services
         }
         if (item.type === 'my_workflow') {
           this.getWorkflowList()
+          this.curInfo.workflow_list = item.workflow_list
         }
         this.$set(item, 'show', true)
       }
@@ -338,11 +363,27 @@ export default {
       if (item.type === 'my_workflow') {
         item.workflow_list = this.curInfo.workflow_list
       } else {
-        item.config = this.curInfo.config
-        item.config.name = this.curInfo.config.env_name
+        // console.log(this.curInfo)
+        // const params = {
+        //   name: item.name,
+        //   type: item.type,
+        //   config: {
+        //     env_name: this.curInfo.config.env_name,
+        //     project_name: this.curInfo.config.project_name,
+        //     service_modules: this.curInfo.config.service_name
+        //   }
+        // }
+        // item = cloneDeep(params)
+        item.config = {
+          env_name: this.curInfo.config.env_name,
+          project_name: this.curInfo.config.project_name,
+          service_modules: this.curInfo.config.service_name
+        }
+        delete item.show
+        delete item.services
       }
       this.updateSettings(this.info)
-      this.$set(item, 'show', false)
+      // this.$set(item, 'show', false)
     }
   },
   mounted () {
@@ -352,7 +393,7 @@ export default {
     })
   },
   beforeDestroy () {
-    this.intervalTimerList.forEach((item) => {
+    this.intervalTimerList.forEach(item => {
       clearInterval(item)
     })
   }

@@ -604,7 +604,8 @@ exports.default = {
     queued: 'Queued',
     skipped: 'Skipped',
     prepare: 'Preparing',
-    reject: 'Rejected'
+    reject: 'Rejected',
+    pending: 'Pending'
   },
   workflow: {
     ascendingByName: 'Ascending by name',

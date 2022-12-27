@@ -604,7 +604,8 @@ exports.default = {
     queued: '队列中',
     skipped: '跳过',
     prepare: '准备环境',
-    reject: '拒绝'
+    reject: '拒绝',
+    pending: '排队中'
   },
   workflow: {
     ascendingByName: '按名称升序',

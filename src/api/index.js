@@ -2404,3 +2404,6 @@ export function getRunningWorkflowAPI () {
 export function getMyEnvAPI (name, projectName) {
   return http.get(`/api/aslan/system/dashboard/environment/${name}?projectName=${projectName}`)
 }
+export function getMyWorkflowsAPI (projectName) {
+  return http.get(`/api/v1/picket/workflows/all?projectName=${projectName}`)
+}
