@@ -863,28 +863,34 @@ export default {
                   delete job.pickedTargets
                 } else {
                   // fromjob
-                  payload.workflow_arg.fromJobInfo.pickedTargets.forEach(
-                    item => {
-                      if (item.update_tag && !item.target_tag) {
-                        this.$message.error(
-                          this.$t(`workflow.inputTargetImage`, { serviceName: item.service_name })
-                        )
-                        throw Error()
+                  if (
+                    payload.workflow_arg.fromJobInfo.pickedTargets && payload.workflow_arg.fromJobInfo.pickedTargets.length > 0
+                  ) {
+                    payload.workflow_arg.fromJobInfo.pickedTargets.forEach(
+                      item => {
+                        if (item.update_tag && !item.target_tag) {
+                          this.$message.error(
+                            this.$t(`workflow.inputTargetImage`, {
+                              serviceName: item.service_name
+                            })
+                          )
+                          throw Error()
+                        }
                       }
-                    }
-                  )
-                  job.spec.targets = payload.workflow_arg.fromJobInfo.pickedTargets.map(
-                    item => {
-                      return {
-                        service_name: item.service_name,
-                        service_module: item.service_module,
-                        source_tag: item.source_tag,
-                        target_tag: item.target_tag,
-                        update_tag: item.update_tag
+                    )
+                    job.spec.targets = payload.workflow_arg.fromJobInfo.pickedTargets.map(
+                      item => {
+                        return {
+                          service_name: item.service_name,
+                          service_module: item.service_module,
+                          source_tag: item.source_tag,
+                          target_tag: item.target_tag,
+                          update_tag: item.update_tag
+                        }
                       }
-                    }
-                  )
-                  delete payload.workflow_arg.fromJobInfo
+                    )
+                    delete payload.workflow_arg.fromJobInfo
+                  }
                 }
               }
             })

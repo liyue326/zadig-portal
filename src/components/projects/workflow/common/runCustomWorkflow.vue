@@ -1164,24 +1164,28 @@ export default {
               delete job.pickedTargets
             } else {
               // fromjob
-              this.fromJobInfo.pickedTargets.forEach(item => {
-                if (item.update_tag && !item.target_tag) {
-                  this.$message.error(
-                    this.$t(`workflow.inputTargetImage`, { serviceName: item.service_name })
-                  )
-                  throw Error()
-                }
-              })
-              job.spec.targets = this.fromJobInfo.pickedTargets
-              job.spec.targets = job.spec.targets.map(item => {
-                return {
-                  service_name: item.service_name,
-                  service_module: item.service_module,
-                  source_tag: item.source_tag,
-                  target_tag: item.target_tag,
-                  update_tag: item.update_tag
-                }
-              })
+              if (this.fromJobInfo.pickedTargets && this.fromJobInfo.pickedTargets.length > 0) {
+                this.fromJobInfo.pickedTargets.forEach(item => {
+                  if (item.update_tag && !item.target_tag) {
+                    this.$message.error(
+                      this.$t(`workflow.inputTargetImage`, {
+                        serviceName: item.service_name
+                      })
+                    )
+                    throw Error()
+                  }
+                })
+                job.spec.targets = this.fromJobInfo.pickedTargets
+                job.spec.targets = job.spec.targets.map(item => {
+                  return {
+                    service_name: item.service_name,
+                    service_module: item.service_module,
+                    source_tag: item.source_tag,
+                    target_tag: item.target_tag,
+                    update_tag: item.update_tag
+                  }
+                })
+              }
             }
           }
           if (job.type === 'k8s-resource-patch') {

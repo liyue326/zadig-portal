@@ -9,25 +9,25 @@
           <el-option v-for="item in dockerList" :key="item.id" :label="`${item.reg_addr}/${item.namespace}`" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-row :gutter="24" class="mg-b16">
+      <el-row :gutter="2" class="mg-b16">
         <el-col :span="6" class="title">{{$t(`global.serviceModule`)}}</el-col>
         <el-col :span="6" class="title">{{$t(`workflow.buildName`)}}</el-col>
-        <el-col :span="6" class="title">{{$t(`workflow.buildConfig`)}}</el-col>
+        <el-col :span="8" class="title">{{$t(`workflow.buildConfig`)}}</el-col>
       </el-row>
       <div v-for="(item,index) in serviceAndBuilds" :key="index">
         <el-form :model="item" :ref="`ruleForm${index}`" label-position="left" size="small">
-          <el-row :gutter="24" style="line-height: 30px;">
+          <el-row :gutter="2" style="line-height: 30px;">
             <el-col :span="6">
               <div>{{item.service_name}}/{{item.service_module}}</div>
             </el-col>
             <el-col :span="6">
               <el-form-item prop="build_name" :rules="{required: true, message: '构建不能为空', trigger: ['blur','change']}">
-                <el-select v-model="item.build_name" size="small" @change="handleBuildChange(item)" style="width: 200px;">
+                <el-select v-model="item.build_name" size="small" @change="handleBuildChange(item)" >
                   <el-option v-for="build in item.module_builds" :key="build.name" :label="build.name" :value="build.name">{{build.name}}</el-option>
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="8">
               <el-tooltip class="item" effect="dark" :content="$t(`workflow.varConfig`)" placement="top">
                 <span class="iconfont iconbianliang1" @click="handleVarBranchChange('var',item,index)"></span>
               </el-tooltip>
