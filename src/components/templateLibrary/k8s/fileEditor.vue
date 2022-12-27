@@ -107,7 +107,6 @@ export default {
       const serviceVars = this.fileContent.variable_kvs.filter((item) => {
         return item.show
       }).map((varItem) => { return varItem.key })
-      console.log(serviceVars)
       const payload = {
         name: fileName,
         content: content,
