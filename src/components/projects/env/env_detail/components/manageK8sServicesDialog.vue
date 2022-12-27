@@ -255,11 +255,12 @@ export default {
       ).catch(err => console.log(err))
       if (res) {
         res.forEach(svc => {
+          const varYaml = svc.latest_variable_yaml || svc.variable_yaml
           serviceVariables[svc.service_name] = {
             service_name: svc.service_name,
             deploy_strategy: '',
-            variable_yaml: svc.variable_yaml,
-            canEditYaml: !!svc.variable_yaml
+            variable_yaml: varYaml,
+            canEditYaml: !!varYaml
           }
         })
         this.serviceVariables = serviceVariables
