@@ -439,14 +439,14 @@ export default {
           serviceIndex++
         ) {
           const service = group[serviceIndex]
-          const currnt = {
+          const current = {
             ...serviceImages.find(element => {
               return element.service_name === service
             }),
             variable_yaml: yamlMap[service] ? yamlMap[service].variable_yaml : '',
             canEditYaml: !!(yamlMap[service] && yamlMap[service].variable_yaml)
           }
-          group[serviceIndex] = currnt
+          group[serviceIndex] = current
         }
       }
       for (const group of envInfo.services) {
@@ -510,6 +510,7 @@ export default {
         isBaseEnv,
         baseEnvName
       )
+      const yamlMap = await this.getServiceDefaultVariable('', flattenDeep(template.services).map(svc => svc.service_name))
       this.loading = false
       this.projectConfig.revision = template.revision
       if (template.source === '' || template.source === 'spock') {
@@ -535,7 +536,7 @@ export default {
             containerMap[ser.service_name] = ser
             ser.picked = true
             ser.deploy_strategy = 'deploy'
-            ser.variable_yaml = ser.variable_yaml || ''
+            ser.variable_yaml = yamlMap[ser.service_name] ? yamlMap[ser.service_name].variable_yaml : ''
             ser.canEditYaml = !!ser.variable_yaml
             const containers = ser.containers
             if (containers) {
