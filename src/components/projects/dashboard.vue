@@ -30,7 +30,7 @@
             <div>
               <el-table
                 :data="item.workflow_list"
-                style="width: 100%; max-height: 200px; overflow-y: auto;"
+                style="width: 100%; max-height: 300px; overflow-y: auto;"
                 v-if="!item.show&&item.type==='my_workflow'||!item.show&&item.type==='running_workflow'"
               >
                 <el-table-column prop="name" label="工作流名称" width="150">
@@ -47,7 +47,7 @@
                     <span>{{ $utils.convertTimestamp(scope.row.start_time)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="time" label="操作"  width="80" v-if="item.type==='my_workflow'">
+                <el-table-column prop="time" label="操作" width="80" v-if="item.type==='my_workflow'">
                   <template slot-scope="scope">
                     <el-button size="small" type="text" @click="goWorkflow(scope.row,true)">执行</el-button>
                   </template>
@@ -64,14 +64,20 @@
                     <span>{{ $utils.convertTimestamp(item.config.update_time)}}</span>
                   </span>
                 </div>
-                <el-table :data="item.services" style="width: 100%;">
+                <el-table :data="item.services" style="width: 100%; max-height: 300px; overflow-y: auto;">
                   <el-table-column prop="service_name" label="服务名称" width="180"></el-table-column>
                   <el-table-column prop="status" label="运行状态" width="180">
                     <template slot-scope="scope">
-                      <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]">{{$t(`workflowTaskStatus.${scope.row.status}`)}}</span>
+                      <span :class="[$translate.calcEnvStatusColor(scope.row.status)]">{{getProdStatus(scope.row.status,true)}}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="image" label="镜像信息"></el-table-column>
+                  <el-table-column prop="image" label="镜像信息">
+                    <template slot-scope="scope">
+                      <el-tooltip effect="dark" :content="scope.row.image" placement="top">
+                        <span>{{$utils.tailCut( scope.row.image,20)}}</span>
+                      </el-tooltip>
+                    </template>
+                  </el-table-column>
                 </el-table>
               </div>
               <div v-if="item.show">
@@ -133,6 +139,7 @@ import draggable from 'vuedraggable'
 import { cloneDeep } from 'lodash'
 import bus from '@utils/eventBus'
 import { v4 } from 'uuid'
+import { translateEnvStatus } from '@utils/wordTranslate'
 
 import {
   updateDashboardSettingsAPI,
@@ -204,6 +211,9 @@ export default {
     this.getSettings()
   },
   methods: {
+    getProdStatus (status, updatable) {
+      return translateEnvStatus(status, false)
+    },
     onStart (val) {
       this.drag = true
     },
