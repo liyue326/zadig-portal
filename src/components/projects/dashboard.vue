@@ -41,7 +41,7 @@
                     </el-tooltip>
                   </template>
                 </el-table-column>
-                <el-table-column prop="updated_by" label="执行人" width="100"></el-table-column>
+                <el-table-column prop="creator" label="执行人" width="100"></el-table-column>
                 <el-table-column prop="start_time" label="创建时间">
                   <template slot-scope="scope">
                     <span>{{ $utils.convertTimestamp(scope.row.start_time)}}</span>
@@ -78,7 +78,7 @@
                 <el-form ref="form" :model="curInfo" label-width="100px">
                   <div v-if="item.type==='my_workflow'">
                     <el-form-item label="选择工作流">
-                      <el-select placeholder="选择工作流" size="small"  v-model="curInfo.workflow_list" multiple>
+                      <el-select placeholder="选择工作流" size="small" v-model="curInfo.workflow_list" multiple>
                         <el-option v-for="item in workflowList" :key="item.name">{{item.name}}</el-option>
                       </el-select>
                     </el-form-item>
@@ -333,9 +333,14 @@ export default {
       } else {
         if (item.type === 'my_env') {
           this.getProjectList()
-          this.curInfo.config.project_name = item.config.project_name
-          this.curInfo.config.env_name = item.config.name
-          this.curInfo.config.service_modules = item.config.services
+          console.log(item)
+          this.curInfo.config.project_name = item.config
+            ? item.config.project_name
+            : ''
+          this.curInfo.config.env_name = item.config ? item.config.name : ''
+          this.curInfo.config.service_modules = item.config
+            ? item.config.services
+            : []
         }
         if (item.type === 'my_workflow') {
           this.getWorkflowList()
