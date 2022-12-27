@@ -84,7 +84,7 @@ export default {
         const res = await this.$store.dispatch('LOGIN', payload)
         this.loading = false
         if (res) {
-          this.$router.push('/v1/projects')
+          this.$router.push('/v1/dashboard')
         }
       })
     }

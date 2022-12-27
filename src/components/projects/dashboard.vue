@@ -30,14 +30,18 @@
             <div>
               <el-table
                 :data="item.workflow_list"
-                style="width: 100%; max-height: 300px; overflow-y: auto;"
+                class="table"
                 v-if="!item.show&&item.type==='my_workflow'||!item.show&&item.type==='running_workflow'"
               >
                 <el-table-column prop="name" label="工作流名称" width="150">
                   <template slot-scope="scope">
                     <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]">•</span>
-                    <el-tooltip effect="dark" :content="scope.row.name" placement="top">
-                      <span class="name" @click="goWorkflow(scope.row, false)">{{$utils.tailCut( scope.row.name,16)}}</span>
+                    <el-tooltip effect="dark" placement="top">
+                      <div slot="content">
+                        <div>所属项目：{{scope.row.project}}</div>
+                        <div>工作流名称：{{scope.row.name}}</div>
+                      </div>
+                      <span class="name" @click="goWorkflow(scope.row, false,item.type)">{{$utils.tailCut( scope.row.name,16)}}</span>
                     </el-tooltip>
                   </template>
                 </el-table-column>
@@ -49,14 +53,16 @@
                 </el-table-column>
                 <el-table-column prop="time" label="操作" width="80" v-if="item.type==='my_workflow'">
                   <template slot-scope="scope">
-                    <el-button size="small" type="text" @click="goWorkflow(scope.row,true)">执行</el-button>
+                    <el-button size="small" type="text" @click="goWorkflow(scope.row,true,item.type)">执行</el-button>
                   </template>
                 </el-table-column>
               </el-table>
               <div v-if="!item.show&&item.type==='my_env'">
                 <div class="env-tip" v-if="item.config">
-                  <span>
-                    {{item.config.name}}
+                  <span v-if="item.config.name">
+                    <router-link :to="`/v1/projects/detail/${item.config.project_name}/envs/detail?envName=${item.config.name}`">
+                      <span class="env-name">{{`${item.config.name}`}}</span>
+                    </router-link>
                     <span class="desc">({{item.config.project_name}})</span>
                   </span>
                   <span class="desc">
@@ -64,9 +70,15 @@
                     <span>{{ $utils.convertTimestamp(item.config.update_time)}}</span>
                   </span>
                 </div>
-                <el-table :data="item.services" style="width: 100%; max-height: 300px; overflow-y: auto;">
-                  <el-table-column prop="service_name" label="服务名称" width="180"></el-table-column>
-                  <el-table-column prop="status" label="运行状态" width="180">
+                <el-table :data="item.services" class="table">
+                  <el-table-column prop="service_name" label="服务名称">
+                    <template slot-scope="scope">
+                      <router-link :to="goService(scope,item.config)">
+                        <span class="service-name">{{ scope.row.service_name }}</span>
+                      </router-link>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="status" label="运行状态" width="100">
                     <template slot-scope="scope">
                       <span :class="[$translate.calcEnvStatusColor(scope.row.status)]">{{getProdStatus(scope.row.status,true)}}</span>
                     </template>
@@ -108,7 +120,7 @@
                       </el-select>
                     </el-form-item>
                     <el-form-item label="选择服务">
-                      <el-select placeholder="选择服务" size="small" v-model="curInfo.config.service_name" multiple>
+                      <el-select placeholder="选择服务" size="small" v-model="curInfo.config.service_name" multiple filterable>
                         <el-option v-for="item in serviceList" :key="item.service_name" :value="item.service_name">{{item.service_name}}</el-option>
                       </el-select>
                     </el-form-item>
@@ -211,7 +223,7 @@ export default {
     this.getSettings()
   },
   methods: {
-    getProdStatus (status, updatable) {
+    getProdStatus (status) {
       return translateEnvStatus(status, false)
     },
     onStart (val) {
@@ -264,7 +276,6 @@ export default {
     },
     updateSettings (payload) {
       updateDashboardSettingsAPI(payload).then(res => {
-        // this.info = res
         this.getSettings()
       })
     },
@@ -344,9 +355,11 @@ export default {
             ? item.config.project_name
             : ''
           this.curInfo.config.env_name = item.config ? item.config.name : ''
+          this.getEnvList()
           this.curInfo.config.service_modules = item.config
             ? item.config.services
             : []
+          this.getServiceList()
         }
         if (item.type === 'my_workflow') {
           this.getWorkflowList()
@@ -355,17 +368,42 @@ export default {
         this.$set(item, 'show', true)
       }
     },
-    goWorkflow (item, type) {
-      if (item.workflow_type === 'common_workflow') {
-        this.$router.push(
-          `/v1/projects/detail/${item.project}/pipelines/custom/${item.name}?display_name=${item.display_name}&formDashboad=${type}`
-        )
-      } else {
-        // product
-        this.$router.push(
-          `/v1/projects/detail/${item.project}/pipelines/multi/${item.name}?display_name=${item.display_name}&formDashboad=${type}`
-        )
+    goWorkflow (item, triggerRun, type) {
+      console.log(item)
+      if (type === 'my_workflow') {
+        // jump list
+        if (
+          item.workflow_type === 'common_workflow' ||
+          item.workflow_type === 'release'
+        ) {
+          this.$router.push(
+            `/v1/projects/detail/${item.project}/pipelines/custom/${item.name}?display_name=${item.display_name}&formDashboad=${triggerRun}`
+          )
+        } else {
+          // product
+          this.$router.push(
+            `/v1/projects/detail/${item.project}/pipelines/multi/${item.name}?display_name=${item.display_name}&formDashboad=${triggerRun}`
+          )
+        }
+      } else if (type === 'running_workflow') {
+        // jump detail
+        if (
+          item.workflow_type === 'common_workflow' ||
+          item.workflow_type === 'release'
+        ) {
+          this.$router.push(
+            `/v1/projects/detail/${item.project}/pipelines/custom/${item.name}/${item.task_id}?status=${item.status}&display_name=${item.display_name}`
+          )
+        } else {
+          // product
+          this.$router.push(
+            `/v1/projects/detail/${item.project}/pipelines/multi/${item.name}/${item.task_id}?status=${item.status}&display_name=${item.display_name}`
+          )
+        }
       }
+    },
+    goService (scope, config) {
+      return `/v1/projects/detail/${config.project_name}/envs/detail/${scope.row.service_name}?envName=${config.name}&projectName=${config.project_name}`
     },
     cancel (item) {
       this.$set(item, 'show', false)
@@ -378,19 +416,7 @@ export default {
           'workflow_list',
           this.curInfo.config.workflow_list
         )
-        // item.config.workflow_list = this.curInfo.config.workflow_list
       } else {
-        // console.log(this.curInfo)
-        // const params = {
-        //   name: item.name,
-        //   type: item.type,
-        //   config: {
-        //     env_name: this.curInfo.config.env_name,
-        //     project_name: this.curInfo.config.project_name,
-        //     service_modules: this.curInfo.config.service_name
-        //   }
-        // }
-        // item = cloneDeep(params)
         item.config = {
           env_name: this.curInfo.config.env_name,
           project_name: this.curInfo.config.project_name,
@@ -400,7 +426,6 @@ export default {
         delete item.services
       }
       this.updateSettings(this.info)
-      // this.$set(item, 'show', false)
     },
     clearInterval () {
       this.intervalTimerList.forEach(item => {
@@ -474,6 +499,13 @@ export default {
           color: @themeColor;
           cursor: pointer;
         }
+      }
+
+      .table {
+        width: 100%;
+        min-height: 220px;
+        max-height: 300px;
+        overflow-y: auto;
       }
 
       .env-tip {
