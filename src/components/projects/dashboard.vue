@@ -30,7 +30,7 @@
             <div>
               <el-table
                 :data="item.workflow_list"
-                style="width: 100%;"
+                style="width: 100%; max-height: 200px; overflow-y: auto;"
                 v-if="!item.show&&item.type==='my_workflow'||!item.show&&item.type==='running_workflow'"
               >
                 <el-table-column prop="name" label="工作流名称" width="150">
@@ -47,7 +47,7 @@
                     <span>{{ $utils.convertTimestamp(scope.row.start_time)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="time" label="操作" v-if="item.type==='my_workflow'">
+                <el-table-column prop="time" label="操作"  width="80" v-if="item.type==='my_workflow'">
                   <template slot-scope="scope">
                     <el-button size="small" type="text" @click="goWorkflow(scope.row,true)">执行</el-button>
                   </template>
@@ -78,8 +78,15 @@
                 <el-form ref="form" :model="curInfo" label-width="100px">
                   <div v-if="item.type==='my_workflow'">
                     <el-form-item label="选择工作流">
-                      <el-select placeholder="选择工作流" size="small" v-model="curInfo.workflow_list" multiple>
-                        <el-option v-for="item in workflowList" :key="item.name">{{item.name}}</el-option>
+                      <el-select
+                        placeholder="选择工作流"
+                        size="small"
+                        value-key="name"
+                        v-model="curInfo.config.workflow_list"
+                        filterable
+                        multiple
+                      >
+                        <el-option v-for="item in workflowList" :label="item.name" :key="item.name" :value="item">{{item.name}}</el-option>
                       </el-select>
                     </el-form-item>
                   </div>
@@ -146,8 +153,8 @@ export default {
         cards: []
       },
       curInfo: {
-        workflow_list: [],
         config: {
+          workflow_list: [],
           project_name: '',
           env_name: '',
           service_name: []
@@ -225,18 +232,7 @@ export default {
       this.getServiceList()
     },
     getSettings () {
-      if (this.runningWorkflowTimer) {
-        window.clearInterval(this.runningWorkflowTimer)
-        this.runningWorkflowTimer = null
-      }
-      if (this.envTimer) {
-        window.clearInterval(this.envTimer)
-        this.envTimer = null
-      }
-      if (this.workflowTimer) {
-        window.clearInterval(this.workflowTimer)
-        this.workflowTimer = null
-      }
+      this.clearInterval()
       getDashboardSettingsAPI().then(res => {
         this.info = res
         this.info.cards.forEach(item => {
@@ -265,7 +261,7 @@ export default {
     getMyWorkflow (item) {
       this.workflowTimer = window.setInterval(() => {
         getMyWorkflowAPI(item.id).then(res => {
-          this.$set(item, 'workflow_list', res.cards[0].workflows)
+          this.$set(item, 'workflow_list', res)
         })
       }, 5000)
       this.intervalTimerList.push(this.workflowTimer)
@@ -313,7 +309,7 @@ export default {
         this.curInfo.config.project_name,
         this.curInfo.config.env_name
       ).then(res => {
-        this.workflowList = res.workflow_list
+        this.workflowList = res
       })
     },
     handleCommand (val, item, index) {
@@ -331,9 +327,9 @@ export default {
           })
         })
       } else {
+        console.log(item)
         if (item.type === 'my_env') {
           this.getProjectList()
-          console.log(item)
           this.curInfo.config.project_name = item.config
             ? item.config.project_name
             : ''
@@ -344,7 +340,7 @@ export default {
         }
         if (item.type === 'my_workflow') {
           this.getWorkflowList()
-          this.curInfo.workflow_list = item.workflow_list
+          this.curInfo.config.workflow_list = item.workflow_list
         }
         this.$set(item, 'show', true)
       }
@@ -352,12 +348,12 @@ export default {
     goWorkflow (item, type) {
       if (item.workflow_type === 'common_workflow') {
         this.$router.push(
-          `/v1/projects/detail/${item.projectName}/pipelines/custom/${item.name}?display_name=${item.display_name}&formDashboad=${type}`
+          `/v1/projects/detail/${item.project}/pipelines/custom/${item.name}?display_name=${item.display_name}&formDashboad=${type}`
         )
       } else {
         // product
         this.$router.push(
-          `/v1/projects/detail/${item.projectName}/pipelines/multi/${item.name}?display_name=${item.display_name}&formDashboad=${type}`
+          `/v1/projects/detail/${item.project}/pipelines/multi/${item.name}?display_name=${item.display_name}&formDashboad=${type}`
         )
       }
     },
@@ -366,7 +362,13 @@ export default {
     },
     save (item) {
       if (item.type === 'my_workflow') {
-        item.workflow_list = this.curInfo.workflow_list
+        item.config = item.config || {}
+        this.$set(
+          item.config,
+          'workflow_list',
+          this.curInfo.config.workflow_list
+        )
+        // item.config.workflow_list = this.curInfo.config.workflow_list
       } else {
         // console.log(this.curInfo)
         // const params = {
@@ -389,6 +391,11 @@ export default {
       }
       this.updateSettings(this.info)
       // this.$set(item, 'show', false)
+    },
+    clearInterval () {
+      this.intervalTimerList.forEach(item => {
+        clearInterval(item)
+      })
     }
   },
   mounted () {
@@ -398,9 +405,7 @@ export default {
     })
   },
   beforeDestroy () {
-    this.intervalTimerList.forEach(item => {
-      clearInterval(item)
-    })
+    this.clearInterval()
   }
 }
 </script>
