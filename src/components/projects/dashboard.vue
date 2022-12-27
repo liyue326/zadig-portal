@@ -273,7 +273,7 @@ export default {
     getRunningWorkflow (item) {
       this.runningWorkflowTimer = window.setInterval(() => {
         getRunningWorkflowAPI().then(res => {
-          this.$set(item, 'workflow_list', res.data)
+          this.$set(item, 'workflow_list', res)
         })
       }, 3000)
       this.intervalTimerList.push(this.runningWorkflowTimer)
