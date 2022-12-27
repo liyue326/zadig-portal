@@ -167,21 +167,25 @@
                     </template>
                   </el-table-column>
                   <el-table-column>
-                    <template slot="header">
+                    <template v-slot:header>
                       <span>服务变量中可见</span>
-                      <el-tooltip effect="dark" content="关闭后在「环境」-「服务变量」中不可配置" placement="top">
-                        <span class="icon-tooltip">
-                          <i class="el-icon-question"></i>
-                        </span>
-                      </el-tooltip>
-                      <span  @click="enableAllVariablesView" class="icon-view">
-                        <i class="el-icon-view"></i>
-                      </span>
+                        <el-tooltip effect="dark" content="关闭后在「环境」-「服务变量」中不可配置" placement="top">
+                          <span class="icon-tooltip">
+                            <i class="el-icon-question"></i>
+                          </span>
+                        </el-tooltip>
+                        <el-button @click="enableAllVariablesView" :disabled="service.template_id!==''&&service.auto_sync" type="text">
+                            <i class="icon-view el-icon-view"></i>
+                        </el-button>
                     </template>
-                    <template slot-scope="scope">
-                      <i v-if="scope.row.show" @click="disableVariableView(scope.row)" class="icon-view el-icon-view"></i>
-                      <i v-else @click="enableVariableView(scope.row)" class="icon-view iconfont iconinvisible"></i>
-                    </template>
+                    <span slot-scope="scope" :key="service.service_name">
+                      <el-button v-if="scope.row.show" @click="disableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync" type="text">
+                        <i class="icon-view el-icon-view"></i>
+                      </el-button>
+                      <el-button v-else @click="enableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync"  type="text">
+                        <i class="icon-view iconfont iconinvisible"></i>
+                      </el-button>
+                    </span>
                   </el-table-column>
                 </el-table>
               </div>

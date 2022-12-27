@@ -42,7 +42,7 @@
                          :label="env">{{env.env_name}}</el-checkbox>
           </el-checkbox-group>
         </div>
-        <div v-if="checkedEnvList.length > 0 && (checkedEnvList[0].vars &&checkedEnvList[0].vars.length > 0 || hasPlutus)" class="env-tabs">
+        <div v-if="checkedEnvList.length > 0" class="env-tabs">
           <el-tabs v-model="activeEnvTabName" type="card">
             <el-tab-pane v-for="(env,index) in checkedEnvList"  :key="index" :label="env.env_name" :name="env.env_name">
               <CheckResource v-if="hasPlutus" :checkResource="env.checkResource" :serviceNames="env.serviceNames" />
@@ -233,7 +233,7 @@ export default {
       this.joinToEnvDialogVisible = true
     },
     changeUpgradeEnv (val) {
-      if (this.checkedEnvList.length && (this.hasPlutus || this.checkedEnvList[0].vars.length > 0)) {
+      if (this.checkedEnvList.length) {
         this.activeEnvTabName = val[val.length - 1].env_name
       }
     },
