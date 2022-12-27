@@ -104,9 +104,11 @@ export default {
       const content = this.fileContent.content
       const variableYaml = this.fileContent.variable_yaml
       const status = this.fileStatus
-      const serviceVars = this.fileContent.variable_kvs.filter((item) => {
-        return item.show
-      }).map((varItem) => { return varItem.key })
+      const serviceVars = this.fileContent.variable_kvs
+        ? this.fileContent.variable_kvs.filter((item) => {
+          return item.show
+        }).map((varItem) => { return varItem.key })
+        : []
       const payload = {
         name: fileName,
         content: content,
