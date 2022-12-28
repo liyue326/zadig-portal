@@ -414,12 +414,14 @@ export default {
           } else if (provider === 'gitee') {
             payload.address = 'https://gitee.com'
           } else if (provider === 'other') {
+            if (payload.ssh_key) {
             // Add newline to the end of the ssh key
-            const sshKeyLastCharacter = payload.ssh_key.charAt(
-              payload.ssh_key.length - 1
-            )
-            if (sshKeyLastCharacter !== '\n') {
-              payload.ssh_key = payload.ssh_key + '\n'
+              const sshKeyLastCharacter = payload.ssh_key.charAt(
+                payload.ssh_key.length - 1
+              )
+              if (sshKeyLastCharacter !== '\n') {
+                payload.ssh_key = payload.ssh_key + '\n'
+              }
             }
           }
           createCodeSourceAPI(payload).then(res => {
