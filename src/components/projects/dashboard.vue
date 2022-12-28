@@ -183,7 +183,7 @@ import {
   getMyEnvAPI,
   getProjectsAPI,
   getEnvironmentsAPI,
-  getEnvServicesAPI,
+  productServicesAPI,
   getMyWorkflowsAPI
 } from '@api'
 export default {
@@ -291,7 +291,7 @@ export default {
             this.getMyWorkflow(item)
           }
           if (item.type === 'my_env') {
-            if (!item.config.project_name) return
+            if (!item.config || !item.config.project_name) return
             this.getMyEnv(item)
           }
         })
@@ -324,6 +324,7 @@ export default {
           item.config.env_name || item.config.name,
           item.config.project_name
         ).then(res => {
+          this.$set(item, 'config', res)
           this.$set(item.config, 'project_name', res.project_name)
           this.$set(item, 'services', res.services)
         })
@@ -341,11 +342,19 @@ export default {
       })
     },
     getServiceList () {
-      getEnvServicesAPI(
+      if (!this.curInfo.config.project_name || !this.curInfo.config.env_name) {
+        return
+      }
+      productServicesAPI(
         this.curInfo.config.project_name,
-        this.curInfo.config.env_name
+        this.curInfo.config.env_name,
+        this.curInfo.config.env_type
       ).then(res => {
-        this.serviceList = res.data
+        if (this.curInfo.config.env_type === 'helm') {
+          this.serviceList = res.data.services
+        } else {
+          this.serviceList = res.data
+        }
       })
     },
     getWorkflowList () {
@@ -373,15 +382,20 @@ export default {
       } else {
         if (item.type === 'my_env') {
           this.getProjectList()
-          this.curInfo.config.project_name = item.config
-            ? item.config.project_name
-            : ''
-          this.curInfo.config.env_name = item.config ? item.config.name : ''
-          this.getEnvList()
-          this.curInfo.config.service_modules = item.config
-            ? item.config.services
-            : []
-          this.getServiceList()
+          if (item.config) {
+            this.curInfo.config.project_name = item.config
+              ? item.config.project_name
+              : ''
+            this.curInfo.config.env_name = item.config
+              ? item.config.env_name || item.config.name
+              : ''
+            this.getEnvList()
+            this.curInfo.config.service_modules = item.config
+              ? item.config.services
+              : []
+            this.curInfo.config.env_type = item.config.env_type
+            this.getServiceList()
+          }
         }
         if (item.type === 'my_workflow') {
           this.getWorkflowList()
@@ -453,6 +467,7 @@ export default {
         delete item.show
         delete item.services
       }
+      this.curInfo.config = {}
       this.updateSettings(this.info)
     },
     clearInterval () {
