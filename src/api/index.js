@@ -2383,3 +2383,27 @@ export function getDeploymentsAPI (clusterId, namespace) {
 export function getIstioVirtualServicesAPI (clusterId, namespace) {
   return http.get(`/api/aslan/cluster/${clusterId}/${namespace}/istio/virtualservices`)
 }
+
+// dashboard
+
+export function addDashboardSettingsAPI (payload) {
+  return http.post(`/api/aslan/system/dashboard/settings`, payload)
+}
+export function updateDashboardSettingsAPI (payload) {
+  return http.put(`/api/aslan/system/dashboard/settings`, payload)
+}
+export function getDashboardSettingsAPI (payload) {
+  return http.get(`/api/aslan/system/dashboard/settings`, payload)
+}
+export function getMyWorkflowAPI (cardId) {
+  return http.get(`/api/aslan/system/dashboard/workflow/mine?card_id=${cardId}`)
+}
+export function getRunningWorkflowAPI () {
+  return http.get(`/api/aslan/system/dashboard/workflow/running`)
+}
+export function getMyEnvAPI (name, projectName) {
+  return http.get(`/api/aslan/system/dashboard/environment/${name}?projectName=${projectName}`)
+}
+export function getMyWorkflowsAPI (projectName) {
+  return http.get(`/api/v1/picket/workflows/all?projectName=${projectName}`)
+}

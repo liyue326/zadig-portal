@@ -166,6 +166,7 @@ exports.default = {
   sidebarMenu: {
     productDelivery: '产品交付',
     status: '运行状态',
+    dashboard: '仪表盘',
     projects: '项目',
     forum: '论坛',
     testCenter: '测试中心',
@@ -603,7 +604,8 @@ exports.default = {
     queued: '队列中',
     skipped: '跳过',
     prepare: '准备环境',
-    reject: '拒绝'
+    reject: '拒绝',
+    pending: '排队中'
   },
   workflow: {
     ascendingByName: '按名称升序',
@@ -1032,6 +1034,7 @@ exports.default = {
       serviceCounts: '服务总数',
       serviceCountsUnit: '个',
       imageInfo: '镜像',
+      selectEnv: '选择环境',
       serviceDetail: {
         restartService: '重启服务',
         serviceStatus: '状态',
@@ -1925,5 +1928,9 @@ exports.default = {
   timeFormate: {
     seconds: '秒',
     minutes: '分'
+  },
+  dashboard: {
+    addCard: '添加卡片',
+    noCard: '暂无卡片'
   }
 }

@@ -48,11 +48,11 @@ const routes = [
         ]
       },
       {
-        path: 'status',
-        component: () => import('@/components/projects/workflow/status/status.vue'),
+        path: 'dashboard',
+        component: () => import('@/components/projects/dashboard.vue'),
         meta: {
           requiresAuth: true,
-          title: i18n.t('sidebarMenu.status')
+          title: i18n.t('sidebarMenu.dashboard')
         }
       },
       {

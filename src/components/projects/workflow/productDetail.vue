@@ -272,6 +272,9 @@ export default {
     clearTimeout(this.timerId)
   },
   mounted () {
+    if (this.$route.query.formDashboad && JSON.parse(this.$route.query.formDashboad)) {
+      this.startTask()
+    }
     getWorkflowDetailAPI(this.projectName, this.workflowName).then(res => {
       this.workflow = res
       this.fetchStages(res)
