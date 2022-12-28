@@ -1033,6 +1033,7 @@ exports.default = {
       serviceCounts: 'Service Counts:',
       serviceCountsUnit: '',
       imageInfo: 'Image',
+      selectEnv: 'Select Environment',
       serviceDetail: {
         restartService: 'Restart',
         serviceStatus: 'Status',

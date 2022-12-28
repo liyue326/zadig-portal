@@ -17,13 +17,13 @@
               <el-dropdown style="float: right;" @command="handleCommand($event, item,index)">
                 <span class="el-dropdown-link">
                   <el-button type="text">
-                    操作
+                    {{$t(`global.operation`)}}
                     <i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="edit" v-if="item.type==='my_workflow'||item.type==='my_env'">编辑</el-dropdown-item>
-                  <el-dropdown-item command="delete">删除</el-dropdown-item>
+                  <el-dropdown-item command="edit" v-if="item.type==='my_workflow'||item.type==='my_env'">{{$t(`global.edit`)}}</el-dropdown-item>
+                  <el-dropdown-item command="delete">{{$t(`global.delete`)}}</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </div>
@@ -33,7 +33,7 @@
                 class="table"
                 v-if="!item.show&&item.type==='my_workflow'||!item.show&&item.type==='running_workflow'"
               >
-                <el-table-column prop="name" label="工作流名称" min-width="20%">
+                <el-table-column prop="name" :label="$t(`global.workflowName`)" min-width="20%">
                   <template slot-scope="scope">
                     <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]" class="status">•</span>
                     <el-tooltip effect="dark" placement="top">
@@ -45,15 +45,15 @@
                     </el-tooltip>
                   </template>
                 </el-table-column>
-                <el-table-column prop="creator" label="执行人" min-width="20%"></el-table-column>
-                <el-table-column prop="start_time" label="创建时间" min-width="20%">
+                <el-table-column prop="creator" :label="$t(`workflow.executor`)" min-width="20%"></el-table-column>
+                <el-table-column prop="start_time" :label="$t(`environments.config.creationTime`)" min-width="20%">
                   <template slot-scope="scope">
                     <span>{{ $utils.convertTimestamp(scope.row.start_time)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="time" label="操作" width="100px" v-if="item.type==='my_workflow'">
+                <el-table-column prop="time" :label="$t(`global.operation`)" width="100px" v-if="item.type==='my_workflow'">
                   <template slot-scope="scope">
-                    <el-button size="small" type="text" @click="goWorkflow(scope.row,true,item.type)">执行</el-button>
+                    <el-button size="small" type="text" @click="goWorkflow(scope.row,true,item.type)">{{$t(`workflow.run`)}}</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -71,19 +71,19 @@
                   </span>
                 </div>
                 <el-table :data="item.services" class="table">
-                  <el-table-column prop="service_name" label="服务名称" min-width="20%">
+                  <el-table-column prop="service_name" :label="$t(`global.serviceName`)" min-width="20%">
                     <template slot-scope="scope">
                       <router-link :to="goService(scope,item.config)">
                         <span class="service-name">{{ scope.row.service_name }}</span>
                       </router-link>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="status" label="运行状态" min-width="20%">
+                  <el-table-column prop="status" :label="$t(`workflow.runStatus`)" min-width="20%">
                     <template slot-scope="scope">
                       <span :class="[$translate.calcEnvStatusColor(scope.row.status)]">{{getProdStatus(scope.row.status,true)}}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="image" label="镜像信息" min-width="20%">
+                  <el-table-column prop="image" :label="$t(`status.imgInfo`)" min-width="20%">
                     <template slot-scope="scope">
                       <el-tooltip effect="dark" :content="scope.row.image" placement="top">
                         <span>{{$utils.tailCut( scope.row.image,20)}}</span>
@@ -95,9 +95,9 @@
               <div v-if="item.show">
                 <el-form ref="form" :model="curInfo" label-width="100px">
                   <div v-if="item.type==='my_workflow'">
-                    <el-form-item label="选择工作流">
+                    <el-form-item :label="$t(`workflow.selectWorkflow`)">
                       <el-select
-                        placeholder="选择工作流"
+                        :placeholder="$t(`workflow.selectWorkflow`)"
                         size="small"
                         value-key="name"
                         v-model="curInfo.config.workflow_list"
@@ -109,19 +109,19 @@
                     </el-form-item>
                   </div>
                   <div v-if="item.type==='my_env'">
-                    <el-form-item label="选择项目">
-                      <el-select placeholder="选择项目" size="small" v-model="curInfo.config.project_name" @change="handleProjectChange">
+                    <el-form-item :label="$t(`dataStatistics.insight.selectProject`)">
+                      <el-select :placeholder="$t(`dataStatistics.insight.selectProject`)" size="small" v-model="curInfo.config.project_name" @change="handleProjectChange">
                         <el-option v-for="item in projectList" :key="item.name" :value="item.name">{{item.name}}</el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="选择环境">
-                      <el-select placeholder="选择环境" size="small" v-model="curInfo.config.env_name" @change="handleEnvChange">
+                    <el-form-item :label="$t(`environments.common.selectEnv`)">
+                      <el-select :placeholder="$t(`environments.common.selectEnv`)" size="small" v-model="curInfo.config.env_name" @change="handleEnvChange">
                         <el-option v-for="item in envList" :key="item.name" :value="item.name">{{item.name}}</el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="选择服务">
+                    <el-form-item :label="$t(`workflow.selectService`)">
                       <el-select
-                        placeholder="选择服务"
+                        :placeholder="$t(`workflow.selectService`)"
                         size="small"
                         v-model="curInfo.config.service_modules"
                         multiple
@@ -139,8 +139,8 @@
                   </div>
                 </el-form>
                 <div class="mg-t24">
-                  <el-button type="primary" size="small" @click="save(item)">保存</el-button>
-                  <el-button size="small" @click="cancel(item)">取消</el-button>
+                  <el-button type="primary" size="small" @click="save(item)">{{$t(`global.save`)}}</el-button>
+                  <el-button size="small" @click="cancel(item)">{{$t(`global.cancel`)}}</el-button>
                 </div>
               </div>
             </div>
@@ -202,12 +202,12 @@ export default {
           desc: '显示系统中运行中的工作流列表',
           id: ''
         },
-        {
-          name: '服务热力图',
-          type: 'service_update_frequency',
-          desc: '热力图方式显示服务被更新次数',
-          id: ''
-        },
+        // {
+        //   name: '服务热力图',
+        //   type: 'service_update_frequency',
+        //   desc: '热力图方式显示服务被更新次数',
+        //   id: ''
+        // },
         {
           name: '我的工作流',
           type: 'my_workflow',
@@ -297,7 +297,7 @@ export default {
         getMyWorkflowAPI(item.id).then(res => {
           this.$set(item, 'workflow_list', res)
         })
-      }, 5000)
+      }, 1500)
       this.intervalTimerList.push(this.workflowTimer)
     },
     getRunningWorkflow (item) {
@@ -305,7 +305,7 @@ export default {
         getRunningWorkflowAPI().then(res => {
           this.$set(item, 'workflow_list', res)
         })
-      }, 3000)
+      }, 2800)
       this.intervalTimerList.push(this.runningWorkflowTimer)
     },
     getMyEnv (item) {
@@ -361,7 +361,6 @@ export default {
           })
         })
       } else {
-        console.log(item)
         if (item.type === 'my_env') {
           this.getProjectList()
           this.curInfo.config.project_name = item.config
@@ -382,7 +381,6 @@ export default {
       }
     },
     goWorkflow (item, triggerRun, type) {
-      console.log(item)
       if (type === 'my_workflow') {
         // jump list
         if (

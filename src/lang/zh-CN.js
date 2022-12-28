@@ -1033,6 +1033,7 @@ exports.default = {
       serviceCounts: '服务总数',
       serviceCountsUnit: '个',
       imageInfo: '镜像',
+      selectEnv: '选择环境',
       serviceDetail: {
         restartService: '重启服务',
         serviceStatus: '状态',
