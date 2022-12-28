@@ -246,9 +246,6 @@ export default {
     this.getSettings()
   },
   methods: {
-    getProdStatus (status) {
-      return translateEnvStatus(status, false)
-    },
     onStart (val) {
       this.drag = true
     },
@@ -264,7 +261,6 @@ export default {
       }
       this.info.cards.push(obj)
       this.updateSettings(this.info)
-
       this.isShowCardDialog = false
     },
     handleProjectChange () {
@@ -440,6 +436,15 @@ export default {
     goService (scope, config) {
       return `/v1/projects/detail/${config.project_name}/envs/detail/${scope.row.service_name}?envName=${config.name}&projectName=${config.project_name}&clusterId=${config.cluster_id}`
     },
+    getProdStatus (status) {
+      return translateEnvStatus(status, false)
+    },
+    deployType (projectName) {
+      const project = this.projectList.find(
+        project => project.name === projectName
+      )
+      return project ? project.deployType : ''
+    },
     cancel (item) {
       this.$set(item, 'show', false)
     },
@@ -460,6 +465,7 @@ export default {
           item => item.service_name
         )
         item.config = {
+          env_type: this.curInfo.config.env_type || this.deployType(this.curInfo.config.project_name),
           env_name: this.curInfo.config.env_name,
           project_name: this.curInfo.config.project_name,
           service_modules: service_modules
