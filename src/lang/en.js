@@ -622,7 +622,7 @@ exports.default = {
     customWorkflow: 'Custom Workflow',
     customWorkflowAbility: 'Customizable workflow steps and free execution order',
     releaseWorkflow: 'Release Workflow',
-    releaseWorkflowAbility: 'The release process can be freely arranged, with the capabilities of blue-green, canary, grayscale release, etc',
+    releaseWorkflowAbility: 'The release process can be freely arranged, with the capabilities of data changes, configuration changes, grayscale release, etc',
     chooseWorkflowType: 'Choose Workflow Type',
     runProductWorkflow: 'Run Product Workflow',
     runWorkflow: 'Run Workflow',
