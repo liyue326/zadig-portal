@@ -33,9 +33,9 @@
                 class="table"
                 v-if="!item.show&&item.type==='my_workflow'||!item.show&&item.type==='running_workflow'"
               >
-                <el-table-column prop="name" label="工作流名称" width="150">
+                <el-table-column prop="name" label="工作流名称" min-width="20%">
                   <template slot-scope="scope">
-                    <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]">•</span>
+                    <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]" class="status">•</span>
                     <el-tooltip effect="dark" placement="top">
                       <div slot="content">
                         <div>所属项目：{{scope.row.project}}</div>
@@ -45,13 +45,13 @@
                     </el-tooltip>
                   </template>
                 </el-table-column>
-                <el-table-column prop="creator" label="执行人" width="100"></el-table-column>
-                <el-table-column prop="start_time" label="创建时间">
+                <el-table-column prop="creator" label="执行人" min-width="20%"></el-table-column>
+                <el-table-column prop="start_time" label="创建时间" min-width="20%">
                   <template slot-scope="scope">
                     <span>{{ $utils.convertTimestamp(scope.row.start_time)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="time" label="操作" width="80" v-if="item.type==='my_workflow'">
+                <el-table-column prop="time" label="操作" width="100px" v-if="item.type==='my_workflow'">
                   <template slot-scope="scope">
                     <el-button size="small" type="text" @click="goWorkflow(scope.row,true,item.type)">执行</el-button>
                   </template>
@@ -71,19 +71,19 @@
                   </span>
                 </div>
                 <el-table :data="item.services" class="table">
-                  <el-table-column prop="service_name" label="服务名称">
+                  <el-table-column prop="service_name" label="服务名称" min-width="20%">
                     <template slot-scope="scope">
                       <router-link :to="goService(scope,item.config)">
                         <span class="service-name">{{ scope.row.service_name }}</span>
                       </router-link>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="status" label="运行状态" width="100">
+                  <el-table-column prop="status" label="运行状态" min-width="20%">
                     <template slot-scope="scope">
                       <span :class="[$translate.calcEnvStatusColor(scope.row.status)]">{{getProdStatus(scope.row.status,true)}}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="image" label="镜像信息">
+                  <el-table-column prop="image" label="镜像信息" min-width="20%">
                     <template slot-scope="scope">
                       <el-tooltip effect="dark" :content="scope.row.image" placement="top">
                         <span>{{$utils.tailCut( scope.row.image,20)}}</span>
@@ -120,8 +120,20 @@
                       </el-select>
                     </el-form-item>
                     <el-form-item label="选择服务">
-                      <el-select placeholder="选择服务" size="small" v-model="curInfo.config.service_name" multiple filterable>
-                        <el-option v-for="item in serviceList" :key="item.service_name" :value="item.service_name">{{item.service_name}}</el-option>
+                      <el-select
+                        placeholder="选择服务"
+                        size="small"
+                        v-model="curInfo.config.service_modules"
+                        multiple
+                        filterable
+                        value-key="service_name"
+                      >
+                        <el-option
+                          v-for="item in serviceList"
+                          :key="item.service_name"
+                          :value="item"
+                          :label="item.service_name"
+                        >{{item.service_name}}</el-option>
                       </el-select>
                     </el-form-item>
                   </div>
@@ -176,7 +188,8 @@ export default {
           workflow_list: [],
           project_name: '',
           env_name: '',
-          service_name: []
+          service_name: [],
+          service_modules: []
         }
       },
       envTimer: 0,
@@ -403,7 +416,7 @@ export default {
       }
     },
     goService (scope, config) {
-      return `/v1/projects/detail/${config.project_name}/envs/detail/${scope.row.service_name}?envName=${config.name}&projectName=${config.project_name}`
+      return `/v1/projects/detail/${config.project_name}/envs/detail/${scope.row.service_name}?envName=${config.name}&projectName=${config.project_name}&clusterId=${config.cluster_id}`
     },
     cancel (item) {
       this.$set(item, 'show', false)
@@ -417,18 +430,17 @@ export default {
             project_name: item.projectName
           }
         })
-        this.$set(
-          item.config,
-          'workflow_list',
-          list
-        )
+        this.$set(item.config, 'workflow_list', list)
         delete item.workflow_list
         delete item.show
       } else {
+        const service_modules = this.curInfo.config.service_modules.map(
+          item => item.service_name
+        )
         item.config = {
           env_name: this.curInfo.config.env_name,
           project_name: this.curInfo.config.project_name,
-          service_modules: this.curInfo.config.service_name
+          service_modules: service_modules
         }
         delete item.show
         delete item.services
@@ -511,9 +523,15 @@ export default {
 
       .table {
         width: 100%;
-        min-height: 220px;
+        min-height: 260px;
         max-height: 300px;
         overflow-y: auto;
+
+        .status {
+          margin-right: 2px;
+          font-size: 20px;
+          vertical-align: -3px;
+        }
       }
 
       .env-tip {
