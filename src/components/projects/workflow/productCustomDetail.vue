@@ -249,7 +249,7 @@ export default {
     clearTimeout(this.timerId)
   },
   mounted () {
-    if (JSON.parse(this.$route.query.formDashboad)) {
+    if (this.$route.query.formDashboad && JSON.parse(this.$route.query.formDashboad)) {
       this.startTask()
     }
     this.refreshHistoryTask()

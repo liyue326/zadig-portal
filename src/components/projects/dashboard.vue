@@ -411,11 +411,19 @@ export default {
     save (item) {
       if (item.type === 'my_workflow') {
         item.config = item.config || {}
+        const list = this.curInfo.config.workflow_list.map(item => {
+          return {
+            name: item.name,
+            project_name: item.projectName
+          }
+        })
         this.$set(
           item.config,
           'workflow_list',
-          this.curInfo.config.workflow_list
+          list
         )
+        delete item.workflow_list
+        delete item.show
       } else {
         item.config = {
           env_name: this.curInfo.config.env_name,
