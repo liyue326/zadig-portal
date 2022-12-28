@@ -110,12 +110,22 @@
                   </div>
                   <div v-if="item.type==='my_env'">
                     <el-form-item :label="$t(`dataStatistics.insight.selectProject`)">
-                      <el-select :placeholder="$t(`dataStatistics.insight.selectProject`)" size="small" v-model="curInfo.config.project_name" @change="handleProjectChange">
+                      <el-select
+                        :placeholder="$t(`dataStatistics.insight.selectProject`)"
+                        size="small"
+                        v-model="curInfo.config.project_name"
+                        @change="handleProjectChange"
+                      >
                         <el-option v-for="item in projectList" :key="item.name" :value="item.name">{{item.name}}</el-option>
                       </el-select>
                     </el-form-item>
                     <el-form-item :label="$t(`environments.common.selectEnv`)">
-                      <el-select :placeholder="$t(`environments.common.selectEnv`)" size="small" v-model="curInfo.config.env_name" @change="handleEnvChange">
+                      <el-select
+                        :placeholder="$t(`environments.common.selectEnv`)"
+                        size="small"
+                        v-model="curInfo.config.env_name"
+                        @change="handleEnvChange"
+                      >
                         <el-option v-for="item in envList" :key="item.name" :value="item.name">{{item.name}}</el-option>
                       </el-select>
                     </el-form-item>
@@ -314,7 +324,7 @@ export default {
           item.config.env_name || item.config.name,
           item.config.project_name
         ).then(res => {
-          this.$set(item, 'config', res)
+          this.$set(item.config, 'project_name', res.project_name)
           this.$set(item, 'services', res.services)
         })
       }, 2000)
