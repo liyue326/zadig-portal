@@ -174,15 +174,18 @@
                             <i class="el-icon-question"></i>
                           </span>
                         </el-tooltip>
-                        <el-button @click="enableAllVariablesView" :disabled="service.template_id!==''&&service.auto_sync" class="var-button" type="text">
-                            <i class="icon-view el-icon-view"></i>
-                        </el-button>
+                        <el-tooltip effect="dark" :content="showAllVariables? '全部隐藏' : '全部显示'" placement="top">
+                          <el-button @click="changeAllVariablesView" :disabled="service.template_id!==''&&service.auto_sync" class="var-button" type="text">
+                            <i class="iconfont icon" :class="{'iconview-off1': !showAllVariables, iconview: showAllVariables}" :style="{ color: showAllVariables?'#0066ff':'#99a9bf' }">
+                            </i>
+                          </el-button>
+                        </el-tooltip>
                     </template>
                     <span slot-scope="scope" :key="service.service_name">
                       <el-button v-if="scope.row.show" @click="disableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync" class="var-button"  type="text">
                         <i class="icon-view el-icon-view"></i>
                       </el-button>
-                      <el-button v-else @click="enableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync" class="var-button" type="text">
+                      <el-button v-else @click="enableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync" class="var-button  not-show" type="text">
                         <i class="icon-view iconfont iconinvisible"></i>
                       </el-button>
                     </span>
@@ -195,13 +198,12 @@
                   size="small"
                   @click="validateVariables"
                   plain
-                  :disabled="variableYamlIsEmpty"
                 >{{$t(`global.validate`)}}</el-button>
                 <el-button
                   type="primary"
                   size="small"
                   @click="saveServiceVariable"
-                  :disabled="variableYamlIsEmpty"
+                  :disabled="service.status==='named'"
                 >{{$t(`global.save`)}}</el-button>
               </div>
             </section>
@@ -262,6 +264,7 @@ export default {
       integrationCodeDrawer: false,
       projectForm: {},
       registryCreateVisible: false,
+      showAllVariables: true,
       buildNameIndex: 0,
       variableSwitcher: 'yamlEditor'
     }
@@ -332,6 +335,7 @@ export default {
           }
           this.serviceConfigs = res
           this.initVariableYaml = res.variable_yaml
+          this.$emit('onGetServiceWithConfigs', res)
         })
       }
       if (this.service.status === 'named') {
@@ -401,7 +405,7 @@ export default {
     },
     parseK8sYamlVariable () {
       const payload = {
-        variable_yaml: this.serviceConfigs.service.yaml
+        variable_yaml: this.latestYaml
       }
       parseK8sYamlVariableAPI(payload)
         .then(res => {
@@ -414,7 +418,7 @@ export default {
         })
     },
     changeVariableView (val) {
-      if (val === 'list' && this.serviceConfigs.service_vars.length === 0 && this.serviceConfigs.variable_kvs.length === 0) {
+      if (val === 'list') {
         const payload = {
           variable_yaml: this.serviceConfigs.variable_yaml
         }
@@ -422,7 +426,12 @@ export default {
           .then(res => {
             if (res) {
               res.forEach(element => {
-                element.show = true
+                if (this.serviceConfigs.service_vars && this.serviceConfigs.service_vars.includes(element.key)) {
+                  element.show = true
+                }
+                if (this.serviceConfigs.variable_kvs.length === 0) {
+                  element.show = true
+                }
               })
               this.serviceConfigs.variable_kvs = res
             }
@@ -438,9 +447,11 @@ export default {
     disableVariableView (row) {
       this.$set(row, 'show', false)
     },
-    enableAllVariablesView () {
+    changeAllVariablesView () {
+      const currentDisplay = !this.showAllVariables
+      this.showAllVariables = currentDisplay
       this.serviceConfigs.variable_kvs.forEach(element => {
-        this.$set(element, 'show', true)
+        this.$set(element, 'show', currentDisplay)
       })
     }
   },
@@ -464,6 +475,10 @@ export default {
       type: Array
     },
     buildBaseUrl: {
+      required: true,
+      type: String
+    },
+    latestYaml: {
       required: true,
       type: String
     },
@@ -631,12 +646,12 @@ export default {
             }
 
             .list-container {
-              .icon-view {
-                cursor: pointer;
-              }
-
               .var-button {
                 padding: 0;
+
+                &.not-show {
+                  color: #99a9bf;
+                }
               }
             }
 

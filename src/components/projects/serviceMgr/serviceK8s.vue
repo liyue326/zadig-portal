@@ -95,6 +95,7 @@
                                     :showNext.sync="showNext"
                                     :yamlChange.sync="yamlChange"
                                     :isOnboarding="isOnboarding"
+                                    :serviceWithConfigs="serviceWithConfigs"
                                     :showJoinToEnvBtn.sync="showJoinToEnvBtn"
                                     @onGetTemplateId="getTemplateId"
                                     @onParseKind="getYamlKind"
@@ -102,6 +103,7 @@
                                     @onRefreshSharedService="getSharedServices"
                                     @onUpdateService="onUpdateService"
                                     @showJoinToEnvDialog="showJoinToEnvDialog"
+                                    @onGetLatestServiceYaml="getLatestYaml"
                                     class="service-editor-content" />
                 </div>
                 <MultipaneResizer/>
@@ -110,6 +112,8 @@
                   <ServiceAside ref="serviceAside"
                                 :service="service"
                                 :services="services"
+                                :latestYaml="latestYaml"
+                                @onGetServiceWithConfigs="getServiceWithConfigs"
                                 :buildBaseUrl="isOnboarding?`/v1/projects/create/${projectName}/k8s/service`:`/v1/projects/detail/${projectName}/services`"
                                 :changeEditorWidth="changeEditorWidth" />
                 </aside>
@@ -183,7 +187,9 @@ export default {
       activeEnvTabName: '',
       deletedService: '',
       middleWidth: '50%',
-      deployableEnvListWithVars: []
+      deployableEnvListWithVars: [],
+      serviceWithConfigs: {},
+      latestYaml: ''
     }
   },
   methods: {
@@ -403,6 +409,12 @@ export default {
     },
     showOnboardingNext () {
       this.$router.push(`/v1/projects/create/${this.projectName}/k8s/runtime?serviceName=${this.serviceName}`)
+    },
+    getServiceWithConfigs (data) {
+      this.serviceWithConfigs = data
+    },
+    getLatestYaml (data) {
+      this.latestYaml = data
     }
   },
   computed: {

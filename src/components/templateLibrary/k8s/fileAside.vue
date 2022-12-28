@@ -103,13 +103,20 @@
                           <i class="el-icon-question"></i>
                         </span>
                       </el-tooltip>
-                      <span @click="enableAllVariablesView" class="icon-view">
-                        <i class="el-icon-view"></i>
-                      </span>
+                      <el-tooltip effect="dark" :content="showAllVariables? '全部隐藏' : '全部显示'" placement="top">
+                        <el-button @click="changeAllVariablesView" class="var-button" type="text">
+                          <i class="iconfont icon" :class="{'iconview-off1': !showAllVariables, iconview: showAllVariables}" :style="{ color: showAllVariables?'#0066ff':'#99a9bf' }">
+                          </i>
+                        </el-button>
+                      </el-tooltip>
                     </template>
                     <template slot-scope="scope">
-                      <i v-if="scope.row.show" @click="disableVariableView(scope.row)" class="icon-view el-icon-view"></i>
-                      <i v-else @click="enableVariableView(scope.row)" class="icon-view iconfont iconinvisible"></i>
+                      <el-button v-if="scope.row.show" @click="disableVariableView(scope.row)"  class="var-button"  type="text">
+                        <i class="icon-view el-icon-view"></i>
+                      </el-button>
+                      <el-button v-else @click="enableVariableView(scope.row)"  class="var-button  not-show" type="text">
+                        <i class="icon-view iconfont iconinvisible"></i>
+                      </el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -155,6 +162,7 @@ export default {
   data () {
     return {
       referenceList: [],
+      showAllVariables: true,
       variableSwitcher: 'yamlEditor'
     }
   },
@@ -265,9 +273,11 @@ export default {
     disableVariableView (row) {
       this.$set(row, 'show', false)
     },
-    enableAllVariablesView () {
+    changeAllVariablesView () {
+      const currentDisplay = !this.showAllVariables
+      this.showAllVariables = currentDisplay
       this.fileContent.variable_kvs.forEach(element => {
-        this.$set(element, 'show', true)
+        this.$set(element, 'show', currentDisplay)
       })
     }
   },
@@ -428,8 +438,12 @@ export default {
             }
 
             .list-container {
-              .icon-view {
-                cursor: pointer;
+              .var-button {
+                padding: 0;
+
+                &.not-show {
+                  color: #99a9bf;
+                }
               }
             }
 
