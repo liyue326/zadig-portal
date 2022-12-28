@@ -174,15 +174,15 @@
                             <i class="el-icon-question"></i>
                           </span>
                         </el-tooltip>
-                        <el-button @click="enableAllVariablesView" :disabled="service.template_id!==''&&service.auto_sync" type="text">
+                        <el-button @click="enableAllVariablesView" :disabled="service.template_id!==''&&service.auto_sync" class="var-button" type="text">
                             <i class="icon-view el-icon-view"></i>
                         </el-button>
                     </template>
                     <span slot-scope="scope" :key="service.service_name">
-                      <el-button v-if="scope.row.show" @click="disableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync" type="text">
+                      <el-button v-if="scope.row.show" @click="disableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync" class="var-button"  type="text">
                         <i class="icon-view el-icon-view"></i>
                       </el-button>
-                      <el-button v-else @click="enableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync"  type="text">
+                      <el-button v-else @click="enableVariableView(scope.row)" :disabled="service.template_id!==''&&service.auto_sync" class="var-button" type="text">
                         <i class="icon-view iconfont iconinvisible"></i>
                       </el-button>
                     </span>
@@ -633,6 +633,10 @@ export default {
             .list-container {
               .icon-view {
                 cursor: pointer;
+              }
+
+              .var-button {
+                padding: 0;
               }
             }
 
