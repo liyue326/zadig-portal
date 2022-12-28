@@ -104,10 +104,16 @@ export default {
       const content = this.fileContent.content
       const variableYaml = this.fileContent.variable_yaml
       const status = this.fileStatus
+      const serviceVars = this.fileContent.variable_kvs
+        ? this.fileContent.variable_kvs.filter((item) => {
+          return item.show
+        }).map((varItem) => { return varItem.key })
+        : []
       const payload = {
         name: fileName,
         content: content,
-        variable_yaml: variableYaml
+        variable_yaml: variableYaml,
+        service_vars: serviceVars
       }
       if (status === 'added') {
         const res = await updateKubernetesTemplateAPI(

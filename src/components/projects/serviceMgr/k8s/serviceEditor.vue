@@ -78,6 +78,10 @@ export default {
       type: Boolean,
       default: false
     },
+    serviceWithConfigs: {
+      type: Object,
+      required: true
+    },
     yamlChange: Boolean
   },
   data () {
@@ -152,19 +156,32 @@ export default {
         ? this.service.visibility
         : 'private'
       const yaml = this.service.yaml
-      const variableYaml = this.service.variable_yaml
-      const serviceVars = this.service.service_vars
+      const variableYaml = this.serviceWithConfigs.variable_yaml
+      const serviceVars = this.serviceWithConfigs.variable_kvs
+        ? this.serviceWithConfigs.variable_kvs.filter((item) => {
+          return item.show
+        }).map((varItem) => { return varItem.key })
+        : []
       const isEdit = this.serviceInTree.status === 'added'
-      const payload = {
-        product_name: projectName,
-        service_name: serviceName,
-        visibility: visibility,
-        type: 'k8s',
-        yaml: yaml,
-        source: 'spock',
-        variable_yaml: variableYaml,
-        service_vars: serviceVars
-      }
+      const payload = isEdit
+        ? {
+          product_name: projectName,
+          service_name: serviceName,
+          visibility: visibility,
+          type: 'k8s',
+          yaml: yaml,
+          source: 'spock',
+          variable_yaml: variableYaml,
+          service_vars: serviceVars
+        }
+        : {
+          product_name: projectName,
+          service_name: serviceName,
+          visibility: visibility,
+          type: 'k8s',
+          yaml: yaml,
+          source: 'spock'
+        }
       return saveServiceTemplateAPI(isEdit, payload).then(res => {
         this.$message({
           type: 'success',
@@ -185,6 +202,7 @@ export default {
     onCmCodeChange: debounce(function (newCode) {
       this.errors = []
       this.service.yaml = newCode
+      this.$emit('onGetLatestServiceYaml', newCode)
       this.$emit('update:yamlChange', this.initYaml !== this.service.yaml)
       if (this.service.yaml) {
         this.validateYaml(newCode)
