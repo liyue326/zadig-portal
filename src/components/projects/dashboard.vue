@@ -2,12 +2,12 @@
   <div class="dashboard">
     <div class="header">
       <!-- <el-input placeholder="搜索" size="small" class="header-search"></el-input> -->
-      <el-button class="header-btn" size="small" type="primary" @click="isShowCardDialog=true">添加卡片</el-button>
+      <el-button class="header-btn" size="small" type="primary" @click="isShowCardDialog=true">{{$t(`dashboard.addCard`)}}</el-button>
     </div>
     <div class="main">
       <section v-if="info.cards.length === 0" class="no-running">
         <img src="@assets/icons/illustration/runStatus.svg" alt />
-        <p>暂无卡片</p>
+        <p>{{$t(`dashboard.noCard`)}}</p>
       </section>
       <draggable v-else v-model="info.cards" group="people" @start="onStart" @end="onEnd">
         <transition-group class="wrap">
@@ -158,7 +158,7 @@
         </transition-group>
       </draggable>
     </div>
-    <el-dialog title="添加卡片" :visible.sync="isShowCardDialog" width="60%" class="card-dialog">
+    <el-dialog :title="$t(`dashboard.addCard`)" :visible.sync="isShowCardDialog" width="60%" class="card-dialog">
       <el-card shadow="hover" v-for="item in cardTypeList" :key="item.title" class="card">
         <div class="type" @click="operateCard(item)">
           <span class="type-title">{{item.name}}</span>
@@ -364,8 +364,8 @@ export default {
     handleCommand (val, item, index) {
       if (val === 'delete') {
         this.$confirm(`确定删除 [${item.name}] 卡片吗`, '确认', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: this.$t(`global.confirm`),
+          cancelButtonText: this.$t(`global.cancel`),
           type: 'warning'
         }).then(() => {
           const params = cloneDeep(this.info)

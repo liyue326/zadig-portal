@@ -1927,5 +1927,9 @@ exports.default = {
   timeFormate: {
     seconds: 's',
     minutes: 'min'
+  },
+  dashboard: {
+    addCard: 'Add Card',
+    noCard: 'No Card'
   }
 }

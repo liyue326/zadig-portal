@@ -1927,5 +1927,9 @@ exports.default = {
   timeFormate: {
     seconds: '秒',
     minutes: '分'
+  },
+  dashboard: {
+    addCard: '添加卡片',
+    noCard: '暂无卡片'
   }
 }
