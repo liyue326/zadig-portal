@@ -1180,7 +1180,7 @@ exports.default = {
       selectHosts: '请选择要关联的主机',
       createHost: '创建主机',
       projectResources: '项目资源',
-      systemResource: '系统资源'
+      systemResources: '系统资源'
     },
     hosting: {
       selectServices: '选择服务',
