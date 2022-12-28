@@ -15,7 +15,7 @@
             </div>
             <!-- Details -->
             <div class="name-listing-description">
-              <h3 v-if="scope.row.uid === '*'" class="name-listing-title">{{$t('project.rbac.projectMember')}}</h3>
+              <h3 v-if="scope.row.uid === '*'" class="name-listing-title">{{$t('project.rbac.allUsers')}}</h3>
               <h3
                 v-else
                 class="name-listing-title"
