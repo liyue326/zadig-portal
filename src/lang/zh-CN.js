@@ -622,7 +622,7 @@ exports.default = {
     customWorkflow: '自定义工作流',
     customWorkflowAbility: '可自定义工作流步骤和自由编排执行顺序',
     releaseWorkflow: '发布工作流',
-    releaseWorkflowAbility: '可自由编排发布流程，具备蓝绿、金丝雀、灰度发布等能力',
+    releaseWorkflowAbility: '可自由编排发布流程，具备数据变更、配置变更、灰度发布等能力',
     chooseWorkflowType: '选择工作流类型',
     runProductWorkflow: '运行 产品-工作流',
     runWorkflow: '执行工作流',
