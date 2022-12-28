@@ -57,7 +57,9 @@
             <el-table-column width="120px"
                              :label="$t(`global.operation`)">
               <template slot-scope="scope">
-                <el-button type="primary"
+                <span v-if="pipeStatus.status !== 'success'">准备中，请稍后...</span>
+                <el-button v-else
+                           type="primary"
                            size="mini"
                            round
                            @click="runCurrentTask(scope.row)"
@@ -108,14 +110,15 @@ import bus from '@utils/eventBus'
 import Step from '../common/step.vue'
 import RunWorkflow from '../../workflow/common/runWorkflow.vue'
 import { wordTranslate } from '@utils/wordTranslate.js'
-import { getProductWorkflowsInProjectAPI, getProjectIngressAPI, getWorkflowDetailAPI } from '@api'
+import { getProductWorkflowsInProjectAPI, getProjectIngressAPI, getWorkflowDetailAPI, generateWorkflowAPI } from '@api'
 export default {
   data () {
     return {
       loading: true,
       workflow: {},
       taskDialogVisible: false,
-      mapWorkflows: []
+      mapWorkflows: [],
+      pipeStatus: { status: '' }
     }
   },
   methods: {
@@ -160,6 +163,27 @@ export default {
     },
     hideAfterSuccess () {
       this.taskDialogVisible = false
+    },
+    generatePipe () {
+      this.pipeTimer = null
+      const fn = () => {
+        if (this.pipeStatus && this.pipeStatus.status !== 'success') {
+          generateWorkflowAPI(this.projectName)
+            .then(res => {
+              this.$set(this, 'pipeStatus', res)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+            .then(() => {
+              if (this.pipeTimer) this.pipeTimer = setTimeout(fn, 1000)
+            })
+        } else {
+          this.getWorkflows()
+          clearInterval(this.pipeTimer)
+        }
+      }
+      this.pipeTimer = setTimeout(fn, 1000)
     }
   },
   computed: {
@@ -169,7 +193,11 @@ export default {
   },
   created () {
     this.getWorkflows()
+    this.generatePipe()
     bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: this.$t('subTopbarMenu.projects'), url: '/v1/projects' }, { title: this.projectName, isProjectName: true, url: '' }] })
+  },
+  beforeDestroy () {
+    this.pipeTimer = null
   },
   components: {
     Step,
