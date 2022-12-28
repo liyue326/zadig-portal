@@ -138,15 +138,19 @@
     </el-table>
     <el-dialog :title="`更新服务 - ${usedServiceInfo.service_name}`" :visible.sync="usedServiceInfo.dialogVisible" width="60%" class="update-service">
       <div>
+        <div style="margin-bottom: 14px;">
+          <el-checkbox
+            v-if="serviceStatus[usedServiceInfo.service_name] && serviceStatus[usedServiceInfo.service_name]['tpl_updatable']"
+            v-model="usedServiceInfo.update_service_tmpl"
+            @change="usedServiceInfo.used_variable_yaml = $event ? usedServiceInfo.latest_variable_yaml : usedServiceInfo.variable_yaml"
+          >同时更新服务配置</el-checkbox>
+        </div>
         <div class="primary-title">变量配置</div>
         <Resize v-show="usedServiceInfo.canEditYaml" @sizeChange="$refs.codemirror.refresh()" :height="'300px'">
-          <CodeMirror ref="codemirror" v-model="usedServiceInfo.variable_yaml" />
+          <CodeMirror ref="codemirror" v-model="usedServiceInfo.used_variable_yaml" />
         </Resize>
         <div v-show="!usedServiceInfo.canEditYaml" style="color: #aaa;">
           无服务变量
-        </div>
-        <div style="margin-top: 14px;">
-          <el-checkbox v-if="serviceStatus[usedServiceInfo.service_name] && serviceStatus[usedServiceInfo.service_name]['tpl_updatable']" v-model="usedServiceInfo.update_service_tmpl">同时更新服务配置</el-checkbox>
         </div>
       </div>
       <div slot="footer" >
@@ -182,6 +186,8 @@ export default {
     this.updateServiceInfo = {
       dialogVisible: false,
       service_name: '',
+      used_variable_yaml: '',
+      latest_variable_yaml: '',
       variable_yaml: '',
       canEditYaml: false,
       update_service_tmpl: false
@@ -244,19 +250,24 @@ export default {
       getServiceDefaultVariableAPI(product_name, env_name, [service_name]).then(res => {
         res.forEach(svc => {
           if (svc.service_name === service_name) {
+            const updated = this.serviceStatus[service_name] && this.serviceStatus[service_name].tpl_updatable
+
             this.usedServiceInfo.variable_yaml = svc.variable_yaml
-            this.usedServiceInfo.canEditYaml = !!svc.variable_yaml
-            this.usedServiceInfo.update_service_tmpl = !!svc.variable_yaml
+            this.usedServiceInfo.latest_variable_yaml = svc.latest_variable_yaml
+            this.usedServiceInfo.canEditYaml = !!(svc.variable_yaml || svc.latest_variable_yaml)
+
+            this.usedServiceInfo.used_variable_yaml = updated ? svc.latest_variable_yaml : svc.variable_yaml
+            this.usedServiceInfo.update_service_tmpl = !!updated
           }
         })
       })
     },
     sureUpdateService () {
-      const { service_name, variable_yaml, update_service_tmpl } = this.usedServiceInfo
+      const { service_name, used_variable_yaml, update_service_tmpl } = this.usedServiceInfo
       const payload = {
         service_name,
         type: 'k8s',
-        variable_yaml,
+        variable_yaml: used_variable_yaml,
         update_service_tmpl
       }
       this.updateService({ service_name, type: 'k8s' }, payload)

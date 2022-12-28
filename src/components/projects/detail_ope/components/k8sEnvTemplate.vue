@@ -40,29 +40,33 @@ export default {
     getEnvInfo () {
       const envName = this.currentInfo.base_name
       const projectName = this.$route.params.project_name
-      getEnvDefaultVariableAPI(projectName, envName).then(res => {
-        this.$set(this.currentInfo, 'default_values', res.default_variable)
-      })
-      getServiceDefaultVariableAPI(projectName, envName).then(res => {
-        const expandKeys = []
-        this.$set(
-          this.currentInfo,
-          'services',
-          res.map(re => {
-            if (re.variable_yaml) {
-              expandKeys.push(re.service_name)
-            }
-            return { ...re, canEditYaml: !!re.variable_yaml }
-          })
-        )
-        this.expandKeys = expandKeys
+      Promise.all([
+        getEnvDefaultVariableAPI(projectName, envName).then(res => {
+          this.$set(this.currentInfo, 'default_values', res.default_variable)
+        }),
+        getServiceDefaultVariableAPI(projectName, envName).then(res => {
+          const expandKeys = []
+          this.$set(
+            this.currentInfo,
+            'services',
+            res.map(re => {
+              if (re.variable_yaml) {
+                expandKeys.push(re.service_name)
+              }
+              return { ...re, canEditYaml: !!re.variable_yaml }
+            })
+          )
+          this.expandKeys = expandKeys
+        })
+      ]).then(() => {
+        this.$set(this.currentInfo, 'hasVarYaml', true)
       })
     }
   },
   watch: {
     currentInfo: {
       handler (val) {
-        if (val && typeof val.default_values === 'undefined') {
+        if (val && !this.currentInfo.hasVarYaml) {
           this.getEnvInfo()
         } else if (val) {
           this.expandKeys = val.services
