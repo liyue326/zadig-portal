@@ -60,7 +60,7 @@
         <span slot="label">
           <span>{{$t(`workflow.specifyMembersTip2`)}}：</span>
         </span>
-        <el-input style="width: 350px;" type="textarea" :rows="3" placeholder="输入指定通知接收人的 user_id，使用 ; 分割" v-model="wechatMobileStr"></el-input>
+        <el-input style="width: 350px;" type="textarea" :rows="3" :placeholder="$t(`workflow.specifyMembersTip2`)" v-model="wechatMobileStr"></el-input>
       </el-form-item>
       <el-form-item v-if="notify.webhook_type==='feishu'" prop="lark_user_ids">
         <span slot="label">
@@ -70,7 +70,7 @@
           style="width: 350px;"
           type="textarea"
           :rows="3"
-          placeholder="输入指定通知接收人的 user_id，使用 ; 分割，为空则全员通知"
+          :placeholder="$t(`workflow.specifyMembersTip2`)"
           v-model="feishuMobileStr"
         ></el-input>
       </el-form-item>

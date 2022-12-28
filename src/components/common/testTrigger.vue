@@ -31,7 +31,7 @@
           </el-select>
         </el-form-item>
         <el-form-item :label="$t(`workflow.targetBranch`)" prop="repo.branch"
-          v-if="checkGitRepo && canSwitchBranch"
+          v-if="checkGitRepo"
           :rules="[
           { required: true, message: webhookSwap.repo.is_regular ? $t(`workflow.inputRegExpressionConfiguration`):$t(`workflow.selectTargetBranch`), trigger: ['blur', 'change'] }
         ]">
