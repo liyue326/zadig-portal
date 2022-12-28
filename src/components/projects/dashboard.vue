@@ -33,7 +33,7 @@
                 class="table"
                 v-if="!item.show&&item.type==='my_workflow'||!item.show&&item.type==='running_workflow'"
               >
-                <el-table-column prop="name" :label="$t(`global.workflowName`)" min-width="20%">
+                <el-table-column prop="display_name" :label="$t(`global.workflowName`)" min-width="20%">
                   <template slot-scope="scope">
                     <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]" class="status">•</span>
                     <el-tooltip effect="dark" placement="top">
@@ -86,7 +86,7 @@
                   <el-table-column prop="image" :label="$t(`status.imgInfo`)" min-width="20%">
                     <template slot-scope="scope">
                       <el-tooltip effect="dark" :content="scope.row.image" placement="top">
-                        <span>{{$utils.tailCut( scope.row.image,20)}}</span>
+                        <span>{{scope.row.image.split(':')[1]}}</span>
                       </el-tooltip>
                     </template>
                   </el-table-column>
@@ -358,7 +358,12 @@ export default {
         this.curInfo.config.project_name,
         this.curInfo.config.env_name
       ).then(res => {
-        this.workflowList = res
+        this.workflowList = res.map(item => {
+          return {
+            name: item.name,
+            project_name: item.project_name
+          }
+        })
       })
     },
     handleCommand (val, item, index) {
@@ -465,7 +470,9 @@ export default {
           item => item.service_name
         )
         item.config = {
-          env_type: this.curInfo.config.env_type || this.deployType(this.curInfo.config.project_name),
+          env_type:
+            this.curInfo.config.env_type ||
+            this.deployType(this.curInfo.config.project_name),
           env_name: this.curInfo.config.env_name,
           project_name: this.curInfo.config.project_name,
           service_modules: service_modules
@@ -484,8 +491,10 @@ export default {
   },
   mounted () {
     bus.$emit('set-topbar-title', {
-      title: '',
-      breadcrumb: [{ title: '', url: '/v1/projects' }]
+      title: this.$t(`sidebarMenu.dashboard`),
+      breadcrumb: [
+        { title: this.$t(`sidebarMenu.dashboard`), url: '/v1/dashboadd' }
+      ]
     })
   },
   beforeDestroy () {
