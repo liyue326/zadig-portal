@@ -40,7 +40,7 @@
       </el-alert>
       <div class="sync-container">
         <el-button size="small" :plain="true" @click="hostOperation('add')" type="success">{{$t('global.add')}}</el-button>
-        <el-button size="small" :plain="true" @click="hostOperation('import')" type="success">{{$t('global.import')}}</el-button>
+        <el-button size="small" :plain="true" @click="hostOperation('import')" type="success">{{$t('global.multiImport')}}</el-button>
       </div>
       <div class="host-list">
         <template>

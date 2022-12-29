@@ -110,7 +110,7 @@ export default {
         return [
           {
             value: 'acr',
-            label: '阿里云 ACR',
+            label: '阿里云 ACR（个人版）',
             reg_addr: '地址',
             namespace: '命名空间',
             access_key: 'Docker 用户名',
@@ -138,7 +138,7 @@ export default {
           },
           {
             value: 'tcr',
-            label: '腾讯云 TCR',
+            label: '腾讯云 TCR（个人版）',
             reg_addr: '地址',
             namespace: '命名空间',
             access_key: 'Docker 用户名',
