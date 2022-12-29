@@ -429,8 +429,8 @@ export default {
           })
         })
       } else {
+        this.info.cards.forEach(item => { item.show = false })
         if (item.type === 'my_env') {
-          this.getProjectList()
           if (item.config) {
             this.curInfo.config.project_name = item.config
               ? item.config.project_name
@@ -440,7 +440,7 @@ export default {
               : ''
             this.getEnvList()
             this.curInfo.config.service_modules = item.config
-              ? item.config.services
+              ? item.config.services || item.vm_services
               : []
             this.curInfo.config.env_type = item.config.env_type
             this.getServiceList()
@@ -559,6 +559,7 @@ export default {
     }
   },
   mounted () {
+    this.getProjectList()
     bus.$emit('set-topbar-title', {
       title: this.$t(`sidebarMenu.dashboard`),
       breadcrumb: [
