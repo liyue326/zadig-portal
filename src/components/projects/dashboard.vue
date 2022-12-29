@@ -45,7 +45,7 @@
                     </el-tooltip>
                   </template>
                 </el-table-column>
-                <el-table-column prop="creator" :label="$t(`workflow.executor`)" min-width="20%"></el-table-column>
+                <el-table-column prop="creator" :label="$t(`workflow.executor`)" min-width="15%"></el-table-column>
                 <el-table-column prop="start_time" :label="$t(`environments.config.creationTime`)" min-width="20%">
                   <template slot-scope="scope">
                     <span>{{ $utils.convertTimestamp(scope.row.start_time)}}</span>
@@ -74,7 +74,7 @@
                   </span>
                 </div>
                 <el-table v-if="item.vm_services && item.vm_services.length > 0" class="pm-service-container" :data="item.vm_services">
-                  <el-table-column :label="$t(`global.serviceName`)" width="250px">
+                  <el-table-column :label="$t(`global.serviceName`)" min-width="20%">
                     <template slot-scope="scope">
                       <router-link :to="setPmRoute(scope,item.config)" target="_blank">
                         <span class="service-name">
@@ -84,7 +84,7 @@
                       </router-link>
                     </template>
                   </el-table-column>
-                  <el-table-column align="left" :label="$t(`global.status`)" width="130px">
+                  <el-table-column align="left" :label="$t(`global.status`)" min-width="20%">
                     <template slot="header">
                       {{$t(`global.status`)}}
                       <el-tooltip effect="dark" placement="top">
@@ -96,7 +96,7 @@
                       <span>{{calcPmServiceStatus(scope.row.env_status)}}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column align="left" min-width="160px" label="主机资源">
+                  <el-table-column align="left" min-width="40%" label="主机资源">
                     <template slot-scope="scope">
                       <template v-if="scope.row.env_status && scope.row.env_status.length>0">
                         {{scope.row.env_status.map(item=>item.address).toString()}}
@@ -117,7 +117,7 @@
                       <span :class="[$translate.calcEnvStatusColor(scope.row.status)]">{{getProdStatus(scope.row.status,true)}}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="image" :label="$t(`status.imgInfo`)" min-width="20%">
+                  <el-table-column prop="image" :label="$t(`status.imgInfo`)" min-width="40%">
                     <template slot-scope="scope">
                       <el-tooltip effect="dark" :content="scope.row.image" placement="top">
                         <span>{{scope.row.image.split(':')[1]}}</span>

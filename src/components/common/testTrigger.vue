@@ -10,7 +10,7 @@
       <el-form ref="triggerForm"
                :model="webhookSwap"
                label-position="left"
-               label-width="90px"
+               :label-width="curLanguage === 'zh-cn' ?'120px' :'160px'"
                :rules="rules">
         <el-form-item :label="$t(`global.repository`)" prop="repo" :rules="[
           { trigger: ['blur', 'change'], validator: validateRepo }
@@ -192,6 +192,7 @@
 <script type="text/javascript">
 import { getBranchInfoByIdAPI, checkRegularAPI } from '@api'
 import { debounce } from 'lodash'
+import store from 'storejs'
 export default {
   data () {
     this.validateRepo = (rule, value, callback) => {
@@ -250,7 +251,8 @@ export default {
       currenteditWebhookIndex: null,
       webhookEditMode: false,
       webhookAddMode: false,
-      matchedBranchNames: null
+      matchedBranchNames: null,
+      curLanguage: store.get('language')
     }
   },
   props: {
