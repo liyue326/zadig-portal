@@ -96,7 +96,7 @@
                   <el-table-column prop="key" label="键"></el-table-column>
                   <el-table-column prop="value" label="值"></el-table-column>
                   <el-table-column prop="show" label="服务变量中可见">
-                    <template slot="header">
+                    <template v-slot:header>
                       <span>服务变量中可见</span>
                       <el-tooltip effect="dark" content="关闭后在「环境」-「服务变量」中不可配置" placement="top">
                         <span class="icon-tooltip">
