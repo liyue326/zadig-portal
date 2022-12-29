@@ -203,7 +203,7 @@
                   type="primary"
                   size="small"
                   @click="saveServiceVariable"
-                  :disabled="service.status==='named'"
+                  :disabled="service.status==='named'||(service.visibility === 'public'&&service.product_name !== projectName)"
                 >{{$t(`global.save`)}}</el-button>
               </div>
             </section>
