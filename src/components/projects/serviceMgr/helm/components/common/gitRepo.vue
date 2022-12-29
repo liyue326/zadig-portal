@@ -594,7 +594,6 @@ export default {
       margin-bottom: 20px;
       padding-right: 12px;
       line-height: 40px;
-      text-align: right;
     }
   }
 }
