@@ -608,7 +608,7 @@ exports.default = {
     pending: '排队中'
   },
   workflow: {
-    workflowName: 'Workflow Name',
+    workflowName: '工作流名称',
     ascendingByName: '按名称升序',
     descendingByName: '按名称降序',
     ascendingByCreationTime: '按创建时间升序',
