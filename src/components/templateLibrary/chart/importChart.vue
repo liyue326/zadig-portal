@@ -74,7 +74,7 @@ export default {
       const refVal = this.$refs.gitRepo.getGitSourceType(this.template.codehostId)
       if (refVal === 'gerrit' || refVal === 'gitee' || refVal === 'gitee-enterprise') {
         const params = {
-          codehostId: this.template.codeHostID,
+          codehostId: this.template.codehostId,
           repoOwner: this.template.owner,
           repoName: this.template.repo,
           branchName: this.template.branch,
