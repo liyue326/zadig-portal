@@ -86,7 +86,7 @@
       </ul>
     </div>
 
-    <el-dialog :title="$t(`workflow.chooseWorkflowType`)" :visible.sync="showSelectWorkflowType" width="450px">
+    <el-dialog :title="$t(`workflow.chooseWorkflowType`)" :visible.sync="showSelectWorkflowType" width="480px">
       <div class="type-content">
         <el-radio v-model="selectWorkflowType" label="product">{{$t(`workflow.productWorkflow`)}}</el-radio>
         <div class="type-desc">{{$t(`workflow.productWorkflowAbility`)}}</div>
