@@ -19,7 +19,7 @@
                 ></el-input>
               </el-tooltip>
               <span @click="editDisplayName = editDisplayName ? false : true" class="mg-r8">
-                <i :class="[editDisplayName ? 'el-icon-finished' : 'el-icon-edit-outline']"></i>
+                <i class="name-icon" :class="[editDisplayName ? 'el-icon-finished' : 'el-icon-edit-outline']"></i>
               </span>
             </el-form-item>
             <el-form-item prop="name" :rules="{required: true,validator:validateWorkflowName, trigger: ['blur', 'change']}" class="mg-r16">
@@ -33,7 +33,7 @@
                 ></el-input>
               </el-tooltip>
               <span @click="editName = editName ? false : true" class="mg-r8">
-                <i :class="[editName ? 'el-icon-finished' : 'el-icon-edit-outline']"></i>
+                <i class="name-icon" :class="[editName ? 'el-icon-finished' : 'el-icon-edit-outline']"></i>
               </span>
             </el-form-item>
             <el-form-item prop="description">
@@ -47,7 +47,7 @@
                 ></el-input>
               </el-tooltip>
               <span @click="editDesc = editDesc ? false : true" class="mg-r8">
-                <i :class="[editDesc ? 'el-icon-finished' : 'el-icon-edit-outline']"></i>
+                <i class="name-icon" :class="[editDesc ? 'el-icon-finished' : 'el-icon-edit-outline']"></i>
               </span>
             </el-form-item>
           </el-form>
@@ -1162,6 +1162,10 @@ export default {
         &-input {
           display: inline-block;
           width: 180px;
+        }
+
+        &-icon {
+          cursor: pointer;
         }
 
         /deep/.el-form-item {
