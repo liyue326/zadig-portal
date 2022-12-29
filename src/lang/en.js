@@ -73,6 +73,7 @@ exports.default = {
     sync: 'Sync',
     autoSync: 'Auto-sync',
     import: 'Import',
+    multiImport: 'Multiple Import',
     reset: 'Reset',
     apply: 'Apply',
     skip: 'Skip',

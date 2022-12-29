@@ -73,6 +73,7 @@ exports.default = {
     sync: '同步',
     autoSync: '自动同步',
     import: '导入',
+    multiImport: '批量导入',
     reset: '重置',
     apply: '应用',
     skip: '跳过',
