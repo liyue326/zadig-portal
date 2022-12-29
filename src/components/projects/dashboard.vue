@@ -576,7 +576,7 @@ export default {
 .dashboard {
   // width: 100%;
   height: 100%;
-  padding: 20px;
+  padding: 8px 16px;
   overflow-y: auto;
 
   .header {
