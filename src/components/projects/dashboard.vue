@@ -581,7 +581,7 @@ export default {
   .header {
     display: flex;
     justify-content: flex-end;
-    margin: 8px 0;
+    margin: 6px 0;
 
     &-search {
       width: 220px;
