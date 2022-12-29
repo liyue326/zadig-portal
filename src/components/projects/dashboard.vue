@@ -381,13 +381,13 @@ export default {
       if (!this.curInfo.config.project_name || !this.curInfo.config.env_name) {
         return
       }
-      const type = this.deployType(this.curInfo.config.project_name)
+      const type = this.deployType(this.curInfo.config.project_name) || this.curInfo.config.env_type
       productServicesAPI(
         this.curInfo.config.project_name,
         this.curInfo.config.env_name,
         type
       ).then(res => {
-        if (type === 'helm') {
+        if (type === 'helm' || type === 'external') {
           this.serviceList = res.data.services
         } else {
           this.serviceList = res.data
