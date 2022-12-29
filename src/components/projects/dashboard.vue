@@ -12,9 +12,9 @@
       <draggable v-else v-model="info.cards" group="people" @start="onStart" @end="onEnd">
         <transition-group class="wrap">
           <el-card v-for="(item,index) in info.cards" :key="item.id" class="item">
-            <div slot="header" class="clearfix">
+            <div slot="header" class="header">
               <span>{{item.name}}</span>
-              <el-dropdown style="float: right;" @command="handleCommand($event, item,index)">
+              <el-dropdown @command="handleCommand($event, item,index)">
                 <span class="el-dropdown-link">
                   <el-button type="text">
                     {{$t(`global.operation`)}}
@@ -361,7 +361,7 @@ export default {
         this.workflowList = res.map(item => {
           return {
             name: item.name,
-            project_name: item.project_name
+            project_name: item.projectName
           }
         })
       })
@@ -459,7 +459,7 @@ export default {
         const list = this.curInfo.config.workflow_list.map(item => {
           return {
             name: item.name,
-            project_name: item.projectName
+            project_name: item.project_name || item.project
           }
         })
         this.$set(item.config, 'workflow_list', list)
@@ -553,9 +553,20 @@ export default {
         width: 49%;
         margin: 8px 0;
 
-        .name {
-          color: @themeColor;
-          cursor: pointer;
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 30px;
+
+          .name {
+            color: @themeColor;
+            cursor: pointer;
+          }
+        }
+
+        /deep/.el-card__header {
+          padding: 0 20px;
         }
       }
 
