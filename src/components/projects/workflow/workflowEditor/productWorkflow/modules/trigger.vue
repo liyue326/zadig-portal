@@ -20,7 +20,7 @@
         <el-tag size="mini" type="success" effect="dark" class="help-tag">{{$t(`global.helpDoc`)}}</el-tag>
       </a>
     </div>
-      <el-form :model="webhookSwap" ref="triggerForm" label-position="left" label-width="125px" :rules="rules">
+      <el-form :model="webhookSwap" ref="triggerForm" label-position="left" :label-width="curLanguage === 'zh-cn' ?'125px' :'160px'" :rules="rules">
         <el-form-item :label="$t(`global.name`)" prop="name" class="bottom-22">
           <el-input size="small" autofocus ref="webhookNamedRef" v-model="webhookSwap.name" :placeholder="$t(`global.inputName`)"></el-input>
         </el-form-item>
@@ -249,7 +249,7 @@
           <div v-if="webhook.enabled" class="trigger-list">
             <el-button @click="addWebhookBtn" type="text">{{$t(`global.addConfig`)}}</el-button>
             <el-table class="add-border" :data="webhook.items" style="width: 100%;">
-              <el-table-column :label="$t(`global.name`)">
+              <el-table-column :label="$t(`global.name`)" width="90px">
                 <template slot-scope="{ row }">
                   <span>{{ row.main_repo.name?row.main_repo.name:'' }}</span>
                 </template>
@@ -259,7 +259,7 @@
                   <span>{{ row.main_repo.description?row.main_repo.description:'N/A' }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="组织名/用户名/代码库">
+              <el-table-column :label="$t(`global.repository`)">
                 <template slot-scope="{ row }">
                   <span>{{ row.main_repo.repo_owner }}/{{ row.main_repo.repo_name }}</span>
                 </template>
@@ -274,7 +274,7 @@
                   <span>{{ row.workflow_args.namespace || 'N/A' }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t(`workflow.triggerEvents`)" width="130px">
+              <el-table-column :label="$t(`workflow.triggerEvents`)" >
                 <template slot-scope="{ row }">
                   <div v-if="row.main_repo.events.length">
                     <div v-for="event in row.main_repo.events" :key="event">
@@ -297,7 +297,7 @@
                   <span v-else>N/A</span>
                 </template>
               </el-table-column>
-              <el-table-column label="YAML 文件路径" min-width="120px">
+              <el-table-column :label="$t(`project.createProjectComp.yamlPath`)" >
                 <template slot-scope="{ row }">
                   <span>{{ row.yaml_path || 'N/A' }}</span>
                 </template>
@@ -328,7 +328,7 @@ import {
   getAssociatedBuildsAPI
 } from '@api'
 import { uniqBy, get, debounce, cloneDeep } from 'lodash'
-
+import store from 'storejs'
 const webhookSwapInfo = {
   is_yaml: false,
   yaml_path: '',
@@ -438,7 +438,8 @@ export default {
       webhookAddMode: false,
       showEnvUpdatePolicy: false,
       firstShowPolicy: false,
-      matchedBranchNames: null
+      matchedBranchNames: null,
+      curLanguage: store.get('language')
     }
   },
   props: {
