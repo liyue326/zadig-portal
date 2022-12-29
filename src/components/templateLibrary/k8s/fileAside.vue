@@ -249,7 +249,7 @@ export default {
         })
     },
     changeVariableView (val) {
-      if (val === 'list' && this.fileContent.service_vars.length === 0 && this.fileContent.variable_kvs.length === 0) {
+      if (val === 'list') {
         const payload = {
           variable_yaml: this.fileContent.variable_yaml
         }
@@ -257,7 +257,12 @@ export default {
           .then(res => {
             if (res) {
               res.forEach(element => {
-                element.show = true
+                if (this.fileContent.service_vars && this.fileContent.service_vars.includes(element.key)) {
+                  element.show = true
+                }
+                if (this.fileContent.variable_kvs.length === 0) {
+                  element.show = true
+                }
               })
               this.fileContent.variable_kvs = res
             }
