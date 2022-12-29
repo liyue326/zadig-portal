@@ -1167,6 +1167,11 @@ export default {
         /deep/.el-form-item {
           margin: 8px 0;
         }
+
+        /deep/.el-input.is-disabled .el-input__inner {
+          background-color: #fff;
+          border-color: #fff;
+        }
       }
 
       .tab {

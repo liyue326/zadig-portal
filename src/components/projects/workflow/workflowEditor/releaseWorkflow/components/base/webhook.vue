@@ -216,7 +216,7 @@
         </el-form-item>
         <el-form-item :label="$t(`workflow.triggerStrategy`)" prop="auto_cancel">
           <el-checkbox v-model="currentWebhook.auto_cancel">
-            <span>自动取消</span>
+            <span>{{$t(`global.autoCancel`)}}</span>
             <el-tooltip effect="dark" content="如果您希望只构建最新的提交，则使用这个选项会自动取消队列中的任务" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
@@ -237,7 +237,7 @@
               placeholder="输入目录时，多个目录请用回车换行分隔"
             ></el-input>
           </el-form-item>
-          <ul style="padding-left: 120px; color: #909399; font-size: 12px; line-height: 20px;">
+          <ul style="color: #909399; font-size: 12px; line-height: 20px;" :style="{'paddingLeft':curLanguage === 'zh-cn' ?'120px' :'160px'}">
             <li>输入目录时，多个目录请用回车换行分隔</li>
             <li>"/" 表示代码库中的所有文件</li>
             <li>用 "!" 符号开头可以排除相应的文件</li>

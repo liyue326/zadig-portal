@@ -85,9 +85,9 @@
             <el-checkbox v-for="tri in triggerMethods.git" :key="tri.value" :label="tri.value">{{ tri.label }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="自动取消" class="label-icon">
+        <el-form-item :label="$t(`global.autoCancel`)" class="label-icon">
           <span slot="label">
-            <span>自动取消</span>
+            <span>{{$t(`global.autoCancel`)}}</span>
             <el-tooltip effect="dark"
                         content="如果您希望只构建最新的提交，则使用这个选项会自动取消队列中的任务"
                         placement="right">
@@ -105,7 +105,7 @@
                     placeholder="输入目录时，多个目录请用回车换行分隔"></el-input>
         </el-form-item>
         <ul v-if="webhookSwap.repo.source!=='gerrit'"
-            style="padding-left: 80px;">
+             :style="{'paddingLeft':curLanguage === 'zh-cn' ?'120px' :'160px'}">
           <li> "/" 表示代码库中的所有文件</li>
           <li> 用 "!" 符号开头可以排除相应的文件</li>
         </ul>
