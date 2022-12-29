@@ -114,7 +114,7 @@
            class="dialog-footer">
         <el-button size="mini"
                    round
-                   @click="webhookAddMode?webhookAddMode=false:webhookEditMode=false">取 消
+                   @click="webhookAddMode?webhookAddMode=false:webhookEditMode=false">{{$t(`global.cancel`)}}
         </el-button>
         <el-button size="mini"
                    round
