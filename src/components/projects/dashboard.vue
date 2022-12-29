@@ -2,7 +2,7 @@
   <div class="dashboard">
     <div class="header">
       <!-- <el-input placeholder="搜索" size="small" class="header-search"></el-input> -->
-      <el-button class="header-btn" size="small" type="primary" @click="isShowCardDialog=true">{{$t(`dashboard.addCard`)}}</el-button>
+      <el-button class="header-btn"  size="small" plain @click="isShowCardDialog=true"><i class="el-icon-plus"/>&nbsp;&nbsp;&nbsp;&nbsp;{{$t(`dashboard.addCard`)}}&nbsp;&nbsp;</el-button>
     </div>
     <div class="main">
       <section v-if="info.cards.length === 0" class="no-running">
@@ -17,8 +17,7 @@
               <el-dropdown @command="handleCommand($event, item,index)">
                 <span class="el-dropdown-link">
                   <el-button type="text">
-                    {{$t(`global.operation`)}}
-                    <i class="el-icon-arrow-down el-icon--right"></i>
+                    <i class="el-icon-more"></i>
                   </el-button>
                 </span>
                 <el-dropdown-menu slot="dropdown">
@@ -589,7 +588,14 @@ export default {
     }
 
     &-btn {
-      margin-left: 16px;
+      padding: 10px 15px;
+      color: #06f;
+      font-weight: 400;
+      font-size: 14px;
+      background-color: #fff;
+      border: 1px solid #06f;
+      border-radius: 4px;
+      cursor: pointer;
     }
   }
 
