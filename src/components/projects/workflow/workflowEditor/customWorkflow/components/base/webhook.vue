@@ -124,7 +124,7 @@
       :close-on-click-modal="false"
       append-to-body
     >
-      <el-form ref="webhookForm" :model="currentWebhook" label-position="left" label-width="90px" :rules="webhookRules">
+      <el-form ref="webhookForm" :model="currentWebhook" label-position="left" :label-width="curLanguage === 'zh-cn' ?'120px' :'160px'" :rules="webhookRules">
         <el-form-item :label="$t(`global.name`)" prop="name">
           <el-input
             size="small"
@@ -380,6 +380,7 @@
 <script>
 import { cloneDeep, isEqual, uniqBy, debounce } from 'lodash'
 import WebhookRunConfig from './webhookRunConfig.vue'
+import store from 'storejs'
 import {
   getBranchInfoByIdAPI,
   addCustomWebhookAPI,
@@ -543,7 +544,8 @@ export default {
         { label: '每周六', value: 'saturday' },
         { label: '每周日', value: 'sunday' }
       ],
-      matchedBranchNames: null
+      matchedBranchNames: null,
+      curLanguage: store.get('language')
     }
   },
   props: {
