@@ -363,6 +363,7 @@ exports.default = {
       projectIdentifierTip: '项目标识是该项目资源的全局唯一标识符，用于该项目下所有资源的引用与更新，默认自动生成，同时支持手动指定，创建后不可更改',
       type: '项目类型',
       yamlProject: 'K8s YAML 项目',
+      yamlPath: 'YAML 文件路径',
       yamlProjectFirstDesc: '基础设施使用 Kubernetes',
       yamlProjectSecondDesc: '使用 Kubernetes YAML 管理和部署服务',
       helmProject: 'K8s Helm Chart 项目',

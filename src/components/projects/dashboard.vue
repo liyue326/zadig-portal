@@ -448,7 +448,7 @@ export default {
         }
         if (item.type === 'my_workflow') {
           this.getWorkflowList()
-          this.curInfo.config.workflow_list = item.workflow_list
+          this.$set(this.curInfo.config, 'workflow_list', item.workflow_list)
         }
         this.$set(item, 'show', true)
       }

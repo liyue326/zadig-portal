@@ -1,6 +1,6 @@
 <template>
   <el-form class="workflow-args"
-           label-width="100px"
+           label-width="120px"
            label-position="left">
     <el-form-item prop="productName"
                   :label="$t(`project.environments`)">
