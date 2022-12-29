@@ -143,7 +143,7 @@
                 <span>Patchset created</span>
                 <template v-if="webhookSwap.events.includes('patchset-created')">
                   <span style="color: #606266;">评分标签</span>
-                  <el-input size="mini" style="width: 250px;" v-model="webhookSwap.repo.label" placeholder="Code-Review"></el-input>
+                  <el-input size="mini" style="width: 200px;" v-model="webhookSwap.repo.label" placeholder="Code-Review"></el-input>
                 </template>
               </el-checkbox>
             </el-checkbox-group>
@@ -259,7 +259,7 @@
                   <span>{{ row.main_repo.description?row.main_repo.description:'N/A' }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="组织名/用户名/代码库" min-width="160px">
+              <el-table-column label="组织名/用户名/代码库">
                 <template slot-scope="{ row }">
                   <span>{{ row.main_repo.repo_owner }}/{{ row.main_repo.repo_name }}</span>
                 </template>

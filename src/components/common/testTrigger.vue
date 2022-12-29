@@ -69,7 +69,7 @@
                 <span>patchset-created</span>
                 <span style="color: #606266;">评分标签</span>
                 <el-input size="mini"
-                          style="width: 250px;"
+                          style="width: 200px;"
                           v-model="webhookSwap.repo.label"
                           placeholder="Code-Review"></el-input>
               </template>

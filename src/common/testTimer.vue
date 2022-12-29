@@ -11,7 +11,7 @@
         <el-form :model="schedule_config"
                  ref="addTimer"
                  :rules="triggerRules"
-                 label-width="100px"
+                 label-width="110px"
                  label-position="left">
           <el-form-item :label="$t(`workflow.triggerWay`)"
                         prop="type">

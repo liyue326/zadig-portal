@@ -608,6 +608,7 @@ exports.default = {
     pending: '排队中'
   },
   workflow: {
+    workflowName: 'Workflow Name',
     ascendingByName: '按名称升序',
     descendingByName: '按名称降序',
     ascendingByCreationTime: '按创建时间升序',
@@ -757,6 +758,7 @@ exports.default = {
     webhookAddr: 'Webhook 地址',
     specifyMembersTip1: '@指定成员（输入指定通知接收人的手机号码，使用 ; 分割，为空则全员通知）',
     specifyMembersTip2: '@指定成员（输入指定通知接收人的 user_id，使用 ; 分割）',
+    specifyMembersTip3: '@指定成员（输入指定通知接收人的用户 ID，使用 ; 分割）',
     notifyType: {
       created: '任务开始',
       passed: '任务成功',
@@ -1931,6 +1933,12 @@ exports.default = {
   },
   dashboard: {
     addCard: '添加卡片',
-    noCard: '暂无卡片'
+    noCard: '暂无卡片',
+    my_workflow: '我的工作流',
+    my_env: '我的环境',
+    running_workflow: '运行中的工作流',
+    runningTip: '显示系统中运行中的工作流列表',
+    myWorkflowTip: '显示个人关注的工作流列表',
+    myEnvTip: '显示个人关注的环境及服务信息'
   }
 }

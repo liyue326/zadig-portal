@@ -13,7 +13,7 @@
         <transition-group class="wrap">
           <el-card v-for="(item,index) in info.cards" :key="item.id" class="item">
             <div slot="header" class="header">
-              <span>{{item.name}}</span>
+              <span>{{$t(`dashboard.${item.type}`)}}</span>
               <el-dropdown @command="handleCommand($event, item,index)">
                 <span class="el-dropdown-link">
                   <el-button type="text">
@@ -33,7 +33,7 @@
                 class="table"
                 v-if="!item.show&&item.type==='my_workflow'||!item.show&&item.type==='running_workflow'"
               >
-                <el-table-column prop="display_name" :label="$t(`global.workflowName`)" min-width="20%">
+                <el-table-column prop="display_name" :label="$t(`workflow.workflowName`)" min-width="20%">
                   <template slot-scope="scope">
                     <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]" class="status">•</span>
                     <el-tooltip effect="dark" placement="top">
@@ -60,7 +60,10 @@
               <div v-if="!item.show&&item.type==='my_env'">
                 <div class="env-tip" v-if="item.config">
                   <span v-if="item.config.name">
-                    <router-link :to="`/v1/projects/detail/${item.config.project_name}/envs/detail?envName=${item.config.name}`">
+                    <router-link
+                      :to="`/v1/projects/detail/${item.config.project_name}/envs/detail?envName=${item.config.name}` "
+                      target="_blank"
+                    >
                       <span class="env-name">{{`${item.config.name}`}}</span>
                     </router-link>
                     <span class="desc">({{item.config.project_name}})</span>
@@ -73,7 +76,7 @@
                 <el-table :data="item.services" class="table">
                   <el-table-column prop="service_name" :label="$t(`global.serviceName`)" min-width="20%">
                     <template slot-scope="scope">
-                      <router-link :to="goService(scope,item.config)">
+                      <router-link :to="goService(scope,item.config)" target="_blank">
                         <span class="service-name">{{ scope.row.service_name }}</span>
                       </router-link>
                     </template>
@@ -91,6 +94,59 @@
                     </template>
                   </el-table-column>
                 </el-table>
+                <!-- <el-table v-if="item.vm_services && item.vm_services.length > 0" class="pm-service-container" :data="item.vm_services">
+                  <el-table-column :label="$t(`global.serviceName`)" width="250px">
+                    <template slot-scope="scope">
+                      <router-link :to="setPmRoute(scope,item.config)">
+                        <span class="service-name">
+                          <i v-if="scope.row.type==='pm'" class="iconfont service-icon iconwuliji"></i>
+                          {{ scope.row.service_name }}
+                        </span>
+                      </router-link>
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="left" :label="$t(`global.status`)" width="130px">
+                    <template slot="header">
+                      状态
+                      <el-tooltip effect="dark" placement="top">
+                        <div slot="content">实际正常运行的服务数量/预期正常运行服务数量</div>
+                        <i class="el-icon-question"></i>
+                      </el-tooltip>
+                    </template>
+                    <template slot-scope="scope">
+                      <span>{{calcPmServiceStatus(scope.row.env_statuses)}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="left" min-width="160px" label="主机资源">
+                    <template slot-scope="scope">
+                      <template v-if="scope.row.env_statuses && scope.row.env_statuses.length>0">
+                        <div v-if="scope.row.serviceHostStatusArr[0]">
+                          <span
+                            class="pm-service-status"
+                            :class="scope.row.serviceHostStatusArr[0]['color']"
+                          >{{scope.row.serviceHostStatusArr[0].host}}</span>
+                        </div>
+                        <div v-if="scope.row.serviceHostStatusArr[1]">
+                          <span
+                            class="pm-service-status"
+                            :class="scope.row.serviceHostStatusArr[1]['color']"
+                          >{{scope.row.serviceHostStatusArr[1].host}}</span>
+                        </div>
+                        <el-popover
+                          v-if="scope.row.serviceHostStatusArr.length > 2"
+                          placement="right"
+                          popper-class="pm-service-host-status-popover"
+                          trigger="hover"
+                        >
+                          <div v-for="(item,index) in _.drop(scope.row.serviceHostStatusArr,2)" :key="index">
+                            <span class="pm-service-status" :class="item['color']">{{item.host}}</span>
+                          </div>
+                          <span slot="reference" class="add-host el-icon-more-outline"></span>
+                        </el-popover>
+                      </template>
+                    </template>
+                  </el-table-column>
+                </el-table> -->
               </div>
               <div v-if="item.show">
                 <el-form ref="form" :model="curInfo" label-width="100px">
@@ -104,7 +160,12 @@
                         filterable
                         multiple
                       >
-                        <el-option v-for="item in workflowList" :label="item.name" :key="item.name" :value="item">{{item.name}}</el-option>
+                        <el-option
+                          v-for="item in workflowList"
+                          :label="`${item.display_name}(${item.project_name})`"
+                          :key="item.name"
+                          :value="item"
+                        >{{item.display_name}}({{item.project_name}})</el-option>
                       </el-select>
                     </el-form-item>
                   </div>
@@ -207,9 +268,9 @@ export default {
       runningWorkflowTimer: 0,
       cardTypeList: [
         {
-          name: '运行中的工作流',
+          name: this.$t(`dashboard.running_workflow`),
           type: 'running_workflow',
-          desc: '显示系统中运行中的工作流列表',
+          desc: this.$t(`dashboard.runningTip`),
           id: ''
         },
         // {
@@ -219,15 +280,15 @@ export default {
         //   id: ''
         // },
         {
-          name: '我的工作流',
+          name: this.$t(`dashboard.my_workflow`),
           type: 'my_workflow',
-          desc: '显示个人关注的工作流列表',
+          desc: this.$t(`dashboard.myWorkflowTip`),
           id: ''
         },
         {
-          name: '我的环境',
+          name: this.$t(`dashboard.my_env`),
           type: 'my_env',
-          desc: '显示个人关注的环境及服务信息',
+          desc: this.$t(`dashboard.myEnvTip`),
           id: ''
         }
       ],
@@ -323,6 +384,31 @@ export default {
           this.$set(item, 'config', res)
           this.$set(item.config, 'project_name', res.project_name)
           this.$set(item, 'services', res.services)
+          if (res.vm_services && res.vm_services.length > 0) {
+            res.vm_services.forEach(serviceItem => {
+              if (serviceItem.env_statuses) {
+                serviceItem.serviceHostStatus = {}
+                serviceItem.env_statuses.forEach(hostItem => {
+                  const host = hostItem.address.split(':')[0]
+                  serviceItem.serviceHostStatus[host] = {
+                    status: [],
+                    color: ''
+                  }
+                  serviceItem.serviceHostStatus[host].status.push(
+                    hostItem.status
+                  )
+                  serviceItem.serviceHostStatus[host].color = checkStatus(
+                    serviceItem.serviceHostStatus[host].status
+                  )
+                })
+                serviceItem.serviceHostStatusArr = this.$utils.mapToArray(
+                  serviceItem.serviceHostStatus,
+                  'host'
+                )
+              }
+            })
+          }
+          this.$set(item, 'vm_services', res.vm_services)
         })
       }, 2000)
       this.intervalTimerList.push(this.envTimer)
@@ -361,6 +447,7 @@ export default {
         this.workflowList = res.map(item => {
           return {
             name: item.name,
+            display_name: item.display_name,
             project_name: item.projectName
           }
         })
@@ -412,14 +499,16 @@ export default {
           item.workflow_type === 'common_workflow' ||
           item.workflow_type === 'release'
         ) {
-          this.$router.push(
+          const url = this.$router.resolve(
             `/v1/projects/detail/${item.project}/pipelines/custom/${item.name}?display_name=${item.display_name}&formDashboad=${triggerRun}`
           )
+          window.open(url.href, '_blank')
         } else {
           // product
-          this.$router.push(
+          const url = this.$router.resolve(
             `/v1/projects/detail/${item.project}/pipelines/multi/${item.name}?display_name=${item.display_name}&formDashboad=${triggerRun}`
           )
+          window.open(url.href, '_blank')
         }
       } else if (type === 'running_workflow') {
         // jump detail
@@ -427,14 +516,16 @@ export default {
           item.workflow_type === 'common_workflow' ||
           item.workflow_type === 'release'
         ) {
-          this.$router.push(
+          const url = this.$router.resolve(
             `/v1/projects/detail/${item.project}/pipelines/custom/${item.name}/${item.task_id}?status=${item.status}&display_name=${item.display_name}`
           )
+          window.open(url.href, '_blank')
         } else {
           // product
-          this.$router.push(
+          const url = this.$router.resolve(
             `/v1/projects/detail/${item.project}/pipelines/multi/${item.name}/${item.task_id}?status=${item.status}&display_name=${item.display_name}`
           )
+          window.open(url.href, '_blank')
         }
       }
     },
@@ -449,6 +540,23 @@ export default {
         project => project.name === projectName
       )
       return project ? project.deployType : ''
+    },
+    calcPmServiceStatus (envStatus) {
+      if (envStatus) {
+        const runningCount = envStatus.filter(
+          s => s.status === 'Running' || s.status === 'Succeeded'
+        ).length
+        return `${runningCount}/${envStatus.length}`
+      } else {
+        return 'N/A'
+      }
+    },
+    setPmRoute (scope, config) {
+      if (typeof config.name === 'undefined') {
+        return `/v1/projects/detail/${config.project_name}/envs/detail/${scope.row.service_name}/pm?projectName=${this.projectName}&clusterId=${this.clusterId}`
+      } else {
+        return `v1/projects/detail/${config.project_name}/envs/detail/pm?envName=${config.name}&projectName=${this.projectName}&clusterId=${this.clusterId}`
+      }
     },
     cancel (item) {
       this.$set(item, 'show', false)
@@ -558,11 +666,6 @@ export default {
           align-items: center;
           justify-content: space-between;
           height: 30px;
-
-          .name {
-            color: @themeColor;
-            cursor: pointer;
-          }
         }
 
         /deep/.el-card__header {
@@ -580,6 +683,11 @@ export default {
           margin-right: 2px;
           font-size: 20px;
           vertical-align: -3px;
+        }
+
+        .name {
+          color: @themeColor;
+          cursor: pointer;
         }
       }
 

@@ -106,5 +106,9 @@ body {
   .el-card {
     background: #fff;
   }
+
+  .el-table::before {
+    z-index: inherit;
+  }
 }
 </style>
