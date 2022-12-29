@@ -41,7 +41,7 @@
                         <div>所属项目：{{scope.row.project}}</div>
                         <div>工作流名称：{{scope.row.name}}</div>
                       </div>
-                      <span class="name" @click="goWorkflow(scope.row, false,item.type)">{{$utils.tailCut( scope.row.name,16)}}</span>
+                      <span class="name" @click="goWorkflow(scope.row, false,item.type)">{{$utils.tailCut( scope.row.display_name,16)}}</span>
                     </el-tooltip>
                   </template>
                 </el-table-column>
