@@ -608,6 +608,7 @@ exports.default = {
     pending: 'Pending'
   },
   workflow: {
+    workflowName: 'Workflow Name',
     ascendingByName: 'Ascending by name',
     descendingByName: 'Descending by name',
     ascendingByCreationTime: 'Ascending by creation time',
@@ -757,6 +758,7 @@ exports.default = {
     webhookAddr: 'Webhook Addr',
     specifyMembersTip1: '@Designated members (enter the mobile phone number of the designated notification recipient, use ; to split, if it is empty, all members will be notified)',
     specifyMembersTip2: '@Specify members (enter the user_id of the specified notification receiver and use; to split)',
+    specifyMembersTip3: '@Specify members (enter the user ID of the specified notification receiver, and use; split)',
     notifyType: {
       created: 'created',
       passed: 'passed',
@@ -1931,6 +1933,12 @@ exports.default = {
   },
   dashboard: {
     addCard: 'Add Card',
-    noCard: 'No Card'
+    noCard: 'No Card',
+    my_workflow: 'My Workflow',
+    my_env: 'My Environment',
+    running_workflow: 'Running Workflow',
+    runningTip: 'Display the list of running workflows in the system',
+    myWorkflowTip: 'Display the list of workflows that I follow',
+    myEnvTip: 'Display personal environment and service information'
   }
 }

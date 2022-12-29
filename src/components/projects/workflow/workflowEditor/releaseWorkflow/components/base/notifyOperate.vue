@@ -60,11 +60,11 @@
         <span slot="label">
           <span>{{$t(`workflow.specifyMembersTip2`)}}：</span>
         </span>
-        <el-input style="width: 350px;" type="textarea" :rows="3" :placeholder="$t(`workflow.specifyMembersTip2`)" v-model="wechatMobileStr"></el-input>
+        <el-input style="width: 350px;" type="textarea" :rows="3" :placeholder="$t(`workflow.specifyMembersTip3`)" v-model="wechatMobileStr"></el-input>
       </el-form-item>
       <el-form-item v-if="notify.webhook_type==='feishu'" prop="lark_user_ids">
         <span slot="label">
-          <span>{{$t(`workflow.specifyMembersTip2`)}}：</span>
+          <span>{{$t(`workflow.specifyMembersTip3`)}}：</span>
         </span>
         <el-input
           style="width: 350px;"

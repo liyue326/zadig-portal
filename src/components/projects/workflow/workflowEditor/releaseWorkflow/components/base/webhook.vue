@@ -204,7 +204,7 @@
               <span>Patchset created</span>
               <template v-if="currentWebhook.main_repo.events.includes('patchset-created')">
                 <span style="color: #606266;">评分标签</span>
-                <el-input size="mini" style="width: 250px;" v-model="currentWebhook.main_repo.label" placeholder="Code-Review"></el-input>
+                <el-input size="mini" style="width: 200px;" v-model="currentWebhook.main_repo.label" placeholder="Code-Review"></el-input>
               </template>
             </el-checkbox>
           </el-checkbox-group>
@@ -266,7 +266,7 @@
       :close-on-click-modal="false"
       append-to-body
     >
-      <el-form :model="currentTimer" ref="timerForm" :rules="timerRules" label-width="100px" label-position="left">
+      <el-form :model="currentTimer" ref="timerForm" :rules="timerRules" label-width="110px" label-position="left">
         <el-form-item :label="$t(`workflow.triggerWay`)" prop="job_type">
           <el-radio-group v-model="currentTimer.job_type" @change="changeTimerType">
             <el-radio label="timing">{{$t(`triggerWay.timingCycle`)}}</el-radio>
