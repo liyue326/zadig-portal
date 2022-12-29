@@ -1939,6 +1939,8 @@ exports.default = {
     running_workflow: '运行中的工作流',
     runningTip: '显示系统中运行中的工作流列表',
     myWorkflowTip: '显示个人关注的工作流列表',
-    myEnvTip: '显示个人关注的环境及服务信息'
+    myEnvTip: '显示个人关注的环境及服务信息',
+    delSuccess: '删除成功',
+    confirmDelCard: '确定删除 {name} 卡片吗'
   }
 }

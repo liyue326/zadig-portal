@@ -1939,6 +1939,8 @@ exports.default = {
     running_workflow: 'Running Workflow',
     runningTip: 'Display the list of running workflows in the system',
     myWorkflowTip: 'Display the list of workflows that I follow',
-    myEnvTip: 'Display personal environment and service information'
+    myEnvTip: 'Display personal environment and service information',
+    delSuccess: 'Delete Success',
+    confirmDelCard: 'Confirm Delete Card [{name}] ?'
   }
 }
