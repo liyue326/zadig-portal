@@ -69,11 +69,42 @@
                     <span class="desc">({{item.config.project_name}})</span>
                   </span>
                   <span class="desc">
-                    最后一次变更：{{item.config.updated_by}}
+                    {{$t(`environments.config.lastModified`)}}：{{item.config.updated_by}}
                     <span>{{ $utils.convertTimestamp(item.config.update_time)}}</span>
                   </span>
                 </div>
-                <el-table :data="item.services" class="table">
+                <el-table v-if="item.vm_services && item.vm_services.length > 0" class="pm-service-container" :data="item.vm_services">
+                  <el-table-column :label="$t(`global.serviceName`)" width="250px">
+                    <template slot-scope="scope">
+                      <router-link :to="setPmRoute(scope,item.config)" target="_blank">
+                        <span class="service-name">
+                          <i v-if="scope.row.type==='pm'" class="iconfont service-icon iconwuliji"></i>
+                          {{ scope.row.service_name }}
+                        </span>
+                      </router-link>
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="left" :label="$t(`global.status`)" width="130px">
+                    <template slot="header">
+                      {{$t(`global.status`)}}
+                      <el-tooltip effect="dark" placement="top">
+                        <div slot="content">实际正常运行的服务数量/预期正常运行服务数量</div>
+                        <i class="el-icon-question"></i>
+                      </el-tooltip>
+                    </template>
+                    <template slot-scope="scope">
+                      <span>{{calcPmServiceStatus(scope.row.env_status)}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="left" min-width="160px" label="主机资源">
+                    <template slot-scope="scope">
+                      <template v-if="scope.row.env_status && scope.row.env_status.length>0">
+                        {{scope.row.env_status.map(item=>item.address).toString()}}
+                      </template>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <el-table :data="item.services" class="table" v-else>
                   <el-table-column prop="service_name" :label="$t(`global.serviceName`)" min-width="20%">
                     <template slot-scope="scope">
                       <router-link :to="goService(scope,item.config)" target="_blank">
@@ -94,59 +125,6 @@
                     </template>
                   </el-table-column>
                 </el-table>
-                <!-- <el-table v-if="item.vm_services && item.vm_services.length > 0" class="pm-service-container" :data="item.vm_services">
-                  <el-table-column :label="$t(`global.serviceName`)" width="250px">
-                    <template slot-scope="scope">
-                      <router-link :to="setPmRoute(scope,item.config)">
-                        <span class="service-name">
-                          <i v-if="scope.row.type==='pm'" class="iconfont service-icon iconwuliji"></i>
-                          {{ scope.row.service_name }}
-                        </span>
-                      </router-link>
-                    </template>
-                  </el-table-column>
-                  <el-table-column align="left" :label="$t(`global.status`)" width="130px">
-                    <template slot="header">
-                      状态
-                      <el-tooltip effect="dark" placement="top">
-                        <div slot="content">实际正常运行的服务数量/预期正常运行服务数量</div>
-                        <i class="el-icon-question"></i>
-                      </el-tooltip>
-                    </template>
-                    <template slot-scope="scope">
-                      <span>{{calcPmServiceStatus(scope.row.env_statuses)}}</span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column align="left" min-width="160px" label="主机资源">
-                    <template slot-scope="scope">
-                      <template v-if="scope.row.env_statuses && scope.row.env_statuses.length>0">
-                        <div v-if="scope.row.serviceHostStatusArr[0]">
-                          <span
-                            class="pm-service-status"
-                            :class="scope.row.serviceHostStatusArr[0]['color']"
-                          >{{scope.row.serviceHostStatusArr[0].host}}</span>
-                        </div>
-                        <div v-if="scope.row.serviceHostStatusArr[1]">
-                          <span
-                            class="pm-service-status"
-                            :class="scope.row.serviceHostStatusArr[1]['color']"
-                          >{{scope.row.serviceHostStatusArr[1].host}}</span>
-                        </div>
-                        <el-popover
-                          v-if="scope.row.serviceHostStatusArr.length > 2"
-                          placement="right"
-                          popper-class="pm-service-host-status-popover"
-                          trigger="hover"
-                        >
-                          <div v-for="(item,index) in _.drop(scope.row.serviceHostStatusArr,2)" :key="index">
-                            <span class="pm-service-status" :class="item['color']">{{item.host}}</span>
-                          </div>
-                          <span slot="reference" class="add-host el-icon-more-outline"></span>
-                        </el-popover>
-                      </template>
-                    </template>
-                  </el-table-column>
-                </el-table> -->
               </div>
               <div v-if="item.show">
                 <el-form ref="form" :model="curInfo" label-width="100px">
@@ -326,11 +304,11 @@ export default {
     },
     handleProjectChange () {
       this.curInfo.config.env_name = ''
-      this.curInfo.config.service_name = []
+      this.curInfo.config.service_modules = []
       this.getEnvList()
     },
     handleEnvChange () {
-      this.curInfo.config.service_name = []
+      this.curInfo.config.service_modules = []
       this.getServiceList()
     },
     getSettings () {
@@ -384,30 +362,6 @@ export default {
           this.$set(item, 'config', res)
           this.$set(item.config, 'project_name', res.project_name)
           this.$set(item, 'services', res.services)
-          if (res.vm_services && res.vm_services.length > 0) {
-            res.vm_services.forEach(serviceItem => {
-              if (serviceItem.env_statuses) {
-                serviceItem.serviceHostStatus = {}
-                serviceItem.env_statuses.forEach(hostItem => {
-                  const host = hostItem.address.split(':')[0]
-                  serviceItem.serviceHostStatus[host] = {
-                    status: [],
-                    color: ''
-                  }
-                  serviceItem.serviceHostStatus[host].status.push(
-                    hostItem.status
-                  )
-                  serviceItem.serviceHostStatus[host].color = checkStatus(
-                    serviceItem.serviceHostStatus[host].status
-                  )
-                })
-                serviceItem.serviceHostStatusArr = this.$utils.mapToArray(
-                  serviceItem.serviceHostStatus,
-                  'host'
-                )
-              }
-            })
-          }
           this.$set(item, 'vm_services', res.vm_services)
         })
       }, 2000)
@@ -427,12 +381,13 @@ export default {
       if (!this.curInfo.config.project_name || !this.curInfo.config.env_name) {
         return
       }
+      const type = this.deployType(this.curInfo.config.project_name)
       productServicesAPI(
         this.curInfo.config.project_name,
         this.curInfo.config.env_name,
-        this.curInfo.config.env_type
+        type
       ).then(res => {
-        if (this.curInfo.config.env_type === 'helm') {
+        if (type === 'helm') {
           this.serviceList = res.data.services
         } else {
           this.serviceList = res.data
@@ -455,15 +410,21 @@ export default {
     },
     handleCommand (val, item, index) {
       if (val === 'delete') {
-        this.$confirm(`确定删除 [${item.name}] 卡片吗`, '确认', {
-          confirmButtonText: this.$t(`global.confirm`),
-          cancelButtonText: this.$t(`global.cancel`),
-          type: 'warning'
-        }).then(() => {
+        this.$confirm(
+          this.$t('dashboard.confirmDelCard', {
+            name: this.$t(`dashboard.${item.type}`)
+          }),
+          this.$t(`global.confirmation`),
+          {
+            confirmButtonText: this.$t(`global.confirm`),
+            cancelButtonText: this.$t(`global.cancel`),
+            type: 'warning'
+          }
+        ).then(() => {
           const params = cloneDeep(this.info)
           params.cards.splice(index, 1)
           updateDashboardSettingsAPI(params).then(() => {
-            this.$message.success('删除成功')
+            this.$message.success(this.$t(`dashboard.delSuccess`))
             this.getSettings()
           })
         })
@@ -553,9 +514,9 @@ export default {
     },
     setPmRoute (scope, config) {
       if (typeof config.name === 'undefined') {
-        return `/v1/projects/detail/${config.project_name}/envs/detail/${scope.row.service_name}/pm?projectName=${this.projectName}&clusterId=${this.clusterId}`
+        return `/v1/projects/detail/${config.project_name}/envs/detail/${scope.row.service_name}/pm?projectName=${config.project_name}&clusterId=${config.clusterId}`
       } else {
-        return `v1/projects/detail/${config.project_name}/envs/detail/pm?envName=${config.name}&projectName=${this.projectName}&clusterId=${this.clusterId}`
+        return `/v1/projects/detail/${config.project_name}/envs/detail/${scope.row.service_name}/pm?envName=${config.name}&projectName=${config.project_name}&clusterId=${config.clusterId}`
       }
     },
     cancel (item) {
