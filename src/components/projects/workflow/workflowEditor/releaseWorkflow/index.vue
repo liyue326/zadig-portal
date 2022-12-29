@@ -589,13 +589,13 @@ export default {
           },
           {
             title: this.$t(`global.workflow`),
-            url: `/v1/projects/detail/${this.projectName}/pipelines`
+            url: `/v1/projects/detail/${this.projectName}/pipelines?display_name=${this.$route.query.display_name}`
           },
           {
             title:
               this.$route.query.display_name ||
               this.$route.params.workflow_name,
-            url: `/v1/projects/detail/${this.projectName}/pipelines/custom/${this.$route.params.workflow_name}`
+            url: `/v1/projects/detail/${this.projectName}/pipelines/custom/${this.$route.params.workflow_name}?display_name=${this.$route.query.display_name}`
           }
         ]
       })

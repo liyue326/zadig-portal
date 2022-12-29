@@ -12,9 +12,9 @@
       <draggable v-else v-model="info.cards" group="people" @start="onStart" @end="onEnd">
         <transition-group class="wrap">
           <el-card v-for="(item,index) in info.cards" :key="item.id" class="item">
-            <div slot="header" class="clearfix">
+            <div slot="header" class="header">
               <span>{{item.name}}</span>
-              <el-dropdown style="float: right;" @command="handleCommand($event, item,index)">
+              <el-dropdown @command="handleCommand($event, item,index)">
                 <span class="el-dropdown-link">
                   <el-button type="text">
                     {{$t(`global.operation`)}}
@@ -33,7 +33,7 @@
                 class="table"
                 v-if="!item.show&&item.type==='my_workflow'||!item.show&&item.type==='running_workflow'"
               >
-                <el-table-column prop="name" :label="$t(`global.workflowName`)" min-width="20%">
+                <el-table-column prop="display_name" :label="$t(`global.workflowName`)" min-width="20%">
                   <template slot-scope="scope">
                     <span :class="[`status-${$utils.taskElTagType(scope.row.status)}`]" class="status">•</span>
                     <el-tooltip effect="dark" placement="top">
@@ -41,7 +41,7 @@
                         <div>所属项目：{{scope.row.project}}</div>
                         <div>工作流名称：{{scope.row.name}}</div>
                       </div>
-                      <span class="name" @click="goWorkflow(scope.row, false,item.type)">{{$utils.tailCut( scope.row.name,16)}}</span>
+                      <span class="name" @click="goWorkflow(scope.row, false,item.type)">{{$utils.tailCut( scope.row.display_name,16)}}</span>
                     </el-tooltip>
                   </template>
                 </el-table-column>
@@ -86,7 +86,7 @@
                   <el-table-column prop="image" :label="$t(`status.imgInfo`)" min-width="20%">
                     <template slot-scope="scope">
                       <el-tooltip effect="dark" :content="scope.row.image" placement="top">
-                        <span>{{$utils.tailCut( scope.row.image,20)}}</span>
+                        <span>{{scope.row.image.split(':')[1]}}</span>
                       </el-tooltip>
                     </template>
                   </el-table-column>
@@ -358,7 +358,12 @@ export default {
         this.curInfo.config.project_name,
         this.curInfo.config.env_name
       ).then(res => {
-        this.workflowList = res
+        this.workflowList = res.map(item => {
+          return {
+            name: item.name,
+            project_name: item.projectName
+          }
+        })
       })
     },
     handleCommand (val, item, index) {
@@ -454,7 +459,7 @@ export default {
         const list = this.curInfo.config.workflow_list.map(item => {
           return {
             name: item.name,
-            project_name: item.projectName
+            project_name: item.project_name || item.project
           }
         })
         this.$set(item.config, 'workflow_list', list)
@@ -465,7 +470,9 @@ export default {
           item => item.service_name
         )
         item.config = {
-          env_type: this.curInfo.config.env_type || this.deployType(this.curInfo.config.project_name),
+          env_type:
+            this.curInfo.config.env_type ||
+            this.deployType(this.curInfo.config.project_name),
           env_name: this.curInfo.config.env_name,
           project_name: this.curInfo.config.project_name,
           service_modules: service_modules
@@ -484,8 +491,10 @@ export default {
   },
   mounted () {
     bus.$emit('set-topbar-title', {
-      title: '',
-      breadcrumb: [{ title: '', url: '/v1/projects' }]
+      title: this.$t(`sidebarMenu.dashboard`),
+      breadcrumb: [
+        { title: this.$t(`sidebarMenu.dashboard`), url: '/v1/dashboadd' }
+      ]
     })
   },
   beforeDestroy () {
@@ -544,9 +553,20 @@ export default {
         width: 49%;
         margin: 8px 0;
 
-        .name {
-          color: @themeColor;
-          cursor: pointer;
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 30px;
+
+          .name {
+            color: @themeColor;
+            cursor: pointer;
+          }
+        }
+
+        /deep/.el-card__header {
+          padding: 0 20px;
         }
       }
 

@@ -274,7 +274,7 @@
                   <span>{{ row.workflow_args.namespace || 'N/A' }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t(`workflow.triggerWay`)" width="130px">
+              <el-table-column :label="$t(`workflow.triggerEvents`)" width="130px">
                 <template slot-scope="{ row }">
                   <div v-if="row.main_repo.events.length">
                     <div v-for="event in row.main_repo.events" :key="event">

@@ -124,7 +124,7 @@
                   style="width: 100%;">
           <el-table-column :label="$t(`workflow.triggerWay`)"
                            #default="{ row }">
-            {{ schedule_config[row.type].name }}
+            {{ $t(`triggerWay.${schedule_config[row.type].name}`)}}
           </el-table-column>
           <el-table-column :label="$t(`workflow.timeConfig`)"
                            #default="{ row}">
