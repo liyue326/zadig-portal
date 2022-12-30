@@ -868,9 +868,9 @@ exports.default = {
     manualApproval: 'Manual Approval'
   },
   triggerWay: {
-    timingCycle: 'Timing Cycle',
-    gapCycle: 'Gap Cycle',
-    cronExpression: 'Cron Expression'
+    timing: 'Timing Cycle',
+    gap: 'Gap Cycle',
+    crontab: 'Cron Expression'
   },
   productWorkflowSideBar: {
     base: 'Base Info',

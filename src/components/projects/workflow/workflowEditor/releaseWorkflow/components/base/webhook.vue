@@ -85,9 +85,9 @@
           <div class="content">
             <div class="cate">
               <span class="title">{{$t(`workflow.triggerWay`)}}</span>
-              <span v-if="item.job_type === 'timing'" class="desc">{{$t(`triggerWay.timingCycle`)}}</span>
-              <span v-else-if="item.job_type === 'gap'" class="desc">{{$t(`triggerWay.gapCycle`)}}</span>
-              <span v-else-if="item.job_type === 'crontab'" class="desc">{{$t(`triggerWay.cronExpression`)}}</span>
+              <span v-if="item.job_type === 'timing'" class="desc">{{$t(`triggerWay.timing`)}}</span>
+              <span v-else-if="item.job_type === 'gap'" class="desc">{{$t(`triggerWay.gap`)}}</span>
+              <span v-else-if="item.job_type === 'crontab'" class="desc">{{$t(`triggerWay.crontab`)}}</span>
             </div>
           </div>
         </el-col>
@@ -120,7 +120,7 @@
     <el-dialog
       :visible.sync="webhookDialogVisible"
       :title="webhookEditMode?$t(`workflow.editTrigger`):$t(`workflow.addTrigger`)"
-      width="700px"
+      width="800px"
       :close-on-click-modal="false"
       append-to-body
     >
@@ -262,16 +262,16 @@
     <el-dialog
       :title="timerEditMode?$t(`workflow.editTimer`):$t(`workflow.addTimer`)"
       :visible.sync="timerDialogVisible"
-      width="700px"
+      width="800px"
       :close-on-click-modal="false"
       append-to-body
     >
       <el-form :model="currentTimer" ref="timerForm" :rules="timerRules" label-width="110px" label-position="left">
         <el-form-item :label="$t(`workflow.triggerWay`)" prop="job_type">
           <el-radio-group v-model="currentTimer.job_type" @change="changeTimerType">
-            <el-radio label="timing">{{$t(`triggerWay.timingCycle`)}}</el-radio>
-            <el-radio label="gap">{{$t(`triggerWay.gapCycle`)}}</el-radio>
-            <el-radio label="crontab">{{$t(`triggerWay.cronExpression`)}}</el-radio>
+            <el-radio label="timing">{{$t(`triggerWay.timing`)}}</el-radio>
+            <el-radio label="gap">{{$t(`triggerWay.gap`)}}</el-radio>
+            <el-radio label="crontab">{{$t(`triggerWay.crontab`)}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t(`workflow.timeConfig`)">

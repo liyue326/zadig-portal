@@ -16,11 +16,11 @@
           <el-form-item :label="$t(`workflow.triggerWay`)"
                         prop="type">
             <el-radio v-model="schedule_config.type"
-                      label="timing">{{ $t(`triggerWay.${schedule_config.timing.name }`) }}</el-radio>
+                      label="timing">{{ $t(`triggerWay.${schedule_config.timing.type }`) }}</el-radio>
             <el-radio v-model="schedule_config.type"
-                      label="gap">{{ $t(`triggerWay.${schedule_config.gap.name}`) }}</el-radio>
+                      label="gap">{{ $t(`triggerWay.${schedule_config.gap.type}`) }}</el-radio>
             <el-radio v-model="schedule_config.type"
-                      label="crontab">{{ $t(`triggerWay.${schedule_config.crontab.name}`) }}</el-radio>
+                      label="crontab">{{ $t(`triggerWay.${schedule_config.crontab.type}`) }}</el-radio>
           </el-form-item>
           <el-form-item :label="$t(`workflow.timeConfig`)">
             <div v-if="schedule_config.type === 'timing'"
@@ -124,7 +124,7 @@
                   style="width: 100%;">
           <el-table-column :label="$t(`workflow.triggerWay`)"
                            #default="{ row }">
-            {{ $t(`triggerWay.${schedule_config[row.type].name}`)}}
+            {{ $t(`triggerWay.${schedule_config[row.type].type}`)}}
           </el-table-column>
           <el-table-column :label="$t(`workflow.timeConfig`)"
                            #default="{ row}">

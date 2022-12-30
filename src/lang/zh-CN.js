@@ -868,9 +868,9 @@ exports.default = {
     manualApproval: '人工审批'
   },
   triggerWay: {
-    timingCycle: '定时循环',
-    gapCycle: '间隔循环',
-    cronExpression: 'Cron 表达式'
+    timing: '定时循环',
+    gap: '间隔循环',
+    crontab: 'Cron 表达式'
   },
   productWorkflowSideBar: {
     base: '基本信息',
