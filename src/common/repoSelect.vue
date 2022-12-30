@@ -537,6 +537,7 @@ export default {
               return item.path === repoOwner
             })
             const type = item ? item.kind : 'group'
+            if (!repoOwner) return
             getRepoNameByIdAPI(
               codehostId,
               type,
