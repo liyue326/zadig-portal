@@ -255,7 +255,7 @@ export default {
           url: `/v1/projects/detail/${this.projectName}/detail`
         },
         {
-          title: this.this.$t(`subTopbarMenu.scannings`),
+          title: this.$t(`subTopbarMenu.scannings`),
           url: `/v1/projects/detail/${this.projectName}/scanner`
         },
         {

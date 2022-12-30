@@ -77,6 +77,7 @@
           :approvalInfo="curStage"
           :workflowName="workflowName"
           :taskId="taskId"
+          :firstLoad="firstLoad"
           :projectName="projectName"
           @showFooter="showFooter"
         />

@@ -478,6 +478,16 @@ export default {
             `/v1/projects/detail/${item.project}/pipelines/custom/${item.name}/${item.task_id}?status=${item.status}&display_name=${item.display_name}`
           )
           window.open(url.href, '_blank')
+        } else if (item.workflow_type === 'test') {
+          const url = this.$router.resolve(
+            `/v1/projects/detail/${item.project}/test/detail/function/${item.name}/${item.task_id}?status=${item.status}`
+          )
+          window.open(url.href, '_blank')
+        } else if (item.workflow_type === 'scanning') {
+          const url = this.$router.resolve(
+            `/v1/projects/detail/${item.project}/scanner/detail/${item.scan_name}/task/${item.task_id}?status=${item.status}&id=${item.scan_id}`
+          )
+          window.open(url.href, '_blank')
         } else {
           // product
           const url = this.$router.resolve(

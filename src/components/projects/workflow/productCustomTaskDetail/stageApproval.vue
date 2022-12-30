@@ -39,7 +39,7 @@
             >{{ wordTranslation(scope.row.reject_or_approve,'approval','status') }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="operation_time"  :label="$t(`workflow.auditTime`)">
+        <el-table-column prop="operation_time" :label="$t(`workflow.auditTime`)">
           <template slot-scope="scope">
             <span>{{$utils.convertTimestamp(scope.row.operation_time)}}</span>
           </template>
@@ -85,6 +85,10 @@ export default {
     projectName: {
       type: String,
       default: ''
+    },
+    firstLoad: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -101,6 +105,7 @@ export default {
       userInfo: state => state.login.userinfo
     }),
     isDisabled () {
+      if (this.firstLoad) return true
       let curUser = ''
       if (this.approvalInfo.approval.type === 'lark') {
         curUser = this.approvalInfo.approval.lark_approval.approve_users.find(
