@@ -632,6 +632,13 @@ export default {
           align-items: center;
           justify-content: space-between;
           height: 30px;
+
+          .el-icon-more {
+            color: #888;
+            font-size: 20px;
+            line-height: 25px;
+            cursor: pointer;
+          }
         }
 
         /deep/.el-card__header {
