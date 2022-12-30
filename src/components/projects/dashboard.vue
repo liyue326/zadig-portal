@@ -16,9 +16,7 @@
               <span>{{$t(`dashboard.${item.type}`)}}</span>
               <el-dropdown @command="handleCommand($event, item,index)">
                 <span class="el-dropdown-link">
-                  <el-button type="text">
-                    <i class="el-icon-more"></i>
-                  </el-button>
+                  <i class="el-icon-more"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item command="edit" v-if="item.type==='my_workflow'||item.type==='my_env'">{{$t(`global.edit`)}}</el-dropdown-item>
@@ -40,7 +38,7 @@
                         <div>所属项目：{{scope.row.project}}</div>
                         <div>工作流名称：{{scope.row.name}}</div>
                       </div>
-                      <span class="name" @click="goWorkflow(scope.row, false,item.type)">{{$utils.tailCut( scope.row.display_name,16)}}</span>
+                      <span class="name" @click="goWorkflow(scope.row, false,item.type)">{{$utils.tailCut( scope.row.display_name||scope.row.name,16)}}</span>
                     </el-tooltip>
                   </template>
                 </el-table-column>
